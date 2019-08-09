@@ -1,8 +1,8 @@
-# open api [![Build Status](https://travis-ci.org/softprops/openapi.svg?branch=master)](https://travis-ci.org/softprops/openapi) [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE) [![crates.io](http://meritbadge.herokuapp.com/openapi)](https://crates.io/crates/openapi)
+# OAS3
 
-> Rust crate for serializing and deserializing [open api](http://swagger.io/specification/) documents
+> Structures and tools to parse and navigate [OpenAPI v3 Spec][oas3-spec] files.
 
-[Documentation](https://softprops.github.io/openapi)
+Doug Tangren (softprops) 2017
 
 ## install
 
@@ -10,20 +10,20 @@ add the following to your `Cargo.toml` file
 
 ```toml
 [dependencies]
-openapi = "0.1"
+oas3 = "*"
 ```
 
 ## usage
 
 ```rust
-extern crate openapi;
+extern crate oas3;
 
 fn main() {
-  match openapi::from_path("path/to/openapi.yaml") {
+  match oas3::from_path("path/to/openapi.yaml") {
     Ok(spec) => println!("spec: {:?}", spec),
     Err(err) => println!("error: {}", err)
   }
 }
 ```
 
-Doug Tangren (softprops) 2017
+[oas3-spec]: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md
