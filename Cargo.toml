@@ -1,0 +1,26 @@
+[package]
+name = "oas3"
+version = "0.1.5"
+authors = ["softprops <d.tangren@gmail.com>"]
+description = "Rust bindings for openapi schemas"
+documentation = "https://softprops.github.io/openapi"
+homepage = "https://github.com/softprops/openapi"
+repository = "https://github.com/softprops/openapi"
+keywords = ["openapi", "swagger"]
+license = "MIT"
+edition = "2018"
+
+[dependencies]
+http = "0.1"
+derive_more = "0.15"
+failure = "0.1"
+semver = "0.9"
+serde = "1"
+serde_derive = "1"
+serde_json = "1"
+serde_yaml = "0.8"
+url = "1.7"
+url_serde = "0.2"
+
+[dev-dependencies]
+pretty_assertions = "0.6"
