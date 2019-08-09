@@ -8,10 +8,9 @@
 //! The hyper client should be configured with tls.
 //!
 //! ```no_run
-//! extern crate openapi;
 //!
 //! fn main() {
-//!   match openapi::from_path("path/to/openapi.yaml") {
+//!   match oas3::from_path("path/to/openapi.yaml") {
 //!     Ok(spec) => println!("spec: {:?}", spec),
 //!     Err(err) => println!("error: {}", err)
 //!   }
@@ -168,12 +167,14 @@ pub fn to_json(spec: &OpenApiV3) -> Result<String> { Ok(serde_json::to_string_pr
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use pretty_assertions::assert_eq;
     use std::{
         fs::{self, read_to_string, File},
         io::Write,
     };
+
+    use pretty_assertions::assert_eq;
+
+    use super::*;
 
     /// Helper function to write string to file.
     fn write_to_file<P>(path: P, filename: &str, data: &str)
@@ -248,49 +249,14 @@ mod tests {
         (api_filename, parsed_spec_json_str, spec_json_str)
     }
 
-    // Just tests if the deserialization does not blow up. But does not test correctness
     #[test]
-    fn can_deserialize() {
-        for entry in fs::read_dir("data/v2").unwrap() {
-            let path = entry.unwrap().path();
-            // cargo test -- --nocapture to see this message
-            println!("Testing if {:?} is deserializable", path);
-            from_path(path).unwrap();
-        }
-    }
-
-    #[test]
-    fn can_deserialize_and_reserialize_v2() {
+    fn can_deserialize_and_reserialize() {
         let save_path_base: std::path::PathBuf =
-            ["target", "tests", "can_deserialize_and_reserialize_v2"]
+            ["target", "tests", "can_deserialize_and_reserialize"]
                 .iter()
                 .collect();
 
-        for entry in fs::read_dir("data/v2").unwrap() {
-            let path = entry.unwrap().path();
-
-            println!("Testing if {:?} is deserializable", path);
-
-            let (api_filename, parsed_spec_json_str, spec_json_str) =
-                compare_spec_through_json(&path, &save_path_base);
-
-            assert_eq!(
-                parsed_spec_json_str.lines().collect::<Vec<_>>(),
-                spec_json_str.lines().collect::<Vec<_>>(),
-                "contents did not match for api {}",
-                api_filename
-            );
-        }
-    }
-
-    #[test]
-    fn can_deserialize_and_reserialize_v3() {
-        let save_path_base: std::path::PathBuf =
-            ["target", "tests", "can_deserialize_and_reserialize_v3"]
-                .iter()
-                .collect();
-
-        for entry in fs::read_dir("data/v3.0").unwrap() {
+        for entry in fs::read_dir("data").unwrap() {
             let entry = entry.unwrap();
             let path = entry.path();
 

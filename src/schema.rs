@@ -37,11 +37,11 @@ pub struct Schema {
     pub required: Vec<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub items: Option<Box<Schema>>,
+    pub items: Option<Box<ObjectOrReference<Schema>>>,
 
     #[serde(default)]
     #[serde(skip_serializing_if = "BTreeMap::is_empty")]
-    pub properties: BTreeMap<String, Schema>,
+    pub properties: BTreeMap<String, ObjectOrReference<Schema>>,
 
     #[serde(skip_serializing_if = "Option::is_none", rename = "readOnly")]
     pub read_only: Option<bool>,
@@ -135,63 +135,6 @@ impl FromRef for Schema {
                 .and_then(|oor| oor.resolve(&spec)),
 
             _ => None,
-        }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_security_scheme_oauth_deser() {
-        const IMPLICIT_OAUTH2_SAMPLE: &str = r#"{
-          "type": "oauth2",
-          "flows": {
-            "implicit": {
-              "authorizationUrl": "https://example.com/api/oauth/dialog",
-              "scopes": {
-                "write:pets": "modify pets in your account",
-                "read:pets": "read your pets"
-              }
-            },
-            "authorizationCode": {
-              "authorizationUrl": "https://example.com/api/oauth/dialog",
-              "tokenUrl": "https://example.com/api/oauth/token",
-              "scopes": {
-                "write:pets": "modify pets in your account",
-                "read:pets": "read your pets"
-              }
-            }
-          }
-        }"#;
-
-        let obj: SecurityScheme = serde_json::from_str(&IMPLICIT_OAUTH2_SAMPLE).unwrap();
-        match obj {
-            SecurityScheme::OAuth2 { flows } => {
-                assert!(flows.implicit.is_some());
-                let implicit = flows.implicit.unwrap();
-                assert_eq!(
-                    implicit.authorization_url,
-                    Url::parse("https://example.com/api/oauth/dialog").unwrap()
-                );
-                assert!(implicit.scopes.contains_key("write:pets"));
-                assert!(implicit.scopes.contains_key("read:pets"));
-
-                assert!(flows.authorization_code.is_some());
-                let auth_code = flows.authorization_code.unwrap();
-                assert_eq!(
-                    auth_code.authorization_url,
-                    Url::parse("https://example.com/api/oauth/dialog").unwrap()
-                );
-                assert_eq!(
-                    auth_code.token_url,
-                    Url::parse("https://example.com/api/oauth/token").unwrap()
-                );
-                assert!(implicit.scopes.contains_key("write:pets"));
-                assert!(implicit.scopes.contains_key("read:pets"));
-            }
-            _ => assert!(false, "wrong security scheme type"),
         }
     }
 }

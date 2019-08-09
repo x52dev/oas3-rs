@@ -1,9 +1,10 @@
-use failure::Fail;
 use std::{io::Write, process::exit};
+
+use failure::Fail;
 
 fn main() {
     if let Some(path) = std::env::args().nth(1) {
-        match openapi::from_path(path) {
+        match oas3::from_path(path) {
             Ok(spec) => {
                 /*for (path, op) in spec.paths {
                     println!("{}", path);
@@ -13,7 +14,7 @@ fn main() {
                     println!("{}", name);
                     println!("{:#?}", definition);
                 }*/
-                println!("{}", openapi::to_json(&spec).unwrap());
+                println!("{}", oas3::to_json(&spec).unwrap());
             }
             Err(e) => {
                 let stderr = &mut ::std::io::stderr();

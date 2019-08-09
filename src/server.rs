@@ -34,6 +34,7 @@ pub struct ServerVariable {
     /// An enumeration of string values to be used if the substitution options are from a limited
     /// set.
     #[serde(default)]
+    #[serde(rename = "enum")]
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub substitutions_enum: Vec<String>,
 

@@ -2,9 +2,9 @@
 
 > Structures and tools to parse and navigate [OpenAPI v3 Spec][oas3-spec] files.
 
-Doug Tangren (softprops) 2017
+Based on v3 parts of [openapi](https://crates.io/crates/openapi) crate by [softprops](https://crates.io/users/softprops).
 
-## install
+## Install
 
 add the following to your `Cargo.toml` file
 

@@ -70,7 +70,7 @@ pub struct ClientCredentialsFlow {
 #[serde(rename_all = "camelCase")]
 pub struct AuthorizationCodeFlow {
     pub authorization_url: Url,
-    token_url: Url,
+    pub token_url: Url,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub refresh_url: Option<Url>,
