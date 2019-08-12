@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use crate::{ Example, ObjectOrReference, Spec};
+use crate::{Example, ObjectOrReference, Spec};
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[serde(untagged)]
@@ -20,7 +20,22 @@ pub enum MediaTypeExamples {
     },
 }
 
+impl Default for MediaTypeExamples {
+    fn default() -> Self {
+        MediaTypeExamples::Examples {
+            examples: BTreeMap::new(),
+        }
+    }
+}
+
 impl MediaTypeExamples {
+    pub fn is_empty(&self) -> bool {
+        match self {
+            MediaTypeExamples::Example { .. } => false,
+            MediaTypeExamples::Examples { examples } => examples.is_empty()
+        }
+    }
+    
     pub fn resolve_all(&self, spec: &Spec) -> BTreeMap<String, Example> {
         match self {
             Self::Example { example } => {

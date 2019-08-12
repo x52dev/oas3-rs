@@ -18,6 +18,7 @@ pub struct Example {
     /// in JSON or YAML, use a string value to contain the example, escaping where necessary.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub value: Option<serde_json::Value>,
+    
     // FIXME: Implement (merge with value as enum)
     // /// A URL that points to the literal example. This provides the capability to reference
     // /// examples that cannot easily be included in JSON or YAML documents. The `value` field
@@ -26,6 +27,15 @@ pub struct Example {
     // pub externalValue: Option<String>,
 
     // TODO: Add "Specification Extensions" https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#specificationExtensions}
+}
+
+impl Example {
+    pub fn as_bytes(&self) -> Vec<u8> {
+        match self.value {
+            Some(ref val) => serde_json::to_string(val).unwrap().as_bytes().to_owned(),
+            None => vec![]
+        }
+    }
 }
 
 impl FromRef for Example {

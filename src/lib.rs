@@ -1,3 +1,5 @@
+#![allow(unused_imports, dead_code, unused_variables)]
+
 //! Openapi provides structures and support for serializing and deserializing [openapi](https://github.com/OAI/OpenAPI-Specification) specifications
 //!
 //! # Examples
@@ -34,6 +36,10 @@ extern crate serde_derive;
 
 use std::{fs::File, io::Read, path::Path, result::Result as StdResult};
 
+use lazy_static::lazy_static;
+use log::debug;
+use regex::Regex;
+
 mod error;
 pub use error::Error;
 
@@ -55,6 +61,7 @@ mod path_item;
 mod request_body;
 mod response;
 mod schema;
+mod schema_validator;
 mod security_scheme;
 mod server;
 mod spec;
@@ -80,6 +87,7 @@ pub use path_item::*;
 pub use request_body::*;
 pub use response::*;
 pub use schema::*;
+pub use schema_validator::*;
 pub use security_scheme::*;
 pub use server::*;
 pub use spec::*;
@@ -124,15 +132,20 @@ pub struct RefPath {
 impl RefPath {
     // TODO: impl FromStr
     pub fn from_str<'a>(path: &'a str) -> Self {
-        // assume path starts with #/
-        let path = &path[13..];
-        println!("path = {:?}", &path);
+        lazy_static! {
+            static ref RE: Regex =
+                Regex::new("^(?P<source>[^#]+)?#/components/(?P<type>[^/]+)/(?P<name>.+)$")
+                    .unwrap();
+        }
 
-        let parts = &path.split('/').collect::<Vec<_>>();
+        let parts = RE.captures(path).unwrap();
+
+        debug!("creating RefPath: {}/{}", &parts["type"], &parts["name"]);
 
         Self {
-            kind: parts[0].to_owned(),
-            name: parts[1].to_owned(),
+            // source: parts["source"].to_owned(),
+            kind: parts["type"].to_owned(),
+            name: parts["name"].to_owned(),
         }
     }
 }

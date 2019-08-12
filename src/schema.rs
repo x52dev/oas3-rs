@@ -2,7 +2,7 @@
 
 use std::collections::BTreeMap;
 
-use crate::{FromRef, ObjectOrReference, RefPath, Spec};
+use crate::{FromRef, ObjectOrReference, RefPath, SchemaValidator, Spec};
 
 // FIXME: Verify against OpenAPI 3.0
 /// The Schema Object allows the definition of input and output data types.
@@ -23,6 +23,9 @@ pub struct Schema {
     #[serde(rename = "type")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub schema_type: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub nullable: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub format: Option<String>,
@@ -118,6 +121,12 @@ pub struct Schema {
     #[serde(rename = "allOf")]
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub all_of: Vec<ObjectOrReference<Schema>>,
+}
+
+impl Schema {
+    pub fn validator(&self, spec: &Spec) -> SchemaValidator {
+        SchemaValidator::from_schema(&self, spec)
+    }
 }
 
 impl FromRef for Schema {

@@ -12,6 +12,8 @@ pub struct MediaType {
     pub schema: Option<ObjectOrReference<Schema>>,
 
     /// Example of the media type.
+    // TODO: figure out how to make this not an Option
+    // #[serde(flatten, default, skip_serializing_if = "MediaTypeExamples::is_empty")]
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
     pub examples: Option<MediaTypeExamples>,
 

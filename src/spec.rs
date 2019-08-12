@@ -63,6 +63,7 @@ pub struct Spec {
     /// Additional external documentation.
     #[serde(skip_serializing_if = "Option::is_none", rename = "externalDocs")]
     pub external_docs: Option<ExternalDoc>,
+
     // TODO: Add "Specification Extensions" https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#specificationExtensions}
 }
 
