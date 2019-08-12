@@ -1,5 +1,4 @@
-use std::collections::BTreeMap;
-use std::ops::Deref;
+use std::{collections::BTreeMap, ops::Deref};
 
 use lazy_static::lazy_static;
 use log::{debug, trace, warn};
@@ -57,7 +56,16 @@ impl SchemaValidator {
                 SchemaType::Array(Box::new(SchemaValidator::from_schema(&item_schema, spec)))
             }
 
-            "object" => SchemaType::Object(BTreeMap::default()),
+            "object" => {
+                let mut prop_schemas = BTreeMap::new();
+
+                for (key, oor) in schema.properties.iter() {
+                    let schema = oor.resolve(&spec).expect("$ref unresolvable");
+                    prop_schemas.insert(key.to_owned(), schema.validator(&spec));
+                }
+
+                SchemaType::Object(prop_schemas)
+            }
 
             typ => SchemaType::Unknown(typ.to_owned()),
         };
@@ -257,8 +265,6 @@ mod tests {
 
     #[test]
     fn type_check_object() {
-        pretty_env_logger::init();
-
         let validators = btreemap! {
             "low".to_owned() => SchemaValidator::require(SchemaType::Number),
             "high".to_owned() => SchemaValidator::require(SchemaType::Number),
@@ -269,6 +275,17 @@ mod tests {
             vltr,
             &[&OBJ_NUMS, &OBJ_EMPTY],
             &[&OBJ_MIXED, &NULL, &INTEGER, &FLOAT, &STRING, &ARRAY_INTS],
+        );
+
+        let validators = btreemap! {
+            "low".to_owned() => SchemaValidator::require(SchemaType::Number),
+        };
+        let vltr = SchemaValidator::require(SchemaType::Object(validators));
+
+        type_check_valid_vs_invalid!(
+            vltr,
+            &[&OBJ_EMPTY],
+            &[&OBJ_NUMS, &OBJ_MIXED, &NULL, &INTEGER, &STRING, &ARRAY_INTS],
         );
 
         let validators = btreemap! {

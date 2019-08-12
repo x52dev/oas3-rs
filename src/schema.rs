@@ -2,7 +2,7 @@
 
 use std::collections::BTreeMap;
 
-use crate::{FromRef, ObjectOrReference, RefPath, SchemaValidator, Spec};
+use crate::{FromRef, ObjectOrReference, RefPath, validation::SchemaValidator, Spec};
 
 // FIXME: Verify against OpenAPI 3.0
 /// The Schema Object allows the definition of input and output data types.
