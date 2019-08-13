@@ -10,6 +10,7 @@ license = "MIT"
 
 [dependencies]
 http = "0.1"
+bytes = "0.4"
 derive_more = "0.15"
 lazy_static = "1"
 log = "0.4"
@@ -24,6 +25,11 @@ url = "1.7"
 url_serde = "0.2"
 
 [dev-dependencies]
-pretty_env_logger = "0.3"
 maplit = "1"
 pretty_assertions = "0.6"
+pretty_env_logger = "0.3"
+
+[features]
+default = ["conformance"]
+validation = []
+conformance = ["validation"]

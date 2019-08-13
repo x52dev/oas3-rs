@@ -1,5 +1,3 @@
-#![allow(unused_imports, dead_code, unused_variables)]
-
 //! Openapi provides structures and support for serializing and deserializing [openapi](https://github.com/OAI/OpenAPI-Specification) specifications
 //!
 //! # Examples
@@ -31,6 +29,9 @@
 //! error_chain users.
 //!
 
+#![feature(todo_macro, const_fn)]
+#![allow(unused_imports, dead_code, unused_variables)]
+
 #[macro_use]
 extern crate serde_derive;
 
@@ -61,12 +62,17 @@ mod path_item;
 mod request_body;
 mod response;
 mod schema;
-pub mod validation;
 mod security_scheme;
 mod server;
 mod spec;
 mod tag;
 mod url;
+
+#[cfg(feature = "validation")]
+pub mod validation;
+
+#[cfg(feature = "validation")]
+pub mod conformance;
 
 pub use self::url::*;
 pub use components::*;
@@ -268,7 +274,7 @@ mod tests {
                 .iter()
                 .collect();
 
-        for entry in fs::read_dir("data").unwrap() {
+        for entry in fs::read_dir("data/oas-samples").unwrap() {
             let entry = entry.unwrap();
             let path = entry.path();
 

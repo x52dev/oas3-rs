@@ -1,3 +1,5 @@
-pub mod schema_validator;
+mod error;
+mod schema_validator;
 
+pub use error::*;
 pub use schema_validator::*;

@@ -2,7 +2,10 @@
 
 use std::collections::BTreeMap;
 
-use crate::{FromRef, ObjectOrReference, RefPath, validation::SchemaValidator, Spec};
+use crate::{FromRef, ObjectOrReference, RefPath, Spec};
+
+#[cfg(feature = "validation")]
+use crate::validation::SchemaValidator;
 
 // FIXME: Verify against OpenAPI 3.0
 /// The Schema Object allows the definition of input and output data types.
@@ -22,7 +25,7 @@ pub struct Schema {
 
     #[serde(rename = "type")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub schema_type: Option<String>,
+    pub type_: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub nullable: Option<bool>,
@@ -124,8 +127,9 @@ pub struct Schema {
 }
 
 impl Schema {
+    #[cfg(feature = "validation")]
     pub fn validator(&self, spec: &Spec) -> SchemaValidator {
-        SchemaValidator::from_schema(&self, spec)
+        SchemaValidator::from_schema(&self, spec).expect("probably schema error")
     }
 }
 
