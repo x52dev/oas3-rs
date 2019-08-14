@@ -2,7 +2,7 @@
 
 use std::collections::BTreeMap;
 
-use crate::{FromRef, ObjectOrReference, RefPath, Spec};
+use crate::{FromRef, ObjectOrReference, RefError, RefPath, RefType, Spec};
 
 #[cfg(feature = "validation")]
 use crate::validation::SchemaValidator;
@@ -134,20 +134,18 @@ impl Schema {
 }
 
 impl FromRef for Schema {
-    fn from_ref(spec: &Spec, path: &str) -> Option<Self>
-    where
-        Self: Sized,
-    {
-        let path = RefPath::from_str(path);
+    fn from_ref(spec: &Spec, path: &str) -> Result<Self, RefError> {
+        let refpath = path.parse::<RefPath>()?;
 
-        match path.kind.as_ref() {
-            "schemas" => spec
+        match refpath.kind {
+             RefType::Schema => spec
                 .components
                 .as_ref()
-                .and_then(|cs| cs.schemas.get(&path.name))
+                .and_then(|cs| cs.schemas.get(&refpath.name))
+                .ok_or(RefError::Unresolvable(path.to_owned()))
                 .and_then(|oor| oor.resolve(&spec)),
 
-            _ => None,
+            typ => Err(RefError::MismatchedType(typ,  RefType::Schema)),
         }
     }
 }

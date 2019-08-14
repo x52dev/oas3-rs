@@ -35,7 +35,7 @@ pub struct Components {
 
     /// An object to hold reusable Request Body Objects.
     #[serde(default)]
-    #[serde(skip_serializing_if = "BTreeMap::is_empty", rename = "requestBodies")]
+    #[serde(rename = "requestBodies", skip_serializing_if = "BTreeMap::is_empty")]
     pub request_bodies: BTreeMap<String, ObjectOrReference<RequestBody>>,
 
     /// An object to hold reusable Header Objects.
@@ -45,7 +45,7 @@ pub struct Components {
 
     /// An object to hold reusable Security Scheme Objects.
     #[serde(default)]
-    #[serde(skip_serializing_if = "BTreeMap::is_empty", rename = "securitySchemes")]
+    #[serde(rename = "securitySchemes", skip_serializing_if = "BTreeMap::is_empty")]
     pub security_schemes: BTreeMap<String, ObjectOrReference<SecurityScheme>>,
 
     /// An object to hold reusable Link Objects.

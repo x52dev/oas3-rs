@@ -38,7 +38,7 @@ extern crate serde_derive;
 use std::{fs::File, io::Read, path::Path, result::Result as StdResult};
 
 use lazy_static::lazy_static;
-use log::debug;
+use log::{debug, trace};
 use regex::Regex;
 
 mod error;
@@ -59,6 +59,7 @@ mod media_type_examples;
 mod operation;
 mod parameter;
 mod path_item;
+mod ref_path;
 mod request_body;
 mod response;
 mod schema;
@@ -90,6 +91,7 @@ pub use media_type_examples::*;
 pub use operation::*;
 pub use parameter::*;
 pub use path_item::*;
+pub use ref_path::*;
 pub use request_body::*;
 pub use response::*;
 pub use schema::*;
@@ -121,44 +123,12 @@ impl<T> ObjectOrReference<T>
 where
     T: FromRef,
 {
-    pub fn resolve(&self, spec: &Spec) -> Option<T> {
+    pub fn resolve(&self, spec: &Spec) -> StdResult<T, RefError> {
         match self {
-            Self::Object(component) => Some(component.clone()),
+            Self::Object(component) => Ok(component.clone()),
             Self::Ref { ref_path } => T::from_ref(&spec, &ref_path),
         }
     }
-}
-
-pub struct RefPath {
-    kind: String,
-    name: String,
-}
-
-impl RefPath {
-    // TODO: impl FromStr
-    pub fn from_str<'a>(path: &'a str) -> Self {
-        lazy_static! {
-            static ref RE: Regex =
-                Regex::new("^(?P<source>[^#]+)?#/components/(?P<type>[^/]+)/(?P<name>.+)$")
-                    .unwrap();
-        }
-
-        let parts = RE.captures(path).unwrap();
-
-        debug!("creating RefPath: {}/{}", &parts["type"], &parts["name"]);
-
-        Self {
-            // source: parts["source"].to_owned(),
-            kind: parts["type"].to_owned(),
-            name: parts["name"].to_owned(),
-        }
-    }
-}
-
-pub trait FromRef: Clone {
-    fn from_ref(spec: &Spec, path: &str) -> Option<Self>
-    where
-        Self: Sized;
 }
 
 /// deserialize an open api spec from a path

@@ -1,7 +1,10 @@
 use std::collections::BTreeMap;
 
+use log::error;
+
 use crate::{
-    Callback, ExternalDoc, ObjectOrReference, Parameter, RequestBody, Response, Server, Spec,
+    Callback, Error, ExternalDoc, ObjectOrReference, Parameter, RefError, RequestBody, Response,
+    Server, Spec,
 };
 
 /// Describes a single API operation on a path.
@@ -106,14 +109,23 @@ pub struct Operation {
 }
 
 impl Operation {
-    pub fn get_request_body(&self, spec: &Spec) -> Option<RequestBody> {
-        self.request_body.as_ref().unwrap().resolve(&spec)
+    pub fn get_request_body(&self, spec: &Spec) -> Result<RequestBody, Error> {
+        self.request_body
+            .as_ref()
+            .unwrap()
+            .resolve(&spec)
+            .map_err(Error::Ref)
     }
 
     pub fn get_responses(&self, spec: &Spec) -> BTreeMap<String, Response> {
         self.responses
             .iter()
-            .filter_map(|(name, oor)| oor.resolve(&spec).map(|obj| (name.clone(), obj)))
+            .filter_map(|(name, oor)| {
+                oor.resolve(&spec)
+                    .map(|obj| (name.clone(), obj))
+                    .map_err(|err| error!("{}", err))
+                    .ok()
+            })
             .collect()
     }
 }

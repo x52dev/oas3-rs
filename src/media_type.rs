@@ -1,6 +1,8 @@
 use std::collections::BTreeMap;
 
-use crate::{Encoding, Example, ObjectOrReference, Schema, Spec, MediaTypeExamples};
+use log::error;
+
+use crate::{Encoding, Error, Example, MediaTypeExamples, ObjectOrReference, Schema, Spec};
 
 /// Each Media Type Object provides schema and examples for the media type identified by its key.
 ///
@@ -27,8 +29,12 @@ pub struct MediaType {
 }
 
 impl MediaType {
-    pub fn get_schema(&self, spec: &Spec) -> Option<Schema> {
-        self.schema.as_ref().unwrap().resolve(&spec)
+    pub fn get_schema(&self, spec: &Spec) -> Result<Schema, Error> {
+        self.schema
+            .as_ref()
+            .unwrap()
+            .resolve(&spec)
+            .map_err(Error::Ref)
     }
 
     pub fn get_examples(&self, spec: &Spec) -> BTreeMap<String, Example> {

@@ -1,5 +1,7 @@
 use std::collections::BTreeMap;
 
+use log::error;
+
 use crate::{Example, ObjectOrReference, Spec};
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
@@ -32,10 +34,10 @@ impl MediaTypeExamples {
     pub fn is_empty(&self) -> bool {
         match self {
             MediaTypeExamples::Example { .. } => false,
-            MediaTypeExamples::Examples { examples } => examples.is_empty()
+            MediaTypeExamples::Examples { examples } => examples.is_empty(),
         }
     }
-    
+
     pub fn resolve_all(&self, spec: &Spec) -> BTreeMap<String, Example> {
         match self {
             Self::Example { example } => {
@@ -53,7 +55,12 @@ impl MediaTypeExamples {
 
             Self::Examples { examples } => examples
                 .iter()
-                .filter_map(|(name, oor)| oor.resolve(&spec).map(|obj| (name.clone(), obj)))
+                .filter_map(|(name, oor)| {
+                    oor.resolve(&spec)
+                        .map(|obj| (name.clone(), obj))
+                        .map_err(|err| error!("{}", err))
+                        .ok()
+                })
                 .collect(),
         }
     }

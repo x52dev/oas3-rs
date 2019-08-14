@@ -1,4 +1,6 @@
-use crate::{FromRef, RefPath, Spec};
+use crate::{
+    FromRef, Header, Link, MediaType, ObjectOrReference, RefPath, RefError, RefType, Spec,
+};
 
 /// See <https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#exampleObject>.
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
@@ -18,7 +20,6 @@ pub struct Example {
     /// in JSON or YAML, use a string value to contain the example, escaping where necessary.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub value: Option<serde_json::Value>,
-    
     // FIXME: Implement (merge with value as enum)
     // /// A URL that points to the literal example. This provides the capability to reference
     // /// examples that cannot easily be included in JSON or YAML documents. The `value` field
@@ -33,26 +34,24 @@ impl Example {
     pub fn as_bytes(&self) -> Vec<u8> {
         match self.value {
             Some(ref val) => serde_json::to_string(val).unwrap().as_bytes().to_owned(),
-            None => vec![]
+            None => vec![],
         }
     }
 }
 
 impl FromRef for Example {
-    fn from_ref(spec: &Spec, path: &str) -> Option<Self>
-    where
-        Self: Sized,
-    {
-        let path = RefPath::from_str(path);
+    fn from_ref(spec: &Spec, path: &str) -> Result<Self, RefError> {
+        let refpath = path.parse::<RefPath>()?;
 
-        match path.kind.as_ref() {
-            "examples" => spec
+        match refpath.kind {
+            RefType::Example => spec
                 .components
                 .as_ref()
-                .and_then(|cs| cs.examples.get(&path.name))
+                .and_then(|cs| cs.examples.get(&refpath.name))
+                .ok_or(RefError::Unresolvable(path.to_owned()))
                 .and_then(|oor| oor.resolve(&spec)),
 
-            _ => None,
+            typ => Err(RefError::MismatchedType(typ, RefType::Example)),
         }
     }
 }

@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use crate::{FromRef, RefPath, MediaType, Spec};
+use crate::{FromRef, MediaType, RefPath, RefError, RefType, Spec};
 
 /// Describes a single request body.
 ///
@@ -23,23 +23,21 @@ pub struct RequestBody {
 }
 
 impl FromRef for RequestBody {
-    fn from_ref(
-        spec: &Spec,
-        path: &str,
-    ) -> Option<Self>
+    fn from_ref(spec: &Spec, path: &str) -> Result<Self, RefError>
     where
         Self: Sized,
     {
-        let path = RefPath::from_str(path);
+        let refpath = path.parse::<RefPath>()?;
 
-        match path.kind.as_ref() {
-            "requestBodies" => spec
+        match refpath.kind {
+            RefType::RequestBody => spec
                 .components
                 .as_ref()
-                .and_then(|cs| cs.request_bodies.get(&path.name))
+                .and_then(|cs| cs.request_bodies.get(&refpath.name))
+                .ok_or(RefError::Unresolvable(path.to_owned()))
                 .and_then(|oor| oor.resolve(&spec)),
 
-            _ => None,
+            typ => Err(RefError::MismatchedType(typ, RefType::RequestBody)),
         }
     }
 }

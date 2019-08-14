@@ -1,3 +1,11 @@
-mod test_spec;
+mod error;
+mod operation;
+mod request;
+mod response;
+mod test;
 
-pub use test_spec::*;
+pub use error::*;
+pub use operation::*;
+pub use request::*;
+pub use response::*;
+pub use test::*;

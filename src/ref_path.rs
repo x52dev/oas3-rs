@@ -1,0 +1,85 @@
+use std::{fs::File, io::Read, path::Path, result::Result as StdResult, str::FromStr};
+
+use derive_more::Display;
+use failure::Fail;
+use lazy_static::lazy_static;
+use log::{debug, trace};
+use regex::Regex;
+
+use crate::Spec;
+
+#[derive(Clone, Debug, PartialEq, Fail)]
+pub enum RefError {
+    #[fail(display = "Invalid type: {}", _0)]
+    InvalidType(String),
+
+    #[fail(display = "Mismatched type: cannot reference a {} as a {}", _0, _1)]
+    MismatchedType(RefType, RefType),
+
+    #[fail(display = "Unresolvable path: {}", _0)]
+    Unresolvable(String),
+}
+
+#[derive(Copy, Clone, Debug, PartialEq, Display)]
+pub enum RefType {
+    Schema,
+    Response,
+    Parameter,
+    Example,
+    RequestBody,
+    Header,
+    SecurityScheme,
+    Link,
+    Callback,
+}
+
+impl FromStr for RefType {
+    type Err = RefError;
+
+    fn from_str(typ: &str) -> Result<Self, Self::Err> {
+        Ok(match typ {
+            "schemas" => Self::Schema,
+            "responses" => Self::Response,
+            "parameters" => Self::Parameter,
+            "examples" => Self::Example,
+            "requestBodies" => Self::RequestBody,
+            "headers" => Self::Header,
+            "securitySchemes" => Self::SecurityScheme,
+            "links" => Self::Link,
+            "callbacks" => Self::Callback,
+            typ => Err(RefError::InvalidType(typ.to_owned()))?,
+        })
+    }
+}
+
+pub struct RefPath {
+    pub source: String,
+    pub kind: RefType,
+    pub name: String,
+}
+
+impl FromStr for RefPath {
+    type Err = RefError;
+
+    fn from_str(path: &str) -> Result<Self, Self::Err> {
+        lazy_static! {
+            static ref RE: Regex =
+                Regex::new("^(?P<source>[^#]*)#/components/(?P<type>[^/]+)/(?P<name>.+)$")
+                    .unwrap();
+        }
+
+        let parts = RE.captures(path).unwrap();
+
+        trace!("creating RefPath: {}/{}", &parts["type"], &parts["name"]);
+
+        Ok(Self {
+            source: parts["source"].to_owned(),
+            kind: parts["type"].parse()?,
+            name: parts["name"].to_owned(),
+        })
+    }
+}
+
+pub trait FromRef: Clone {
+    fn from_ref(spec: &Spec, path: &str) -> Result<Self, RefError>;
+}

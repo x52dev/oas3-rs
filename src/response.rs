@@ -1,6 +1,8 @@
 use std::collections::BTreeMap;
 
-use crate::{FromRef, Header, Link, MediaType, Spec, ObjectOrReference, RefPath};
+use crate::{
+    FromRef, Header, Link, MediaType, ObjectOrReference, RefPath, RefError, RefType, Spec,
+};
 
 /// Describes a single response from an API Operation, including design-time, static `links`
 /// to operations based on the response.
@@ -37,21 +39,19 @@ pub struct Response {
     // TODO: Add "Specification Extensions" https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#specificationExtensions}
 }
 
-impl FromRef for Response {
-    fn from_ref(spec: &Spec, path: &str) -> Option<Self>
-    where
-        Self: Sized,
-    {
-        let path = RefPath::from_str(path);
+impl FromRef for Response   {
+    fn from_ref(spec: &Spec, path: &str) -> Result<Self, RefError> {
+        let refpath = path.parse::<RefPath>()?;
 
-        match path.kind.as_ref() {
-            "responses" => spec
+        match refpath.kind {
+            RefType::Response => spec
                 .components
                 .as_ref()
-                .and_then(|cs| cs.responses.get(&path.name))
+                .and_then(|cs| cs.responses.get(&refpath.name))
+                .ok_or(RefError::Unresolvable(path.to_owned()))
                 .and_then(|oor| oor.resolve(&spec)),
 
-            _ => None,
+            typ => Err(RefError::MismatchedType(typ, RefType::Response)),
         }
     }
 }
