@@ -8,8 +8,8 @@ use http::{Method, StatusCode};
 use log::{debug, info};
 use oas3::{
     conformance::{
-        ConformanceTestSpec, OperationSpec, RequestSpec, ResolvedConformanceTestSpec, ResponseSpec,
-        TestAuthorization, TestRequest,
+        ConformanceTestSpec, OperationSpec, RequestSource, RequestSpec,
+        ResolvedConformanceTestSpec, ResponseSpec, TestAuthorization, TestRequest,
     },
     validation::Error as ValidationError,
     Error, Spec,
@@ -37,16 +37,21 @@ fn do_test(spec: &Spec, test: ResolvedConformanceTestSpec) -> Result<(), Validat
     debug!("response spec: {:?}", &test.response);
 
     let mut res = do_request(&test.request).unwrap();
-    let body = res.json().map_err(|_| ValidationError::NotJson)?;
-    let status = res.status();
 
-    debug!("response: {:?}", &res);
-
+    // validate response status
     let validation = test.response.validate_status(&res.status())?;
     info!("validation: {:?}", &validation);
 
-    let validation = test.response.validate_body(&body)?;
-    info!("validation: {:?}", &validation);
+    // validate response body
+    if test.response.body_validator.is_some() {
+        let body = res.json().map_err(|_| ValidationError::NotJson)?;
+        let status = res.status();
+
+        debug!("response: {:?}", &res);
+
+        let validation = test.response.validate_body(&body)?;
+        info!("validation: {:?}", &validation);
+    }
 
     Ok(())
 }
@@ -74,8 +79,7 @@ fn main() {
     let _ = dotenv::dotenv();
     pretty_env_logger::init();
 
-    let spec = oas3::from_path("../app/docs/api.yml")
-        .expect("api spec parse error");
+    let spec = oas3::from_path(env::var("OAS_PATH").unwrap()).expect("api spec parse error");
 
     let auth_method = TestAuthorization::bearer(env::var("TOKEN").unwrap());
 
