@@ -38,6 +38,9 @@ impl MediaType {
     }
 
     pub fn get_examples(&self, spec: &Spec) -> BTreeMap<String, Example> {
-        self.examples.as_ref().unwrap().resolve_all(&spec)
+        self.examples
+            .as_ref()
+            .map(|examples| examples.resolve_all(&spec))
+            .unwrap_or_else(|| BTreeMap::new())
     }
 }

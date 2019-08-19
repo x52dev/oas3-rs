@@ -29,7 +29,7 @@
 //! error_chain users.
 //!
 
-#![feature(todo_macro, const_fn)]
+#![feature(todo_macro, const_fn, stmt_expr_attributes, custom_inner_attributes)]
 #![allow(unused_imports, dead_code, unused_variables)]
 
 #[macro_use]
@@ -95,6 +95,7 @@ pub use ref_path::*;
 pub use request_body::*;
 pub use response::*;
 pub use schema::*;
+
 pub use security_scheme::*;
 pub use server::*;
 pub use spec::*;

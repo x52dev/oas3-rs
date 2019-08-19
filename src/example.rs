@@ -1,5 +1,5 @@
 use crate::{
-    FromRef, Header, Link, MediaType, ObjectOrReference, RefPath, RefError, RefType, Spec,
+    FromRef, Header, Link, MediaType, ObjectOrReference, RefError, RefPath, RefType, Spec,
 };
 
 /// See <https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#exampleObject>.
@@ -48,9 +48,9 @@ impl FromRef for Example {
                 .components
                 .as_ref()
                 .and_then(|cs| cs.examples.get(&refpath.name))
-                .ok_or(RefError::Unresolvable(path.to_owned()))
+                .ok_or_else(|| RefError::Unresolvable(path.to_owned()))
                 .and_then(|oor| oor.resolve(&spec)),
-
+ 
             typ => Err(RefError::MismatchedType(typ, RefType::Example)),
         }
     }

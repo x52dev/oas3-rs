@@ -138,14 +138,14 @@ impl FromRef for Schema {
         let refpath = path.parse::<RefPath>()?;
 
         match refpath.kind {
-             RefType::Schema => spec
+            RefType::Schema => spec
                 .components
                 .as_ref()
                 .and_then(|cs| cs.schemas.get(&refpath.name))
-                .ok_or(RefError::Unresolvable(path.to_owned()))
+                .ok_or_else(|| RefError::Unresolvable(path.to_owned()))
                 .and_then(|oor| oor.resolve(&spec)),
 
-            typ => Err(RefError::MismatchedType(typ,  RefType::Schema)),
+            typ => Err(RefError::MismatchedType(typ, RefType::Schema)),
         }
     }
 }

@@ -1,3 +1,5 @@
+use http::Method;
+
 use crate::{ObjectOrReference, Operation, Parameter, Server};
 
 /// Describes the operations available on a single path.
@@ -77,4 +79,24 @@ pub struct PathItem {
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub parameters: Vec<ObjectOrReference<Parameter>>,
     // TODO: Add "Specification Extensions" https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#specificationExtensions}
+}
+
+impl PathItem {
+    pub fn iter_methods(&self) -> impl Iterator<Item = (Method, &Operation)> {
+        let mut methods = vec![];
+
+        #[rustfmt::skip]
+        {
+            if let Some(ref op) = self.get { methods.push((Method::GET, op)) }
+            if let Some(ref op) = self.put { methods.push((Method::PUT, op)) }
+            if let Some(ref op) = self.post { methods.push((Method::POST, op)) }
+            if let Some(ref op) = self.delete { methods.push((Method::DELETE, op)) }
+            if let Some(ref op) = self.options { methods.push((Method::OPTIONS, op)) }
+            if let Some(ref op) = self.head { methods.push((Method::HEAD, op)) }
+            if let Some(ref op) = self.patch { methods.push((Method::PATCH, op)) }
+            if let Some(ref op) = self.trace { methods.push((Method::TRACE, op)) }
+        }
+
+        methods.into_iter()
+    }
 }

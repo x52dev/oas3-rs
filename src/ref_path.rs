@@ -47,7 +47,7 @@ impl FromStr for RefType {
             "securitySchemes" => Self::SecurityScheme,
             "links" => Self::Link,
             "callbacks" => Self::Callback,
-            typ => Err(RefError::InvalidType(typ.to_owned()))?,
+            typ => return Err(RefError::InvalidType(typ.to_owned())),
         })
     }
 }
@@ -64,8 +64,7 @@ impl FromStr for RefPath {
     fn from_str(path: &str) -> Result<Self, Self::Err> {
         lazy_static! {
             static ref RE: Regex =
-                Regex::new("^(?P<source>[^#]*)#/components/(?P<type>[^/]+)/(?P<name>.+)$")
-                    .unwrap();
+                Regex::new("^(?P<source>[^#]*)#/components/(?P<type>[^/]+)/(?P<name>.+)$").unwrap();
         }
 
         let parts = RE.captures(path).unwrap();

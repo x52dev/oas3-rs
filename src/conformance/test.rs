@@ -1,5 +1,5 @@
 use bytes::Bytes;
-use http::{HeaderMap, Method, StatusCode};
+use http::{HeaderMap, HeaderValue, Method, StatusCode};
 use lazy_static::lazy_static;
 use log::{debug, error};
 
@@ -9,8 +9,8 @@ use crate::{
 };
 
 use super::{
-    OperationSpec, RequestSource, RequestSpec, ResponseSpec, ResponseSpecSource, TestRequest,
-    TestResponseSpec,
+    OperationSpec, RequestSource, RequestSpec, ResponseSpec, ResponseSpecSource, TestAuthorization,
+    TestOperation, TestRequest, TestResponseSpec,
 };
 
 #[derive(Debug, Clone)]
@@ -30,21 +30,57 @@ impl ConformanceTestSpec {
     }
 
     pub fn resolve(&self, spec: &Spec) -> Result<ResolvedConformanceTestSpec, Error> {
-        Ok  (ResolvedConformanceTestSpec {
+        Ok(ResolvedConformanceTestSpec {
+            unresolved: self.clone(),
             request: self.resolve_request(&spec)?,
             response: self.resolve_response_spec(&spec)?,
         })
     }
 
-    pub fn resolve_operation<'a>(&self, spec: &'a Spec) -> Result<&'a Operation, Error> {
-        spec.get_operation(&self.operation.method, &self.operation.path)
-            .ok_or(Error::Placeholder)
+    pub fn resolve_test_operation<'a>(&self, spec: &'a Spec) -> Result<TestOperation, Error> {
+        let test_op = match &self.operation {
+            OperationSpec::Parts { method, path } => {
+                TestOperation::new(method.clone(), path.clone())
+            }
+
+            OperationSpec::OperationId(op_id) => spec
+                .iter_operations()
+                .find(|(path, method, op)| {
+                    op.operation_id
+                        .as_ref()
+                        .map(|id| id == op_id)
+                        .unwrap_or(false)
+                })
+                .map(|(path, method, op)| TestOperation::new(method.clone(), path.clone()))
+                .ok_or_else(|| ValidationError::OperationIdNotFound(op_id.clone()))?,
+        };
+
+        Ok(test_op)
     }
 
     pub fn resolve_request(&self, spec: &Spec) -> Result<TestRequest, Error> {
-        let op = self.resolve_operation(&spec)?;
+        let test_op = self.resolve_test_operation(&spec)?;
+        let op = test_op.resolve_operation(&spec)?;
 
-        let req = match self.request.source {
+        let mut req = match self.request.source {
+            RequestSource::Empty => TestRequest {
+                operation: test_op.clone(),
+                headers: HeaderMap::new(),
+                body: Bytes::new(),
+            },
+
+            RequestSource::Raw(ref data) => {
+                if !self.request.bad {
+                    panic!("Raw requests are expected to be malformed. Set `bad: true` on RequestSpec.")
+                }
+
+                TestRequest {
+                    operation: test_op.clone(),
+                    headers: HeaderMap::new(),
+                    body: data.clone(),
+                }
+            }
+
             RequestSource::Example {
                 ref media_type,
                 ref name,
@@ -70,36 +106,39 @@ impl ConformanceTestSpec {
                 hdrs.insert("Content-Type", media_type.clone().parse().unwrap());
 
                 TestRequest {
-                    operation: self.operation.clone(),
+                    operation: test_op.clone(),
                     headers: hdrs,
                     body: example.as_bytes().into(),
                 }
             }
-
-            RequestSource::Raw(ref data) => {
-                if !self.request.bad {
-                    panic!("Raw requests are expected to be malformed. Set `bad: true` on RequestSpec.")
-                }
-
-                TestRequest {
-                    operation: self.operation.clone(),
-                    headers: HeaderMap::new(),
-                    body: data.clone(),
-                }
-            }
         };
+
+        match self.request.auth {
+            Some(TestAuthorization::Bearer(ref jwt)) => {
+                let val = format!("Bearer {}", jwt);
+                req.headers.append(
+                    "Authorization",
+                    HeaderValue::from_str(&val).expect("invalid header value"),
+                );
+            }
+            _ => {}
+        }
 
         Ok(req)
     }
 
     pub fn resolve_response_spec(&self, spec: &Spec) -> Result<TestResponseSpec, Error> {
-        let op = self.resolve_operation(&spec)?;
+        let test_op = self.resolve_test_operation(&spec)?;
+        let op = test_op.resolve_operation(&spec)?;
 
         let res_spec = match &self.response_spec.source {
-            ResponseSpecSource::Schema {
-                ref status,
-                ref media_type,
-            } => {
+            ResponseSpecSource::Status(status) => TestResponseSpec {
+                operation: test_op.clone(),
+                status: status.clone(),
+                body_validator: None,
+            },
+
+            ResponseSpecSource::Schema { status, media_type } => {
                 // traverse spec
                 let responses = op.get_responses(&spec);
                 let status_spec = responses.get(status.as_str()).ok_or(Error::Placeholder)?;
@@ -113,15 +152,16 @@ impl ConformanceTestSpec {
                 let validator = schema.validator(&spec);
 
                 TestResponseSpec {
-                    operation: self.operation.clone(),
-                    body_validator: validator,
+                    operation: test_op.clone(),
+                    status: status.clone(),
+                    body_validator: Some(validator),
                 }
             }
 
             ResponseSpecSource::Example {
-                ref status,
-                ref media_type,
-                ref name,
+                status,
+                media_type,
+                name,
             } => {
                 // traverse spec
                 let reses = op.get_responses(&spec);
@@ -151,8 +191,9 @@ impl ConformanceTestSpec {
                 hdrs.insert("Content-Type", media_type.clone().parse().unwrap());
 
                 TestResponseSpec {
-                    operation: self.operation.clone(),
-                    body_validator: validator,
+                    operation: test_op.clone(),
+                    status: status.clone(),
+                    body_validator: Some(validator),
                 }
             }
 
@@ -165,6 +206,7 @@ impl ConformanceTestSpec {
 
 #[derive(Debug, Clone)]
 pub struct ResolvedConformanceTestSpec {
+    pub unresolved: ConformanceTestSpec,
     pub request: TestRequest,
     pub response: TestResponseSpec,
 }
@@ -173,18 +215,21 @@ pub struct ResolvedConformanceTestSpec {
 mod tests {
     use super::*;
 
-    lazy_static! {
-        static ref TEST0: ConformanceTestSpec = ConformanceTestSpec {
+    #[test]
+    fn new_conformance_test_spec() {
+        let test0: ConformanceTestSpec = ConformanceTestSpec {
             operation: OperationSpec::post("/token"),
             request: RequestSpec::from_example("application/json", "basic"),
             response_spec: ResponseSpec::from_schema("200", "application/json"),
         };
-        static ref TEST1: ConformanceTestSpec = ConformanceTestSpec {
+
+        let test1: ConformanceTestSpec = ConformanceTestSpec {
             operation: OperationSpec::post("/verify"),
             request: RequestSpec::from_json_example("expired"),
             response_spec: ResponseSpec::from_example("200", "application/json", "expired"),
         };
-        static ref TEST2: ConformanceTestSpec = ConformanceTestSpec {
+
+        let test2: ConformanceTestSpec = ConformanceTestSpec {
             operation: OperationSpec::get("/isloggedin"),
             request: RequestSpec::from_bad_raw("not json"),
             response_spec: ResponseSpec::from_schema("401", "application/json"),

@@ -1,11 +1,13 @@
 use bytes::Bytes;
 use http::StatusCode;
+use serde_json::Value as JsonValue;
 
-use super::OperationSpec;
+use super::{OperationSpec, TestOperation};
 use crate::validation::{Error as ValidationError, SchemaValidator};
 
 #[derive(Debug, Clone)]
 pub enum ResponseSpecSource {
+    Status(StatusCode),
     Schema {
         status: StatusCode,
         media_type: String,
@@ -24,6 +26,12 @@ pub struct ResponseSpec {
 }
 
 impl ResponseSpec {
+    pub fn from_status(status: &str) -> Self {
+        Self {
+            source: ResponseSpecSource::Status(status.parse().unwrap()),
+        }
+    }
+
     pub fn from_schema<M>(status: &str, media_type: M) -> Self
     where
         M: Into<String>,
@@ -53,14 +61,31 @@ impl ResponseSpec {
 
 #[derive(Debug, Clone)]
 pub struct TestResponseSpec {
-    pub operation: OperationSpec,
-    pub body_validator: SchemaValidator,
+    pub operation: TestOperation,
+    pub status: StatusCode,
+    pub body_validator: Option<SchemaValidator>,
 }
 
 impl TestResponseSpec {
-    pub fn validate(&self, val: &serde_json::Value) -> Result<(), ValidationError> {
-        self.body_validator
-            .validate_type(val)
-            .and(self.body_validator.validate_required_fields(val))
+    // TODO: own response type
+
+    pub fn validate_status(&self, val: &StatusCode) -> Result<(), ValidationError> {
+        if &self.status == val {
+            Ok(())
+        } else {
+            Err(ValidationError::StatusMismatch(
+                self.status.clone(),
+                val.clone(),
+            ))
+        }
+    }
+
+    pub fn validate_body(&self, body: &JsonValue) -> Result<(), ValidationError> {
+        if let Some(ref vltr) = self.body_validator {
+            vltr.validate_type(body)?;
+            vltr.validate_required_fields(body)?;
+        }
+
+        Ok(())
     }
 }

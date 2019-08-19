@@ -1,4 +1,3 @@
-
 use crate::Schema;
 
 // FIXME: Verify against OpenAPI 3.0

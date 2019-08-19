@@ -158,7 +158,7 @@ impl SchemaValidator {
                         debug!("checking {}", &key);
 
                         if let Some(ref vltr) = prop_validators.get(key.deref()) {
-                            let _ = vltr.validate_type(&val)?;
+                            vltr.validate_type(&val)?;
                         } else {
                             return Err(Error::ExtraneousField(key.to_owned()));
                         }

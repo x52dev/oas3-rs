@@ -1,4 +1,3 @@
-
 use crate::Schema;
 
 /// The Header Object follows the structure of the

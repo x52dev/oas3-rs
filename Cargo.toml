@@ -23,8 +23,11 @@ serde_json = "1"
 serde_yaml = "0.8"
 url = "1.7"
 url_serde = "0.2"
+reqwest = "0.9"
 
 [dev-dependencies]
+dotenv = "0.14"
+colored = "1"
 maplit = "1"
 pretty_assertions = "0.6"
 pretty_env_logger = "0.3"

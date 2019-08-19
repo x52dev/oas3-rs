@@ -7,32 +7,33 @@ use semver::{SemVerError, Version};
 use serde_json::Error as JsonError;
 use serde_yaml::Error as YamlError;
 
-use crate::{RefError, validation::Error as ValidationError};
+use crate::{validation::Error as ValidationError, RefError};
 
 /// errors that openapi functions may return
 #[derive(Debug, Fail)]
 pub enum Error {
     #[fail(display = "{}", _0)]
-    Io(IoError),
+    Io(#[cause] IoError),
 
     #[fail(display = "{}", _0)]
-    Yaml(YamlError),
+    Yaml(#[cause] YamlError),
 
     #[fail(display = "{}", _0)]
-    Serialize(JsonError),
+    Serialize(#[cause] JsonError),
 
     #[fail(display = "{}", _0)]
-    SemVerError(SemVerError),
-    
+    SemVerError(#[cause] SemVerError),
+
     #[fail(display = "Unsupported spec file version ({})", _0)]
     UnsupportedSpecFileVersion(Version),
-    
+
     #[fail(display = "Reference error: {}", _0)]
-    Ref(RefError),
-    
+    Ref(#[cause] RefError),
+
     #[fail(display = "Validation error: {}", _0)]
-    Validation(ValidationError),
-    
+    Validation(#[cause] ValidationError),
+
+    // TODO: remove placeholder error
     #[fail(display = "Placeholder")]
     Placeholder,
 }
@@ -51,4 +52,8 @@ impl From<JsonError> for Error {
 
 impl From<SemVerError> for Error {
     fn from(e: SemVerError) -> Self { Error::SemVerError(e) }
+}
+
+impl From<ValidationError> for Error {
+    fn from(e: ValidationError) -> Self { Error::Validation(e) }
 }

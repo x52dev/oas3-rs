@@ -1,8 +1,8 @@
 use std::collections::BTreeMap;
 
 use crate::{
-    Callback, Example, Header, Link, Parameter, RequestBody, Response, Schema,
-    SecurityScheme, ObjectOrReference,
+    Callback, Example, Header, Link, ObjectOrReference, Parameter, RequestBody, Response, Schema,
+    SecurityScheme,
 };
 
 /// Holds a set of reusable objects for different aspects of the OAS.

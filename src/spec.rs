@@ -1,4 +1,6 @@
-use std::collections::BTreeMap;
+use http::Method;
+
+use std::{collections::BTreeMap, iter::Iterator};
 
 use crate::{Components, Error, ExternalDoc, Info, Operation, PathItem, Result, Server, Tag};
 
@@ -63,7 +65,6 @@ pub struct Spec {
     /// Additional external documentation.
     #[serde(skip_serializing_if = "Option::is_none", rename = "externalDocs")]
     pub external_docs: Option<ExternalDoc>,
-
     // TODO: Add "Specification Extensions" https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#specificationExtensions}
 }
 
@@ -72,13 +73,15 @@ impl Spec {
         let spec_version = &self.openapi;
         let sem_ver = semver::Version::parse(spec_version)?;
         let required_version = semver::VersionReq::parse(OPENAPI_SUPPORTED_VERSION_RANGE).unwrap();
+        
         if required_version.matches(&sem_ver) {
             Ok(sem_ver)
         } else {
-            Err(Error::UnsupportedSpecFileVersion(sem_ver))?
+            Err(Error::UnsupportedSpecFileVersion(sem_ver))
         }
     }
 
+    // TODO: rename without get_
     pub fn get_operation(&self, method: &http::Method, path: &str) -> Option<&Operation> {
         use http::Method;
 
@@ -95,5 +98,12 @@ impl Spec {
             Method::TRACE => resource.trace.as_ref(),
             _ => None,
         }
+    }
+
+    pub fn iter_operations(&self) -> impl Iterator<Item = (String, Method, &Operation)> {
+        self.paths.iter().flat_map(|(path, item)| {
+            item.iter_methods()
+                .map(move |(method, op)| (path.to_owned(), method, op))
+        })
     }
 }

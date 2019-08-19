@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use crate::{FromRef, MediaType, RefPath, RefError, RefType, Spec};
+use crate::{FromRef, MediaType, RefError, RefPath, RefType, Spec};
 
 /// Describes a single request body.
 ///
@@ -34,7 +34,7 @@ impl FromRef for RequestBody {
                 .components
                 .as_ref()
                 .and_then(|cs| cs.request_bodies.get(&refpath.name))
-                .ok_or(RefError::Unresolvable(path.to_owned()))
+                .ok_or_else(|| RefError::Unresolvable(path.to_owned()))
                 .and_then(|oor| oor.resolve(&spec)),
 
             typ => Err(RefError::MismatchedType(typ, RefType::RequestBody)),
