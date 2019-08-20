@@ -2,40 +2,42 @@
 
 use std::io::Error as IoError;
 
-use failure::Fail;
 use semver::{SemVerError, Version};
 use serde_json::Error as JsonError;
 use serde_yaml::Error as YamlError;
 
 use crate::{validation::Error as ValidationError, RefError};
 
-/// errors that openapi functions may return
-#[derive(Debug, Fail)]
+/// Top-level Errors
+#[derive(Debug, Error)]
 pub enum Error {
-    #[fail(display = "{}", _0)]
+    //
+    // Wrapped Errors
+    //
+    #[error(display = "I/O error")]
     Io(#[cause] IoError),
 
-    #[fail(display = "{}", _0)]
+    #[error(display = "Yaml error")]
     Yaml(#[cause] YamlError),
 
-    #[fail(display = "{}", _0)]
+    #[error(display = "JSON error")]
     Serialize(#[cause] JsonError),
 
-    #[fail(display = "{}", _0)]
+    #[error(display = "Semver error")]
     SemVerError(#[cause] SemVerError),
 
-    #[fail(display = "Unsupported spec file version ({})", _0)]
-    UnsupportedSpecFileVersion(Version),
-
-    #[fail(display = "Reference error: {}", _0)]
+    // TODO: subset of schema errors
+    #[error(display = "Reference error")]
     Ref(#[cause] RefError),
 
-    #[fail(display = "Validation error: {}", _0)]
+    #[error(display = "Validation error")]
     Validation(#[cause] ValidationError),
 
-    // TODO: remove placeholder error
-    #[fail(display = "Placeholder")]
-    Placeholder,
+    //
+    // Leaf Errors
+    //
+    #[error(display = "Unsupported spec file version ({})", _0)]
+    UnsupportedSpecFileVersion(Version),
 }
 
 impl From<IoError> for Error {

@@ -34,6 +34,9 @@
 
 #[macro_use]
 extern crate serde_derive;
+#[macro_use]
+extern crate err_derive;
+
 
 use std::{fs::File, io::Read, path::Path, result::Result as StdResult};
 

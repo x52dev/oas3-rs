@@ -12,9 +12,9 @@ license = "MIT"
 http = "0.1"
 bytes = "0.4"
 derive_more = "0.15"
+err-derive = "0.1"
 lazy_static = "1"
 log = "0.4"
-failure = "0.1"
 regex = "1"
 semver = "0.9"
 serde = "1"
@@ -28,9 +28,11 @@ reqwest = "0.9"
 [dev-dependencies]
 dotenv = "0.14"
 colored = "1"
+envy = "0.4"
 maplit = "1"
 pretty_assertions = "0.6"
 pretty_env_logger = "0.3"
+prettytable-rs = "0.8"
 
 [features]
 default = ["conformance"]

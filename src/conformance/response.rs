@@ -26,32 +26,43 @@ pub struct ResponseSpec {
 }
 
 impl ResponseSpec {
-    pub fn from_status(status: &str) -> Self {
+    pub fn from_status(status: u16) -> Self {
         Self {
-            source: ResponseSpecSource::Status(status.parse().unwrap()),
+            source: ResponseSpecSource::Status(
+                StatusCode::from_u16(status).expect("invalid status code"),
+            ),
         }
     }
 
-    pub fn from_schema<M>(status: &str, media_type: M) -> Self
+    pub fn from_schema<M>(status: u16, media_type: M) -> Self
     where
         M: Into<String>,
     {
         Self {
             source: ResponseSpecSource::Schema {
-                status: status.parse().unwrap(),
+                status: StatusCode::from_u16(status).expect("invalid status code"),
                 media_type: media_type.into(),
             },
         }
     }
 
-    pub fn from_example<M, N>(status: &str, media_type: M, name: N) -> Self
+    pub fn from_json_schema(status: u16) -> Self {
+        Self {
+            source: ResponseSpecSource::Schema {
+                status: StatusCode::from_u16(status).expect("invalid status code"),
+                media_type: "application/json".to_owned(),
+            },
+        }
+    }
+
+    pub fn from_example<M, N>(status: u16, media_type: M, name: N) -> Self
     where
         M: Into<String>,
         N: Into<String>,
     {
         Self {
             source: ResponseSpecSource::Example {
-                status: status.parse().unwrap(),
+                status: StatusCode::from_u16(status).expect("invalid status code"),
                 media_type: media_type.into(),
                 name: name.into(),
             },

@@ -4,7 +4,7 @@ use lazy_static::lazy_static;
 use log::{debug, trace, warn};
 use serde_json::Value as JsonValue;
 
-use crate::{validation::Error, Schema, Spec};
+use crate::{schema::Error as SchemaError, validation::Error, Schema, Spec};
 
 #[derive(Debug, Clone)]
 pub enum SchemaType {
@@ -19,15 +19,16 @@ pub enum SchemaType {
 
 #[derive(Debug, Clone)]
 pub struct SchemaValidator {
-    pub type_: SchemaType,
+    pub schema_type: SchemaType,
     pub nullable: bool,
-    pub required: Option<Vec<String>>, // TODO: hmmm, currently all object schemas will have Some(Vec) and this is probably needless just like on schemas
+    // TODO: hmmm, currently all object schemas will have Some(Vec) and this is probably needless just like on schemas
+    pub required: Option<Vec<String>>,
 }
 
 impl SchemaValidator {
     pub fn require(typ: SchemaType) -> SchemaValidator {
         SchemaValidator {
-            type_: typ,
+            schema_type: typ,
             nullable: false,
             required: None,
         }
@@ -35,7 +36,7 @@ impl SchemaValidator {
 
     pub fn nullable(typ: SchemaType) -> SchemaValidator {
         SchemaValidator {
-            type_: typ,
+            schema_type: typ,
             nullable: true,
             required: None,
         }
@@ -48,9 +49,8 @@ impl SchemaValidator {
         }
     }
 
-    // TODO: if only schema errors can be returned then narrow the error scope
-    pub fn from_schema(schema: &Schema, spec: &Spec) -> Result<SchemaValidator, Error> {
-        let type_ = match &schema.type_.as_ref().expect("no schema type")[..] {
+    pub fn from_schema(schema: &Schema, spec: &Spec) -> Result<SchemaValidator, SchemaError> {
+        let schema_type = match &schema.schema_type.as_ref().expect("no schema type")[..] {
             "boolean" => SchemaType::Boolean,
             "integer" => SchemaType::Integer,
             "number" => SchemaType::Number,
@@ -62,7 +62,7 @@ impl SchemaValidator {
                     .as_ref()
                     .expect("items MUST be present if the type is array");
 
-                let item_schema = item_schema.resolve(&spec).expect("$ref unresolvable");
+                let item_schema = item_schema.resolve(&spec)?;
 
                 SchemaType::Array(Box::new(SchemaValidator::from_schema(&item_schema, spec)?))
             }
@@ -71,8 +71,8 @@ impl SchemaValidator {
                 let mut prop_schemas = BTreeMap::new();
 
                 for (key, oor) in schema.properties.iter() {
-                    let schema = oor.resolve(&spec).expect("$ref unresolvable");
-                    prop_schemas.insert(key.to_owned(), schema.validator(&spec));
+                    let schema = oor.resolve(&spec)?;
+                    prop_schemas.insert(key.to_owned(), schema.validator(&spec)?);
                 }
 
                 SchemaType::Object(prop_schemas)
@@ -81,39 +81,33 @@ impl SchemaValidator {
             typ => SchemaType::Unknown(typ.to_owned()),
         };
 
-        let required = match &schema
-            .type_
-            .as_ref()
-            .ok_or(Error::SchemaError("no type defined on schema"))?[..]
-        {
+        let required = match &schema.schema_type.as_ref().ok_or(SchemaError::NoType)?[..] {
             "object" => Some(schema.required.clone()),
 
             _ => {
                 if schema.required.is_empty() {
                     None
                 } else {
-                    return Err(Error::SchemaError(
-                        "required field defined on a non-object schema",
-                    ));
+                    return Err(SchemaError::RequiredSpecifiedOnNonObject);
                 }
             }
         };
 
         Ok(SchemaValidator {
-            type_,
+            schema_type,
             nullable: schema.nullable.unwrap_or(false),
             required,
         })
     }
 
-    /// Checks only that the value provided validates. Will validate array items and recurse down
-    /// into object types.
+    /// Checks that the value provided is of expected type.
+    /// Will validate array items and check object properties recursively.
     pub fn validate_type(&self, val: &JsonValue) -> Result<(), Error> {
         if self.nullable && val.is_null() {
             return Ok(());
         }
 
-        match self.type_ {
+        match self.schema_type {
             SchemaType::Boolean => match val {
                 JsonValue::Bool(_) => Ok(()),
                 val => Err(Error::TypeMismatch(val.clone(), "bool")),
@@ -142,7 +136,8 @@ impl SchemaValidator {
                         .find(|item| item_validator.validate_type(&item).is_err())
                     {
                         // an item was invalid
-                        Err(Error::ArrayItemTypeMismatch(item.to_owned()))
+                        let err = item_validator.validate_type(&item).unwrap_err();
+                        Err(Error::ArrayItemTypeMismatch(item.to_owned(), Box::new(err)))
                     } else {
                         // all items ok
                         Ok(())
@@ -180,8 +175,9 @@ impl SchemaValidator {
         }
     }
 
+    /// Checks that specified required fields are present on object type.
     pub fn validate_required_fields(&self, val: &JsonValue) -> Result<(), Error> {
-        match self.type_ {
+        match self.schema_type {
             SchemaType::Object(ref prop_validators) => match val {
                 JsonValue::Object(ref map) => match self.required {
                     // search for missing fields
@@ -197,13 +193,11 @@ impl SchemaValidator {
                     _ => Ok(()),
                 },
 
-                _ => Err(Error::SchemaError("type mismatch")),
+                val => Err(Error::TypeMismatch(val.clone(), "object")),
             },
 
             _ => match self.required {
-                Some(_) => Err(Error::SchemaError(
-                    "required fields spec exists on non-object type",
-                )),
+                Some(_) => Err(Error::Schema(SchemaError::RequiredSpecifiedOnNonObject)),
 
                 // not trying to be an object
                 _ => Ok(()),

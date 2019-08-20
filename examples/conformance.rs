@@ -1,9 +1,9 @@
 #![feature(todo_macro)]
 #![allow(dead_code, unused_imports, unused_variables)]
 
-use std::env;
+use std::{env, error::Error as StdError, string::ToString};
 
-use colored::Colorize;
+use colored::{ColoredString, Colorize};
 use http::{Method, StatusCode};
 use log::{debug, info};
 use oas3::{
@@ -14,6 +14,7 @@ use oas3::{
     validation::Error as ValidationError,
     Error, Spec,
 };
+use prettytable::{cell, row, Table};
 
 fn do_request(req: &TestRequest) -> Result<reqwest::Response, reqwest::Error> {
     let base_url = "http://localhost:9000/api/auth/v1";
@@ -32,6 +33,7 @@ fn do_request(req: &TestRequest) -> Result<reqwest::Response, reqwest::Error> {
         .send()
 }
 
+// TODO: review error type
 fn do_test(spec: &Spec, test: ResolvedConformanceTestSpec) -> Result<(), ValidationError> {
     debug!("request: {:?}", &test.request);
     debug!("response spec: {:?}", &test.response);
@@ -75,6 +77,54 @@ fn do_tests(
     results
 }
 
+fn error_string(err: &dyn StdError) -> ColoredString {
+    let mut err_str = err.to_string();
+    err_str.push('\n');
+    
+    let mut cause = err.source();
+    while let Some(err) = cause {
+        err_str.push_str(&err.to_string());
+        err_str.push('\n');
+        cause = err.source();
+    }
+
+    err_str.red()
+}
+
+fn print_test_results(results: &[(ConformanceTestSpec, Option<Error>)]) {
+    let mut table = Table::new();
+
+    table.add_row(row!["TEST", "RESULT", "MESSAGE"]);
+
+    for (test, error) in results {
+        let op = &test.operation;
+
+        let test_desc = if let Some(ref name) = test.name {
+            let test_name = name.yellow();
+            let op_spec = op.to_string().italic();
+            format!("{}\n{}", test_name, op_spec)
+        } else {
+            let op_spec = op.to_string().italic();
+            op_spec.to_string()
+        };
+
+        let status = if error.is_some() {
+            " ERR ".red().reversed().blink()
+        } else {
+            " OK ".green().reversed()
+        };
+
+        let msg = error
+            .as_ref()
+            .map(|err| error_string(err))
+            .unwrap_or_else(|| "".normal());
+
+        table.add_row(row![test_desc, status, msg]);
+    }
+
+    table.printstd();
+}
+
 fn main() {
     let _ = dotenv::dotenv();
     pretty_env_logger::init();
@@ -83,61 +133,61 @@ fn main() {
 
     let auth_method = TestAuthorization::bearer(env::var("TOKEN").unwrap());
 
-    let test_pass0 = ConformanceTestSpec::new(
-        OperationSpec::post("/token"),
-        RequestSpec::from_example("application/json", "basic"),
-        ResponseSpec::from_schema("200", "application/json"),
+    let results = do_tests(
+        &spec,
+        &[
+            &ConformanceTestSpec::named(
+                "login success",
+                OperationSpec::post("/token"),
+                RequestSpec::from_json_example("basic"),
+                ResponseSpec::from_json_schema(200),
+            ),
+            &ConformanceTestSpec::named(
+                "verify revoked",
+                OperationSpec::post("/verify"),
+                RequestSpec::from_json_example("revoked"),
+                ResponseSpec::from_example(200, "application/json", "revoked"),
+            ),
+            &ConformanceTestSpec::named(
+                "fail login unregistered",
+                OperationSpec::operation_id("signin"),
+                RequestSpec::from_json_example("unregistered"),
+                ResponseSpec::from_json_schema(401),
+            ),
+            &ConformanceTestSpec::named(
+                "check logged in",
+                OperationSpec::operation_id("checkLoggedIn"),
+                RequestSpec::empty().with_auth(&auth_method),
+                ResponseSpec::from_status(200),
+            ),
+            &ConformanceTestSpec::named(
+                "fetch own tokens",
+                OperationSpec::operation_id("ownTokens"),
+                RequestSpec::empty().with_auth(&auth_method),
+                ResponseSpec::from_json_schema(200),
+            ),
+            &ConformanceTestSpec::named(
+                "fetch own valid tokens",
+                OperationSpec::operation_id("listOwnHwcreds"),
+                RequestSpec::empty().with_auth(&auth_method),
+                ResponseSpec::from_status(200),
+            ),
+            &ConformanceTestSpec::named(
+                "start mobile token process",
+                OperationSpec::operation_id("mtRequest"),
+                RequestSpec::from_json_example("blank").with_auth(&auth_method),
+                ResponseSpec::from_json_schema(200),
+            ),
+            &ConformanceTestSpec::named(
+                "admin list failed logins",
+                OperationSpec::operation_id("adminListFailedLogins"),
+                RequestSpec::empty().with_auth(&auth_method),
+                ResponseSpec::from_json_schema(200),
+            ),
+        ],
     );
-
-    let test_pass1 = ConformanceTestSpec::new(
-        OperationSpec::post("/verify"),
-        RequestSpec::from_json_example("revoked"),
-        ResponseSpec::from_example("200", "application/json", "revoked"),
-    );
-
-    let test_fail0 = ConformanceTestSpec::new(
-        OperationSpec::operation_id("signin"),
-        RequestSpec::from_json_example("unregistered"),
-        ResponseSpec::from_example("401", "application/json", "success"),
-    );
-
-    let test_fail1 = ConformanceTestSpec::new(
-        OperationSpec::operation_id("checkLoggedIn"),
-        RequestSpec::empty().with_auth(&auth_method),
-        ResponseSpec::from_status("200"),
-    );
-
-    let results = do_tests(&spec, &[&test_pass0, &test_pass1, &test_fail0, &test_fail1]);
 
     println!("");
     print_test_results(results.as_slice());
     println!("");
-}
-
-fn print_test_results(results: &[(ConformanceTestSpec, Option<Error>)]) {
-    for (test, error) in results {
-        let mut msg = vec![];
-
-        let op = &test.operation;
-
-        if error.is_some() {
-            msg.push("❌ Err".red());
-        } else {
-            msg.push("✅ Ok ".green());
-        }
-
-        msg.push(" | ".normal());
-        msg.push(format!("{}", &op).normal());
-
-        if let Some(ref err) = error {
-            msg.push(" | ".normal());
-            msg.push(err.to_string().red());
-        }
-
-        for part in msg {
-            print!("{}", part);
-        }
-
-        println!("");
-    }
 }

@@ -1,22 +1,22 @@
 use std::{fs::File, io::Read, path::Path, result::Result as StdResult, str::FromStr};
 
 use derive_more::Display;
-use failure::Fail;
 use lazy_static::lazy_static;
 use log::{debug, trace};
 use regex::Regex;
 
 use crate::Spec;
 
-#[derive(Clone, Debug, PartialEq, Fail)]
+#[derive(Clone, Debug, PartialEq, Error)]
 pub enum RefError {
-    #[fail(display = "Invalid type: {}", _0)]
+    #[error(display = "Invalid type: {}", _0)]
     InvalidType(String),
 
-    #[fail(display = "Mismatched type: cannot reference a {} as a {}", _0, _1)]
+    #[error(display = "Mismatched type: cannot reference a {} as a {}", _0, _1)]
     MismatchedType(RefType, RefType),
 
-    #[fail(display = "Unresolvable path: {}", _0)]
+    // TODO: use some kind of path structure
+    #[error(display = "Unresolvable path: {}", _0)]
     Unresolvable(String),
 }
 

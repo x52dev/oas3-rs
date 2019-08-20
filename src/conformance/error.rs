@@ -1,8 +1,7 @@
-use failure::{Backtrace, Context, Fail};
 use serde_json::Value as JsonValue;
 
-#[derive(Clone, PartialEq, Debug, Fail)]
+#[derive(Clone, PartialEq, Debug, Error)]
 pub enum Error {
-    #[fail(display = "Unknown error")]
+    #[error(display = "Unknown error")]
     Unknown,
 }

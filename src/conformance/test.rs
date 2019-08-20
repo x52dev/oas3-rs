@@ -5,7 +5,7 @@ use log::{debug, error};
 
 use crate::{
     validation::{Error as ValidationError, SchemaValidator},
-    Error, Operation, Spec,
+    Error, Operation, RefError, Spec,
 };
 
 use super::{
@@ -15,6 +15,7 @@ use super::{
 
 #[derive(Debug, Clone)]
 pub struct ConformanceTestSpec {
+    pub name: Option<String>,
     pub operation: OperationSpec,
     pub request: RequestSpec,
     pub response_spec: ResponseSpec,
@@ -23,9 +24,22 @@ pub struct ConformanceTestSpec {
 impl ConformanceTestSpec {
     pub fn new(op: OperationSpec, req: RequestSpec, res: ResponseSpec) -> Self {
         Self {
+            name: None,
             operation: op,
             request: req,
             response_spec: res,
+        }
+    }
+
+    pub fn named<T: Into<String>>(
+        name: T,
+        op: OperationSpec,
+        req: RequestSpec,
+        res: ResponseSpec,
+    ) -> Self {
+        Self {
+            name: Some(name.into()),
+            ..Self::new(op, req, res)
         }
     }
 
@@ -86,20 +100,33 @@ impl ConformanceTestSpec {
                 ref name,
             } => {
                 let req_body = op.get_request_body(&spec)?;
-                let media_spec = req_body.content.get(media_type).ok_or(Error::Placeholder)?;
+                let media_spec =
+                    req_body
+                        .content
+                        .get(media_type)
+                        .ok_or(Error::Ref(RefError::Unresolvable(format!(
+                            "mediaType/{}",
+                            &name
+                        ))))?;
                 let schema = media_spec.get_schema(&spec)?;
                 let examples = media_spec.get_examples(&spec);
-                let example = examples.get(name).ok_or(Error::Placeholder)?;
+                let example =
+                    examples
+                        .get(name)
+                        .ok_or(Error::Ref(RefError::Unresolvable(format!(
+                            "example/{}",
+                            &name
+                        ))))?;
 
                 if let Some(ref ex) = example.value {
                     // check example validity
-                    let validator = schema.validator(&spec);
+                    let validator = schema.validator(&spec).map_err(ValidationError::Schema)?;
 
                     debug!("validating example: {:?}", &ex);
                     debug!("against schema: {:?}", &schema);
                     debug!("with validator: {:?}", &validator);
 
-                    validator.validate_type(&ex).map_err(Error::Validation)?;
+                    validator.validate_type(&ex)?;
                 }
 
                 let mut hdrs = HeaderMap::new();
@@ -131,74 +158,87 @@ impl ConformanceTestSpec {
         let test_op = self.resolve_test_operation(&spec)?;
         let op = test_op.resolve_operation(&spec)?;
 
-        let res_spec = match &self.response_spec.source {
-            ResponseSpecSource::Status(status) => TestResponseSpec {
-                operation: test_op.clone(),
-                status: status.clone(),
-                body_validator: None,
-            },
-
-            ResponseSpecSource::Schema { status, media_type } => {
-                // traverse spec
-                let responses = op.get_responses(&spec);
-                let status_spec = responses.get(status.as_str()).ok_or(Error::Placeholder)?;
-                let media_spec = status_spec
-                    .content
-                    .get(media_type)
-                    .ok_or(Error::Placeholder)?;
-                let schema = media_spec.get_schema(&spec)?;
-
-                // create validator
-                let validator = schema.validator(&spec);
-
-                TestResponseSpec {
+        let res_spec =
+            match &self.response_spec.source {
+                ResponseSpecSource::Status(status) => TestResponseSpec {
                     operation: test_op.clone(),
                     status: status.clone(),
-                    body_validator: Some(validator),
-                }
-            }
+                    body_validator: None,
+                },
 
-            ResponseSpecSource::Example {
-                status,
-                media_type,
-                name,
-            } => {
-                // traverse spec
-                let reses = op.get_responses(&spec);
-                let status_spec = reses.get(status.as_str()).ok_or(Error::Placeholder)?;
-                let media_spec = status_spec
-                    .content
-                    .get(media_type)
-                    .ok_or(Error::Placeholder)?;
-                let schema = media_spec.get_schema(&spec)?;
-                let examples = media_spec.get_examples(&spec);
-                let example = examples.get(name).ok_or(Error::Placeholder)?;
+                ResponseSpecSource::Schema { status, media_type } => {
+                    // traverse spec
+                    let responses = op.get_responses(&spec);
+                    let status_spec = responses.get(status.as_str()).ok_or(Error::Ref(
+                        RefError::Unresolvable(format!("status/{}", &status.as_u16())),
+                    ))?;
+                    let media_spec = status_spec.content.get(media_type).ok_or(Error::Ref(
+                        RefError::Unresolvable(format!("mediaType/{}", &media_type)),
+                    ))?;
+                    let schema = media_spec.get_schema(&spec)?;
 
-                // create validator
-                let validator = schema.validator(&spec);
+                    // create validator
+                    let validator = schema.validator(&spec).map_err(ValidationError::Schema)?;
 
-                if let Some(ref ex) = example.value {
-                    // check example validity
-
-                    debug!("validating example: {:?}", &ex);
-                    debug!("against schema: {:?}", &schema);
-                    debug!("with validator: {:?}", &validator);
-
-                    validator.validate_type(&ex).map_err(Error::Validation)?;
+                    TestResponseSpec {
+                        operation: test_op.clone(),
+                        status: status.clone(),
+                        body_validator: Some(validator),
+                    }
                 }
 
-                let mut hdrs = HeaderMap::new();
-                hdrs.insert("Content-Type", media_type.clone().parse().unwrap());
+                ResponseSpecSource::Example {
+                    status,
+                    media_type,
+                    name,
+                } => {
+                    // traverse spec
+                    let reses = op.get_responses(&spec);
+                    let status_spec =
+                        reses
+                            .get(status.as_str())
+                            .ok_or(Error::Ref(RefError::Unresolvable(format!(
+                                "status/{}",
+                                &status.as_u16()
+                            ))))?;
+                    let media_spec = status_spec.content.get(media_type).ok_or(Error::Ref(
+                        RefError::Unresolvable(format!("mediaType/{}", &media_type)),
+                    ))?;
+                    let schema = media_spec.get_schema(&spec)?;
+                    let examples = media_spec.get_examples(&spec);
+                    let example =
+                        examples
+                            .get(name)
+                            .ok_or(Error::Ref(RefError::Unresolvable(format!(
+                                "example/{}",
+                                &name
+                            ))))?;
 
-                TestResponseSpec {
-                    operation: test_op.clone(),
-                    status: status.clone(),
-                    body_validator: Some(validator),
+                    // create validator
+                    let validator = schema.validator(&spec).map_err(ValidationError::Schema)?;
+
+                    if let Some(ref ex) = example.value {
+                        // check example validity
+
+                        debug!("validating example: {:?}", &ex);
+                        debug!("against schema: {:?}", &schema);
+                        debug!("with validator: {:?}", &validator);
+
+                        validator.validate_type(&ex).map_err(Error::Validation)?;
+                    }
+
+                    let mut hdrs = HeaderMap::new();
+                    hdrs.insert("Content-Type", media_type.clone().parse().unwrap());
+
+                    TestResponseSpec {
+                        operation: test_op.clone(),
+                        status: status.clone(),
+                        body_validator: Some(validator),
+                    }
                 }
-            }
 
-            ResponseSpecSource::Exactly(ref data) => todo!(),
-        };
+                ResponseSpecSource::Exactly(ref data) => todo!(),
+            };
 
         Ok(res_spec)
     }
@@ -217,22 +257,25 @@ mod tests {
 
     #[test]
     fn new_conformance_test_spec() {
-        let test0: ConformanceTestSpec = ConformanceTestSpec {
-            operation: OperationSpec::post("/token"),
-            request: RequestSpec::from_example("application/json", "basic"),
-            response_spec: ResponseSpec::from_schema("200", "application/json"),
-        };
+        let test0: ConformanceTestSpec = ConformanceTestSpec::new(
+            "basic login",
+            OperationSpec::post("/token"),
+            RequestSpec::from_example("application/json", "basic"),
+            ResponseSpec::from_schema("200", "application/json"),
+        );
 
-        let test1: ConformanceTestSpec = ConformanceTestSpec {
-            operation: OperationSpec::post("/verify"),
-            request: RequestSpec::from_json_example("expired"),
-            response_spec: ResponseSpec::from_example("200", "application/json", "expired"),
-        };
+        let test1: ConformanceTestSpec = ConformanceTestSpec::new(
+            "verify expired",
+            OperationSpec::post("/verify"),
+            RequestSpec::from_json_example("expired"),
+            ResponseSpec::from_example("200", "application/json", "expired"),
+        );
 
-        let test2: ConformanceTestSpec = ConformanceTestSpec {
-            operation: OperationSpec::get("/isloggedin"),
-            request: RequestSpec::from_bad_raw("not json"),
-            response_spec: ResponseSpec::from_schema("401", "application/json"),
-        };
+        let test2: ConformanceTestSpec = ConformanceTestSpec::new(
+            "is not logged in",
+            OperationSpec::get("/isloggedin"),
+            RequestSpec::from_bad_raw("not json"),
+            ResponseSpec::from_schema("401", "application/json"),
+        );
     }
 }
