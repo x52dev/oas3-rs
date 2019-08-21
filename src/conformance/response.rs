@@ -1,5 +1,5 @@
 use bytes::Bytes;
-use http::StatusCode;
+use http::{StatusCode, HeaderMap};
 use serde_json::Value as JsonValue;
 
 use super::{OperationSpec, TestOperation};
@@ -99,4 +99,15 @@ impl TestResponseSpec {
 
         Ok(())
     }
+}
+
+#[derive(Debug, Clone)]
+pub struct TestResponse {
+    pub status: StatusCode,
+    pub headers: HeaderMap,
+    pub body: JsonValue,
+}
+
+impl TestResponse {
+    pub fn body(&self) -> JsonValue { self.body.clone() }
 }

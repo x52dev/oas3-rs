@@ -1,26 +1,27 @@
-use std::{env, error::Error as StdError, ops::Deref, string::ToString};
+use std::{collections::VecDeque, env, error::Error as StdError, ops::Deref, string::ToString};
 
 use colored::{ColoredString, Colorize};
 use http::{Method, StatusCode};
 use log::{debug, info};
 use prettytable::{cell, row, Table};
+use serde_json::Value as JsonValue;
 
 use crate::{
     conformance::{
         ConformanceTestSpec, OperationSpec, ParamPosition, RequestSource, RequestSpec,
-        ResolvedConformanceTestSpec, ResponseSpec, TestAuthorization, TestRequest,
+        ResolvedConformanceTestSpec, ResponseSpec, TestAuthorization, TestRequest, TestResponse,
     },
     validation::Error as ValidationError,
     Error, Spec,
 };
 
-type TestResult = (ConformanceTestSpec, Result<reqwest::Response, Error>);
+type TestResult = (ConformanceTestSpec, Result<TestResponse, Error>);
 
 #[derive(Debug)]
 pub struct TestRunner {
     pub base_url: String,
     pub spec: Spec,
-    pub queue: Vec<ConformanceTestSpec>,
+    pub queue: VecDeque<ConformanceTestSpec>,
     pub results: Vec<TestResult>,
     pub auth: Option<TestAuthorization>,
 }
@@ -30,17 +31,17 @@ impl TestRunner {
         Self {
             base_url: base_url.into(),
             spec,
-            queue: vec![],
+            queue: VecDeque::new(),
             results: vec![],
             auth: None,
         }
     }
 
     pub fn add_tests(&mut self, tests: &[ConformanceTestSpec]) {
-        self.queue.append(&mut tests.to_owned())
+        self.queue.append(&mut tests.to_owned().into())
     }
 
-    pub fn send_request(&self, req: &TestRequest) -> Result<reqwest::Response, reqwest::Error> {
+    pub fn send_request(&self, req: &TestRequest) -> Result<TestResponse, Error> {
         let client = reqwest::Client::new();
 
         // TODO: add other param types to request
@@ -56,35 +57,34 @@ impl TestRunner {
                 url.replace(&["{", &part.name, "}"].concat(), &part.value)
             });
 
-        client
+        let mut res = client
             .request(method, &url)
             .headers(req.headers.clone())
             .body(req.body.to_vec())
-            .send()
+            .send()?;
+
+        Ok(TestResponse {
+            status: res.status(),
+            headers: res.headers().clone(),
+            body: res.json().map_err(|_| ValidationError::NotJson)?,
+        })
     }
 
-    // TODO: review error type
-    fn run_test(
-        &self,
-        test: ResolvedConformanceTestSpec,
-    ) -> Result<reqwest::Response, ValidationError> {
+    fn run_test(&self, test: ResolvedConformanceTestSpec) -> Result<TestResponse, Error> {
         debug!("request: {:?}", &test.request);
         debug!("response spec: {:?}", &test.response);
 
-        let mut res = self.send_request(&test.request).unwrap();
+        let res = self.send_request(&test.request)?;
 
-        // validate response status
-        let validation = test.response.validate_status(&res.status())?;
+            // validate response status
+        let validation = test.response.validate_status(&res.status)?;
         info!("validation: {:?}", &validation);
 
         // validate response body
         if test.response.body_validator.is_some() {
-            let body = res.json().map_err(|_| ValidationError::NotJson)?;
-            let status = res.status();
-
             debug!("response body: {:?}", &res);
 
-            let validation = test.response.validate_body(&body)?;
+            let validation = test.response.validate_body(&res.body())?;
             info!("validation: {:?}", &validation);
         }
 
@@ -94,13 +94,11 @@ impl TestRunner {
     /// Runs tests in queue serially, removing them from the queue and appending the results and
     /// original test specs in the result list.
     pub fn run_queued_tests(&mut self) {
-        while let Some(test) = self.queue.pop() {
+        while let Some(test) = self.queue.pop_front() {
             match test.resolve(&self.spec) {
                 Ok(resolved_test) => {
-                    self.results.push((
-                        test.clone(),
-                        self.run_test(resolved_test).map_err(Error::Validation),
-                    ));
+                    self.results
+                        .push((test.clone(), self.run_test(resolved_test)));
                 }
                 Err(err) => self.results.push((test.clone(), Err(err))),
             }
@@ -108,6 +106,12 @@ impl TestRunner {
     }
 
     pub fn results(&self) -> &[TestResult] { &self.results }
+
+    pub fn last_response_body(&self) -> JsonValue {
+        let (_, res) = self.results.last().unwrap();
+        let res = res.as_ref().unwrap();
+        res.body()
+    }
 
     pub fn print_results(&self) {
         let mut table = Table::new();

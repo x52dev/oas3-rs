@@ -18,7 +18,7 @@ fn main() {
     let base_url = "http://localhost:9000/api/auth/v1";
     let spec = oas3::from_path(env::var("OAS_PATH").unwrap()).expect("api spec parse error");
     let mut runner = TestRunner::new(base_url, spec.clone());
-
+    // let auth_method = TestAuthorization::bearer(env::var("TOKEN").unwrap());
 
     let login_test = ConformanceTestSpec::named(
         "login success",
@@ -30,12 +30,17 @@ fn main() {
     runner.add_tests(&[login_test.clone()]);
     runner.run_queued_tests();
 
-    let req = login_test.resolve_request(&spec).unwrap();
-    let body: JsonValue = runner.send_request(&req).unwrap().json().unwrap();
-    let jwt = body.as_object().unwrap().get("token").unwrap().as_str().unwrap().to_owned();
+    let body: JsonValue = runner.last_response_body();
+    let jwt = body
+        .as_object()
+        .unwrap()
+        .get("token")
+        .unwrap()
+        .as_str()
+        .unwrap()
+        .to_owned();
     info!("{:?}", &jwt);
 
-    // let auth_method = TestAuthorization::bearer(env::var("TOKEN").unwrap());
     let auth_method = TestAuthorization::bearer(jwt);
 
     runner.add_tests(&[
@@ -66,12 +71,18 @@ fn main() {
             OperationSpec::operation_id("listOwnHwcreds"),
         )
         .with_auth(&auth_method),
-        ConformanceTestSpec::named(
-            "start mobile token process",
-            OperationSpec::operation_id("mtRequest"),
-            RequestSpec::from_json_example("blank").with_auth(&auth_method),
-            ResponseSpec::from_json_schema(200),
-        ),
+    ]);
+
+    // mt tests
+    ConformanceTestSpec::named(
+        "start mobile token process",
+        OperationSpec::operation_id("mtRequest"),
+        RequestSpec::from_json_example("blank").with_auth(&auth_method),
+        ResponseSpec::from_json_schema(200),
+    );
+
+    // admin tests
+    runner.add_tests(&[
         ConformanceTestSpec::named_get_success(
             "admin list failed logins",
             OperationSpec::operation_id("adminListFailedLogins"),
@@ -90,7 +101,7 @@ fn main() {
             OperationSpec::operation_id("adminListAccountPasswordChanges"),
             RequestSpec::empty()
                 .with_auth(&auth_method)
-                .add_param("acc_id", "53ad084e-ca6e-475d-a9f3-4b184999b244"),
+                .add_param("acc_uid", "53ad084e-ca6e-475d-a9f3-4b184999b244"),
             ResponseSpec::from_status(200),
         ),
         ConformanceTestSpec::named(
@@ -98,7 +109,7 @@ fn main() {
             OperationSpec::operation_id("adminListAccountFailedLogins"),
             RequestSpec::empty()
                 .with_auth(&auth_method)
-                .add_param("acc_id", "53ad084e-ca6e-475d-a9f3-4b184999b244"),
+                .add_param("acc_uid", "53ad084e-ca6e-475d-a9f3-4b184999b244"),
             ResponseSpec::from_status(200),
         ),
     ]);

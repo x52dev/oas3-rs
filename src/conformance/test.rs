@@ -48,7 +48,7 @@ impl ConformanceTestSpec {
             ..Self::new(
                 op,
                 RequestSpec::empty(),
-                ResponseSpec::from_json_schema(200),
+                ResponseSpec::from_status(200),
             )
         }
     }
