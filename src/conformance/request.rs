@@ -1,7 +1,7 @@
 use bytes::Bytes;
 use http::HeaderMap;
 
-use super::{OperationSpec, TestAuthorization, TestOperation};
+use super::{OperationSpec, ParamReplacement, TestAuthorization, TestOperation, TestParam};
 
 #[derive(Debug, Clone)]
 pub enum RequestSource {
@@ -15,6 +15,7 @@ pub struct RequestSpec {
     pub source: RequestSource,
     pub bad: bool,
     pub auth: Option<TestAuthorization>,
+    pub params: Vec<ParamReplacement>,
 }
 
 impl RequestSpec {
@@ -23,6 +24,7 @@ impl RequestSpec {
             source: RequestSource::Empty,
             bad: false,
             auth: None,
+            params: vec![],
         }
     }
 
@@ -36,8 +38,7 @@ impl RequestSpec {
                 media_type: media_type.into(),
                 name: name.into(),
             },
-            bad: false,
-            auth: None,
+            ..Self::empty()
         }
     }
 
@@ -50,8 +51,7 @@ impl RequestSpec {
                 media_type: "application/json".to_owned(),
                 name: name.into(),
             },
-            bad: false,
-            auth: None,
+            ..Self::empty()
         }
     }
 
@@ -62,7 +62,7 @@ impl RequestSpec {
         Self {
             source: RequestSource::Raw(body.into()),
             bad: true,
-            auth: None,
+            ..Self::empty()
         }
     }
 
@@ -72,12 +72,22 @@ impl RequestSpec {
             ..self
         }
     }
+
+    pub fn add_param<N, V>(mut self, name: N, val: V) -> Self
+    where
+        N: Into<String>,
+        V: Into<String>,
+    {
+        let param = ParamReplacement::new(name, val);
+        self.params.push(param);
+        self
+    }
 }
 
 #[derive(Debug, Clone)]
 pub struct TestRequest {
     pub operation: TestOperation,
     pub headers: HeaderMap,
-    // pub parameters: Vec<_>,
+    pub params: Vec<TestParam>,
     pub body: Bytes,
 }

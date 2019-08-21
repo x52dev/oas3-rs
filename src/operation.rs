@@ -1,10 +1,8 @@
 use std::collections::BTreeMap;
 
-use log::error;
-
 use crate::{
-    Callback, Error, ExternalDoc, ObjectOrReference, Parameter, RefError, RequestBody, Response,
-    Server, Spec,
+    Callback, Error, ExternalDoc, FromRef, ObjectOrReference, Parameter, RefError, RequestBody,
+    Response, Server, Spec,
 };
 
 /// Describes a single API operation on a path.
@@ -123,9 +121,30 @@ impl Operation {
             .filter_map(|(name, oor)| {
                 oor.resolve(&spec)
                     .map(|obj| (name.clone(), obj))
+                    // TODO: find better error solution
                     .map_err(|err| error!("{}", err))
                     .ok()
             })
             .collect()
+    }
+
+    pub fn get_parameters(&self, spec: &Spec) -> Result<Vec<Parameter>, Error> {
+        let params = self.parameters
+            .iter()
+            // TODO: find better error solution
+            .filter_map(|oor| oor.resolve(&spec).map_err(|err| error!("{}", err)).ok())
+            .collect();
+        
+        Ok(params)
+    }
+
+    pub fn get_parameter(&self, search: &str, spec: &Spec) -> Result<Option<Parameter>, Error> {
+        let param = self
+            .get_parameters(&spec)?
+            .iter()
+            .find(|param| param.name == search)
+            .cloned();
+
+        Ok(param)
     }
 }

@@ -8,7 +8,7 @@ use http::{Method, StatusCode};
 use log::{debug, info};
 use oas3::{
     conformance::{
-        ConformanceTestSpec, OperationSpec, RequestSource, RequestSpec,
+        ConformanceTestSpec, OperationSpec, ParamPosition, RequestSource, RequestSpec,
         ResolvedConformanceTestSpec, ResponseSpec, TestAuthorization, TestRequest,
     },
     validation::Error as ValidationError,
@@ -20,11 +20,18 @@ fn do_request(req: &TestRequest) -> Result<reqwest::Response, reqwest::Error> {
     let base_url = "http://localhost:9000/api/auth/v1";
     let client = reqwest::Client::new();
 
-    // TODO: add url params
-    // TODO: add qs params
+    // TODO: add other param types to request
 
     let method: reqwest::Method = req.operation.method.as_str().parse().unwrap();
     let url: String = [base_url, &req.operation.path].concat();
+
+    let url = req
+        .params
+        .iter()
+        .filter(|&param| param.position == ParamPosition::Path)
+        .fold(url, |url, part| {
+            url.replace(&["{", &part.name, "}"].concat(), &part.value)
+        });
 
     client
         .request(method, &url)
@@ -80,7 +87,7 @@ fn do_tests(
 fn error_string(err: &dyn StdError) -> ColoredString {
     let mut err_str = err.to_string();
     err_str.push('\n');
-    
+
     let mut cause = err.source();
     while let Some(err) = cause {
         err_str.push_str(&err.to_string());
@@ -154,35 +161,55 @@ fn main() {
                 RequestSpec::from_json_example("unregistered"),
                 ResponseSpec::from_json_schema(401),
             ),
-            &ConformanceTestSpec::named(
+            &ConformanceTestSpec::named_get_success(
                 "check logged in",
                 OperationSpec::operation_id("checkLoggedIn"),
-                RequestSpec::empty().with_auth(&auth_method),
-                ResponseSpec::from_status(200),
-            ),
-            &ConformanceTestSpec::named(
+            )
+            .with_auth(&auth_method),
+            &ConformanceTestSpec::named_get_success(
                 "fetch own tokens",
                 OperationSpec::operation_id("ownTokens"),
-                RequestSpec::empty().with_auth(&auth_method),
-                ResponseSpec::from_json_schema(200),
-            ),
-            &ConformanceTestSpec::named(
+            )
+            .with_auth(&auth_method),
+            &ConformanceTestSpec::named_get_success(
                 "fetch own valid tokens",
                 OperationSpec::operation_id("listOwnHwcreds"),
-                RequestSpec::empty().with_auth(&auth_method),
-                ResponseSpec::from_status(200),
-            ),
+            )
+            .with_auth(&auth_method),
             &ConformanceTestSpec::named(
                 "start mobile token process",
                 OperationSpec::operation_id("mtRequest"),
                 RequestSpec::from_json_example("blank").with_auth(&auth_method),
                 ResponseSpec::from_json_schema(200),
             ),
-            &ConformanceTestSpec::named(
+            &ConformanceTestSpec::named_get_success(
                 "admin list failed logins",
                 OperationSpec::operation_id("adminListFailedLogins"),
-                RequestSpec::empty().with_auth(&auth_method),
-                ResponseSpec::from_json_schema(200),
+            )
+            .with_auth(&auth_method),
+            &ConformanceTestSpec::named(
+                "admin list user tokens",
+                OperationSpec::operation_id("adminListAccountTokens"),
+                RequestSpec::empty()
+                    .with_auth(&auth_method)
+                    .add_param("acc_uid", "53ad084e-ca6e-475d-a9f3-4b184999b244"),
+                ResponseSpec::from_status(200),
+            ),
+            &ConformanceTestSpec::named(
+                "admin list user password changes",
+                OperationSpec::operation_id("adminListAccountPasswordChanges"),
+                RequestSpec::empty()
+                    .with_auth(&auth_method)
+                    .add_param("acc_id", "53ad084e-ca6e-475d-a9f3-4b184999b244"),
+                ResponseSpec::from_status(200),
+            ),
+            &ConformanceTestSpec::named(
+                "admin list user failed logins",
+                OperationSpec::operation_id("adminListAccountFailedLogins"),
+                RequestSpec::empty()
+                    .with_auth(&auth_method)
+                    .add_param("acc_id", "53ad084e-ca6e-475d-a9f3-4b184999b244"),
+                ResponseSpec::from_status(200),
             ),
         ],
     );

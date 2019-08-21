@@ -1,6 +1,5 @@
 use std::collections::BTreeMap;
 
-use log::error;
 
 use crate::{Encoding, Error, Example, MediaTypeExamples, ObjectOrReference, Schema, Spec};
 

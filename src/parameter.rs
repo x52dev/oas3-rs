@@ -1,6 +1,6 @@
-use crate::Schema;
+use crate::{FromRef, MediaType, RefError, RefPath, RefType, Schema, Spec};
 
-// FIXME: Verify against OpenAPI 3.0
+// FIXME: Verify against OpenAPI 3.0.1
 /// Describes a single operation parameter.
 /// A unique parameter is defined by a combination of a
 /// [name](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#parameterName)
@@ -12,8 +12,9 @@ pub struct Parameter {
     /// The name of the parameter.
     pub name: String,
 
-    /// values depend on parameter type
-    /// may be `header`, `query`, 'path`, `formData`
+    // TODO: enumify
+    /// The location of the parameter.
+    /// Possible values are "query", "header", "path" or "cookie".
     #[serde(rename = "in")]
     pub location: String,
 
@@ -66,4 +67,24 @@ pub struct Parameter {
 enum ParameterStyle {
     Form,
     Simple,
+}
+
+impl FromRef for Parameter {
+    fn from_ref(spec: &Spec, path: &str) -> Result<Self, RefError>
+    where
+        Self: Sized,
+    {
+        let refpath = path.parse::<RefPath>()?;
+
+        match refpath.kind {
+            RefType::Parameter => spec
+                .components
+                .as_ref()
+                .and_then(|cs| cs.parameters.get(&refpath.name))
+                .ok_or_else(|| RefError::Unresolvable(path.to_owned()))
+                .and_then(|oor| oor.resolve(&spec)),
+
+            typ => Err(RefError::MismatchedType(typ, RefType::Parameter)),
+        }
+    }
 }

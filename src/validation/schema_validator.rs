@@ -1,7 +1,6 @@
 use std::{collections::BTreeMap, fmt, ops::Deref};
 
 use lazy_static::lazy_static;
-use log::{debug, trace, warn};
 use serde_json::Value as JsonValue;
 
 use crate::{schema::Error as SchemaError, validation::Error, Schema, Spec};

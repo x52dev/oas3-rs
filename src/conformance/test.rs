@@ -1,7 +1,6 @@
 use bytes::Bytes;
 use http::{HeaderMap, HeaderValue, Method, StatusCode};
 use lazy_static::lazy_static;
-use log::{debug, error};
 
 use crate::{
     validation::{Error as ValidationError, SchemaValidator},
@@ -9,8 +8,8 @@ use crate::{
 };
 
 use super::{
-    OperationSpec, RequestSource, RequestSpec, ResponseSpec, ResponseSpecSource, TestAuthorization,
-    TestOperation, TestRequest, TestResponseSpec,
+    OperationSpec, ParamPosition, RequestSource, RequestSpec, ResponseSpec, ResponseSpecSource,
+    TestAuthorization, TestOperation, TestParam, TestRequest, TestResponseSpec,
 };
 
 #[derive(Debug, Clone)]
@@ -43,6 +42,24 @@ impl ConformanceTestSpec {
         }
     }
 
+    pub fn named_get_success<T: Into<String>>(name: T, op: OperationSpec) -> Self {
+        Self {
+            name: Some(name.into()),
+            ..Self::new(
+                op,
+                RequestSpec::empty(),
+                ResponseSpec::from_json_schema(200),
+            )
+        }
+    }
+
+    pub fn with_auth(self, auth: &TestAuthorization) -> Self {
+        Self {
+            request: self.request.with_auth(auth),
+            ..self
+        }
+    }
+
     pub fn resolve(&self, spec: &Spec) -> Result<ResolvedConformanceTestSpec, Error> {
         Ok(ResolvedConformanceTestSpec {
             unresolved: self.clone(),
@@ -72,6 +89,47 @@ impl ConformanceTestSpec {
         Ok(test_op)
     }
 
+    pub fn resolve_params(&self, spec: &Spec) -> Result<Vec<TestParam>, Error> {
+        let test_op = self.resolve_test_operation(&spec)?;
+        let op = test_op.resolve_operation(&spec)?;
+
+        let mut test_params = vec![];
+
+        // iterate params
+        for param in &self.request.params {
+            // resolve in spec
+            let parameter = op
+                .get_parameter(&param.name, &spec)?
+                .ok_or(ValidationError::ParameterNotFound(param.name.clone()))?;
+
+            // validate position
+            let pos = match parameter.location.as_ref() {
+                "query" => ParamPosition::Query,
+                "header" => ParamPosition::Header,
+                "path" => ParamPosition::Path,
+                "cookie" => ParamPosition::Cookie,
+                pos_str => Err(ValidationError::InvalidParameterLocation(
+                    pos_str.to_owned(),
+                ))?,
+            };
+
+            // TODO: validate type
+            // TODO: validate other spec options
+
+            // insert into test params
+            let test_param = TestParam::new(&param.name, &param.value, pos);
+            test_params.push(test_param);
+
+            // mark param as used for redundancy checks later
+            param.used.replace(true);
+        }
+
+        // TODO: check params for unused and report
+        // TODO: check spec params for unreplaced and report if not required
+
+        Ok(test_params)
+    }
+
     pub fn resolve_request(&self, spec: &Spec) -> Result<TestRequest, Error> {
         let test_op = self.resolve_test_operation(&spec)?;
         let op = test_op.resolve_operation(&spec)?;
@@ -80,6 +138,7 @@ impl ConformanceTestSpec {
             RequestSource::Empty => TestRequest {
                 operation: test_op.clone(),
                 headers: HeaderMap::new(),
+                params: self.resolve_params(&spec)?,
                 body: Bytes::new(),
             },
 
@@ -91,6 +150,7 @@ impl ConformanceTestSpec {
                 TestRequest {
                     operation: test_op.clone(),
                     headers: HeaderMap::new(),
+                    params: self.resolve_params(&spec)?,
                     body: data.clone(),
                 }
             }
@@ -135,6 +195,7 @@ impl ConformanceTestSpec {
                 TestRequest {
                     operation: test_op.clone(),
                     headers: hdrs,
+                    params: self.resolve_params(&spec)?,
                     body: example.as_bytes().into(),
                 }
             }

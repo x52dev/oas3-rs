@@ -2,7 +2,6 @@ use std::{fs::File, io::Read, path::Path, result::Result as StdResult, str::From
 
 use derive_more::Display;
 use lazy_static::lazy_static;
-use log::{debug, trace};
 use regex::Regex;
 
 use crate::Spec;

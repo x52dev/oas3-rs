@@ -36,12 +36,13 @@
 extern crate serde_derive;
 #[macro_use]
 extern crate err_derive;
+#[macro_use]
+extern crate log;
 
 
 use std::{fs::File, io::Read, path::Path, result::Result as StdResult};
 
 use lazy_static::lazy_static;
-use log::{debug, trace};
 use regex::Regex;
 
 mod error;
