@@ -3,8 +3,7 @@ use std::collections::BTreeMap;
 use crate::Url;
 
 /// Allows configuration of the supported OAuth Flows.
-/// See [link]
-/// [link][https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#oauth-flows-object]
+/// See [https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#oauth-flows-object]
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct Flows {
@@ -22,8 +21,7 @@ pub struct Flows {
 }
 
 /// Configuration details for a implicit OAuth Flow
-/// See [link]
-/// [link](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#oauth-flow-object)
+/// See [https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#oauth-flow-object]
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct ImplicitFlow {
@@ -36,8 +34,7 @@ pub struct ImplicitFlow {
 }
 
 /// Configuration details for a password OAuth Flow
-/// See [link]
-/// [link](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#oauth-flow-object
+/// See [https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#oauth-flow-object]
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct PasswordFlow {
@@ -50,8 +47,7 @@ pub struct PasswordFlow {
 }
 
 /// Configuration details for a client credentials OAuth Flow
-/// See [link]
-/// [link](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#oauth-flow-object
+/// See [https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#oauth-flow-object]
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct ClientCredentialsFlow {
@@ -64,8 +60,7 @@ pub struct ClientCredentialsFlow {
 }
 
 /// Configuration details for a authorization code OAuth Flow
-/// See [link]
-/// [link](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#oauth-flow-object
+/// See [https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#oauth-flow-object]
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct AuthorizationCodeFlow {

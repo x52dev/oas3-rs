@@ -106,4 +106,8 @@ impl Spec {
                 .map(move |(method, op)| (path.to_owned(), method, op))
         })
     }
+
+    pub fn primary_server(&self) -> Option<&Server> {
+        self.servers.first()
+    }
 }

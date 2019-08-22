@@ -131,7 +131,7 @@ impl Operation {
     pub fn get_parameters(&self, spec: &Spec) -> Result<Vec<Parameter>, Error> {
         let params = self.parameters
             .iter()
-            // TODO: find better error solution
+            // TODO: find better error solution, maybe vec<result<_>>
             .filter_map(|oor| oor.resolve(&spec).map_err(|err| error!("{}", err)).ok())
             .collect();
         

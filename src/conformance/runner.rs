@@ -5,6 +5,7 @@ use http::{Method, StatusCode};
 use log::{debug, info};
 use prettytable::{cell, row, Table};
 use serde_json::Value as JsonValue;
+use url::Url;
 
 use crate::{
     conformance::{
@@ -51,11 +52,10 @@ impl TestRunner {
     pub fn send_request(&self, req: &TestRequest) -> Result<TestResponse, Error> {
         let client = reqwest::Client::new();
 
-        // TODO: add other param types to request
-
         let method: reqwest::Method = req.operation.method.as_str().parse().unwrap();
         let url: String = [self.base_url.deref(), &req.operation.path].concat();
 
+        // path params
         let url = req
             .params
             .iter()
@@ -64,8 +64,24 @@ impl TestRunner {
                 url.replace(&["{", &part.name, "}"].concat(), &part.value)
             });
 
+        let mut url: Url = url.parse().unwrap();
+
+        {
+            // query params
+            let mut qs = url.query_pairs_mut();
+            qs.clear();
+            req.params
+                .iter()
+                .filter(|&param| param.position == ParamPosition::Query)
+                .for_each(|param| {
+                    qs.append_pair(&param.name, &param.value);
+                });
+        }
+
+        // TODO: add other param types to request
+
         let mut res = client
-            .request(method, &url)
+            .request(method, &url.to_string())
             .headers(req.headers.clone())
             .body(req.body.to_vec())
             .send()?;

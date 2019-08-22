@@ -149,7 +149,7 @@ impl SchemaValidator {
             SchemaType::Object(ref prop_validators) => match val {
                 JsonValue::Object(props) => {
                     for (key, val) in props {
-                        debug!("checking {}", &key);
+                        trace!("checking {}", &key);
 
                         if let Some(ref vltr) = prop_validators.get(key.deref()) {
                             vltr.validate_type(&val)?;
