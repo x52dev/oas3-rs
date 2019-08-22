@@ -3,6 +3,8 @@
 
 #[macro_use]
 extern crate log;
+#[macro_use]
+extern crate serde_json;
 
 use std::env;
 
@@ -20,33 +22,22 @@ fn main() {
     let mut runner = TestRunner::new(base_url, spec.clone());
     // let auth_method = TestAuthorization::bearer(env::var("TOKEN").unwrap());
 
-    let login_test = ConformanceTestSpec::named(
+    runner.immediate_test(ConformanceTestSpec::named(
         "login success",
-        OperationSpec::post("/token"),
+        OperationSpec::operation_id("signin"),
         RequestSpec::from_json_example("basic"),
         ResponseSpec::from_json_schema(200),
-    );
+    ));
 
-    runner.add_tests(&[login_test.clone()]);
-    runner.run_queued_tests();
-
-    let body: JsonValue = runner.last_response_body();
-    let jwt = body
-        .as_object()
-        .unwrap()
-        .get("token")
-        .unwrap()
-        .as_str()
-        .unwrap()
-        .to_owned();
-    info!("{:?}", &jwt);
+    let login: JsonValue = runner.last_response_body().unwrap();
+    let jwt = login["token"].as_str().expect("token is not a string");
 
     let auth_method = TestAuthorization::bearer(jwt);
 
     runner.add_tests(&[
         ConformanceTestSpec::named(
             "verify revoked",
-            OperationSpec::post("/verify"),
+            OperationSpec::operation_id("verify"),
             RequestSpec::from_json_example("revoked"),
             ResponseSpec::from_example(200, "application/json", "revoked"),
         ),
@@ -74,12 +65,63 @@ fn main() {
     ]);
 
     // mt tests
-    ConformanceTestSpec::named(
+    runner.immediate_test(ConformanceTestSpec::named(
         "start mobile token process",
         OperationSpec::operation_id("mtRequest"),
-        RequestSpec::from_json_example("blank").with_auth(&auth_method),
+        RequestSpec::from_json_example("dummy").with_auth(&auth_method),
         ResponseSpec::from_json_schema(200),
-    );
+    ));
+
+    let mtr: JsonValue = runner.last_response_body().unwrap();
+    let mtr_uid = mtr["uid"].as_str().unwrap();
+    let scan_req = serde_json::to_vec(&mtr).unwrap();
+
+    runner.immediate_test(ConformanceTestSpec::named(
+        "scan mobile token",
+        OperationSpec::operation_id("mtScan"),
+        // no auth on mobile side
+        // TODO: really need a way to validate dynamic requests
+        RequestSpec::from_bad_raw(scan_req).override_content_type("application/json"),
+        ResponseSpec::from_json_schema(200),
+    ));
+
+    runner.run_queued_tests();
+    let scan: JsonValue = runner.last_response_body().unwrap();
+    let status_req = serde_json::to_vec(&json!({ "uid": &mtr_uid })).unwrap();
+
+    // confirm = mtr + confirm code
+    let confirm = json!({
+        "confirmation_code": scan["confirmation_code"],
+        "uid": mtr["uid"],
+        "requester_token": mtr["requester_token"],
+        "created_at": mtr["created_at"],
+    });
+    let confirm_req = serde_json::to_vec(&confirm).unwrap();
+
+    runner.add_tests(&[
+        ConformanceTestSpec::named(
+            "mobile token request status disallows login before confirmation",
+            OperationSpec::operation_id("mtStatus"),
+            // no auth on mobile side
+            RequestSpec::from_bad_raw(status_req.clone()).override_content_type("application/json"),
+            ResponseSpec::from_json_schema(403),
+        ),
+        ConformanceTestSpec::named(
+            "confirm mobile token",
+            OperationSpec::operation_id("mtConfirm"),
+            RequestSpec::from_bad_raw(confirm_req)
+                .with_auth(&auth_method)
+                .override_content_type("application/json"),
+            ResponseSpec::from_status(200),
+        ),
+        ConformanceTestSpec::named(
+            "mobile token request allows login",
+            OperationSpec::operation_id("mtStatus"),
+            // no auth on mobile side
+            RequestSpec::from_bad_raw(status_req).override_content_type("application/json"),
+            ResponseSpec::from_json_schema(200),
+        ),
+    ]);
 
     // admin tests
     runner.add_tests(&[

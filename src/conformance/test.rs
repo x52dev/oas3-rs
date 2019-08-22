@@ -45,11 +45,7 @@ impl ConformanceTestSpec {
     pub fn named_get_success<T: Into<String>>(name: T, op: OperationSpec) -> Self {
         Self {
             name: Some(name.into()),
-            ..Self::new(
-                op,
-                RequestSpec::empty(),
-                ResponseSpec::from_status(200),
-            )
+            ..Self::new(op, RequestSpec::empty(), ResponseSpec::from_status(200))
         }
     }
 
@@ -201,15 +197,15 @@ impl ConformanceTestSpec {
             }
         };
 
-        match self.request.auth {
-            Some(TestAuthorization::Bearer(ref jwt)) => {
-                let val = format!("Bearer {}", jwt);
-                req.headers.append(
-                    "Authorization",
-                    HeaderValue::from_str(&val).expect("invalid header value"),
-                );
-            }
-            _ => {}
+        if let Some(TestAuthorization::Bearer(ref jwt)) = self.request.auth {
+            let val = format!("Bearer {}", jwt);
+            req.headers
+                .insert("Authorization", val.parse().expect("invalid auth token"));
+        }
+
+        if let Some(ct) = self.request.content_type_override.as_ref() {
+            req.headers
+                .insert("Content-Type", ct.parse().expect("invalid content type"));
         }
 
         Ok(req)

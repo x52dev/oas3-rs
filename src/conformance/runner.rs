@@ -41,6 +41,13 @@ impl TestRunner {
         self.queue.append(&mut tests.to_owned().into())
     }
 
+    pub fn add_test(&mut self, test: ConformanceTestSpec) { self.queue.push_back(test); }
+
+    pub fn immediate_test(&mut self, test: ConformanceTestSpec) {
+        self.add_test(test);
+        self.run_queued_tests();
+    }
+
     pub fn send_request(&self, req: &TestRequest) -> Result<TestResponse, Error> {
         let client = reqwest::Client::new();
 
@@ -63,10 +70,17 @@ impl TestRunner {
             .body(req.body.to_vec())
             .send()?;
 
+        let body_is_empty = res.content_length().map(|x| x == 0).unwrap_or(false);
+        let body = if body_is_empty {
+            None
+        } else {
+            Some(res.json().map_err(|_| ValidationError::NotJson)?)
+        };
+
         Ok(TestResponse {
             status: res.status(),
             headers: res.headers().clone(),
-            body: res.json().map_err(|_| ValidationError::NotJson)?,
+            body,
         })
     }
 
@@ -76,16 +90,16 @@ impl TestRunner {
 
         let res = self.send_request(&test.request)?;
 
-            // validate response status
-        let validation = test.response.validate_status(&res.status)?;
-        info!("validation: {:?}", &validation);
+        // validate response status
+        test.response.validate_status(&res.status)?;
 
         // validate response body
         if test.response.body_validator.is_some() {
-            debug!("response body: {:?}", &res);
+            if res.body().is_none() {
+                return Err(ValidationError::NotJson.into());
+            }
 
-            let validation = test.response.validate_body(&res.body())?;
-            info!("validation: {:?}", &validation);
+            test.response.validate_body(&res.body().unwrap())?;
         }
 
         Ok(res)
@@ -107,7 +121,7 @@ impl TestRunner {
 
     pub fn results(&self) -> &[TestResult] { &self.results }
 
-    pub fn last_response_body(&self) -> JsonValue {
+    pub fn last_response_body(&self) -> Option<JsonValue> {
         let (_, res) = self.results.last().unwrap();
         let res = res.as_ref().unwrap();
         res.body()
@@ -147,6 +161,8 @@ impl TestRunner {
 
         table.printstd();
     }
+
+    pub fn clear_results(&mut self) { self.results.clear(); }
 }
 
 pub fn format_error(err: &dyn StdError) -> ColoredString {

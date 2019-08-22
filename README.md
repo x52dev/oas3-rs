@@ -1,6 +1,6 @@
 # OAS3
 
-> Structures and tools to parse and navigate [OpenAPI v3 Spec][oas3-spec] files.
+> Structures and tools to parse, navigate and validate [OpenAPI v3 Spec][oas3-spec] files. 
 
 Based on v3 parts of [openapi](https://crates.io/crates/openapi) crate by [softprops](https://crates.io/users/softprops).
 
@@ -13,7 +13,7 @@ add the following to your `Cargo.toml` file
 oas3 = "*"
 ```
 
-## usage
+## Usage
 
 ```rust
 extern crate oas3;

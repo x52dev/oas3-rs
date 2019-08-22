@@ -16,6 +16,7 @@ pub struct RequestSpec {
     pub bad: bool,
     pub auth: Option<TestAuthorization>,
     pub params: Vec<ParamReplacement>,
+    pub content_type_override: Option<String>,
 }
 
 impl RequestSpec {
@@ -25,6 +26,7 @@ impl RequestSpec {
             bad: false,
             auth: None,
             params: vec![],
+            content_type_override: None,
         }
     }
 
@@ -63,6 +65,16 @@ impl RequestSpec {
             source: RequestSource::Raw(body.into()),
             bad: true,
             ..Self::empty()
+        }
+    }
+
+    pub fn override_content_type<T>(self, ct: T) -> Self
+    where
+        T: Into<String>,
+    {
+        Self {
+            content_type_override: Some(ct.into()),
+            ..self
         }
     }
 

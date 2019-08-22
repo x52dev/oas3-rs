@@ -1,5 +1,5 @@
 use bytes::Bytes;
-use http::{StatusCode, HeaderMap};
+use http::{HeaderMap, StatusCode};
 use serde_json::Value as JsonValue;
 
 use super::{OperationSpec, TestOperation};
@@ -78,8 +78,6 @@ pub struct TestResponseSpec {
 }
 
 impl TestResponseSpec {
-    // TODO: own response type
-
     pub fn validate_status(&self, val: &StatusCode) -> Result<(), ValidationError> {
         if &self.status == val {
             Ok(())
@@ -105,9 +103,9 @@ impl TestResponseSpec {
 pub struct TestResponse {
     pub status: StatusCode,
     pub headers: HeaderMap,
-    pub body: JsonValue,
+    pub body: Option<JsonValue>,
 }
 
 impl TestResponse {
-    pub fn body(&self) -> JsonValue { self.body.clone() }
+    pub fn body(&self) -> Option<JsonValue> { self.body.clone() }
 }

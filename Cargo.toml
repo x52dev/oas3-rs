@@ -1,11 +1,14 @@
 [package]
 name = "oas3"
-version = "0.0.1"
+version = "0.1.0"
 edition = "2018"
-authors = ["robjtede <robjtede@icloud.com>", "softprops <d.tangren@gmail.com>"]
-description = "Structures and tools to parse and navigate OpenAPI v3 specifications."
+authors = [
+  "rob <rob@cryptofacilities.com>",
+  "softprops <d.tangren@gmail.com>"
+]
+description = "Structures and tools to parse, navigate and validate OpenAPI v3 specifications."
 # repository = "https://github.com/softprops/openapi"
-keywords = ["oas", "oas3", "openapi", "openapi3", "swagger"]
+keywords = ["oas", "oas3", "openapi", "openapi3", "swagger", "roast"]
 license = "MIT"
 
 [dependencies]
