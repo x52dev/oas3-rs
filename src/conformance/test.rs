@@ -9,7 +9,7 @@ use crate::{
 
 use super::{
     OperationSpec, ParamPosition, RequestSource, RequestSpec, ResponseSpec, ResponseSpecSource,
-    TestAuthorization, TestOperation, TestParam, TestRequest, TestResponseSpec,
+    TestAuthentication, TestOperation, TestParam, TestRequest, TestResponseSpec,
 };
 
 #[derive(Debug, Clone)]
@@ -42,14 +42,14 @@ impl ConformanceTestSpec {
         }
     }
 
-    pub fn named_get_success<T: Into<String>>(name: T, op: OperationSpec) -> Self {
+    pub fn named_success<T: Into<String>>(name: T, op: OperationSpec) -> Self {
         Self {
             name: Some(name.into()),
             ..Self::new(op, RequestSpec::empty(), ResponseSpec::from_status(200))
         }
     }
 
-    pub fn with_auth(self, auth: &TestAuthorization) -> Self {
+    pub fn with_auth(self, auth: &TestAuthentication) -> Self {
         Self {
             request: self.request.with_auth(auth),
             ..self
@@ -57,9 +57,15 @@ impl ConformanceTestSpec {
     }
 
     pub fn resolve(&self, spec: &Spec) -> Result<ResolvedConformanceTestSpec, Error> {
+        let mut req = self.resolve_request(&spec)?;
+
+        if let Some(TestAuthentication::Custom(transformer)) = self.request.auth {
+            req = transformer(req);
+        };
+
         Ok(ResolvedConformanceTestSpec {
             unresolved: self.clone(),
-            request: self.resolve_request(&spec)?,
+            request: req,
             response: self.resolve_response_spec(&spec)?,
         })
     }
@@ -197,7 +203,7 @@ impl ConformanceTestSpec {
             }
         };
 
-        if let Some(TestAuthorization::Bearer(ref jwt)) = self.request.auth {
+        if let Some(TestAuthentication::Bearer(ref jwt)) = self.request.auth {
             let val = format!("Bearer {}", jwt);
             req.headers
                 .insert("Authorization", val.parse().expect("invalid auth token"));
@@ -314,25 +320,25 @@ mod tests {
 
     #[test]
     fn new_conformance_test_spec() {
-        let test0: ConformanceTestSpec = ConformanceTestSpec::new(
+        let test0: ConformanceTestSpec = ConformanceTestSpec::named(
             "basic login",
             OperationSpec::post("/token"),
             RequestSpec::from_example("application/json", "basic"),
-            ResponseSpec::from_schema("200", "application/json"),
+            ResponseSpec::from_schema(200, "application/json"),
         );
 
-        let test1: ConformanceTestSpec = ConformanceTestSpec::new(
+        let test1: ConformanceTestSpec = ConformanceTestSpec::named(
             "verify expired",
             OperationSpec::post("/verify"),
             RequestSpec::from_json_example("expired"),
-            ResponseSpec::from_example("200", "application/json", "expired"),
+            ResponseSpec::from_example(200, "application/json", "expired"),
         );
 
-        let test2: ConformanceTestSpec = ConformanceTestSpec::new(
+        let test2: ConformanceTestSpec = ConformanceTestSpec::named(
             "is not logged in",
             OperationSpec::get("/isloggedin"),
             RequestSpec::from_bad_raw("not json"),
-            ResponseSpec::from_schema("401", "application/json"),
+            ResponseSpec::from_schema(401, "application/json"),
         );
     }
 }

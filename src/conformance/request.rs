@@ -1,7 +1,7 @@
 use bytes::Bytes;
 use http::HeaderMap;
 
-use super::{OperationSpec, ParamReplacement, TestAuthorization, TestOperation, TestParam};
+use super::{OperationSpec, ParamReplacement, TestAuthentication, TestOperation, TestParam};
 
 #[derive(Debug, Clone)]
 pub enum RequestSource {
@@ -14,7 +14,7 @@ pub enum RequestSource {
 pub struct RequestSpec {
     pub source: RequestSource,
     pub bad: bool,
-    pub auth: Option<TestAuthorization>,
+    pub auth: Option<TestAuthentication>,
     pub params: Vec<ParamReplacement>,
     pub content_type_override: Option<String>,
 }
@@ -78,7 +78,7 @@ impl RequestSpec {
         }
     }
 
-    pub fn with_auth(self, auth: &TestAuthorization) -> Self {
+    pub fn with_auth(self, auth: &TestAuthentication) -> Self {
         Self {
             auth: Some(auth.clone()),
             ..self

@@ -10,7 +10,7 @@ use url::Url;
 use crate::{
     conformance::{
         ConformanceTestSpec, OperationSpec, ParamPosition, RequestSource, RequestSpec,
-        ResolvedConformanceTestSpec, ResponseSpec, TestAuthorization, TestRequest, TestResponse,
+        ResolvedConformanceTestSpec, ResponseSpec, TestAuthentication, TestRequest, TestResponse,
     },
     validation::Error as ValidationError,
     Error, Spec,
@@ -24,7 +24,7 @@ pub struct TestRunner {
     pub spec: Spec,
     pub queue: VecDeque<ConformanceTestSpec>,
     pub results: Vec<TestResult>,
-    pub auth: Option<TestAuthorization>,
+    pub auth: Option<TestAuthentication>,
 }
 
 impl TestRunner {

@@ -33,7 +33,6 @@ url_serde = "0.2"
 
 [dev-dependencies]
 dotenv = "0.14"
-envy = "0.4"
 pretty_assertions = "0.6"
 pretty_env_logger = "0.3"
 
