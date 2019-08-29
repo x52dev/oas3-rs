@@ -20,8 +20,7 @@ pub enum SchemaType {
 pub struct SchemaValidator {
     pub schema_type: SchemaType,
     pub nullable: bool,
-    // TODO: hmmm, currently all object schemas will have Some(Vec) and this is probably needless just like on schemas
-    pub required: Option<Vec<String>>,
+    pub required: Vec<String>,
 }
 
 impl SchemaValidator {
@@ -29,7 +28,7 @@ impl SchemaValidator {
         SchemaValidator {
             schema_type: typ,
             nullable: false,
-            required: None,
+            required: vec![],
         }
     }
 
@@ -37,13 +36,13 @@ impl SchemaValidator {
         SchemaValidator {
             schema_type: typ,
             nullable: true,
-            required: None,
+            required: vec![],
         }
     }
 
     pub fn with_required_fields(self, fields: Vec<String>) -> Self {
         Self {
-            required: Some(fields),
+            required: fields,
             ..self
         }
     }
@@ -80,12 +79,13 @@ impl SchemaValidator {
             typ => SchemaType::Unknown(typ.to_owned()),
         };
 
-        let required = match &schema.schema_type.as_ref().ok_or(SchemaError::NoType)?[..] {
-            "object" => Some(schema.required.clone()),
+        let kind = schema.schema_type.as_ref().ok_or(SchemaError::NoType)?;
+        let required = match &kind[..] {
+            "object" => schema.required.clone(),
 
             _ => {
                 if schema.required.is_empty() {
-                    None
+                    vec![]
                 } else {
                     return Err(SchemaError::RequiredSpecifiedOnNonObject);
                 }
@@ -178,28 +178,25 @@ impl SchemaValidator {
     pub fn validate_required_fields(&self, val: &JsonValue) -> Result<(), Error> {
         match self.schema_type {
             SchemaType::Object(ref prop_validators) => match val {
-                JsonValue::Object(ref map) => match self.required {
+                JsonValue::Object(ref map) => {
                     // search for missing fields
-                    Some(ref reqs) => match reqs.iter().find(|&req| !map.contains_key(req)) {
+                    match self.required.iter().find(|&req| !map.contains_key(req)) {
                         // no missing required fields
                         None => Ok(()),
 
                         // missing required field
                         Some(field) => Err(Error::RequiredFieldMissing(field.clone())),
-                    },
-
-                    // no required fields
-                    _ => Ok(()),
-                },
+                    }
+                }
 
                 val => Err(Error::TypeMismatch(val.clone(), "object")),
             },
 
-            _ => match self.required {
-                Some(_) => Err(Error::Schema(SchemaError::RequiredSpecifiedOnNonObject)),
+            _ => match self.required.is_empty() {
+                false => Err(Error::Schema(SchemaError::RequiredSpecifiedOnNonObject)),
 
                 // not trying to be an object
-                _ => Ok(()),
+                true => Ok(()),
             },
         }
     }

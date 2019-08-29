@@ -1,0 +1,49 @@
+openapi: 3.0.0
+servers:
+  - url: "http//example.com/api"
+info:
+  version: 1.0.0
+  title: Example API
+  description: Example API with discriminated disjunctions
+paths:
+  /:
+    get:
+      operationId: list-data
+      summary: List data
+      responses:
+        "200":
+          $ref: "#/components/responses/listData"
+
+components:
+  responses:
+    listData:
+      description: Returns a list of data sets
+      content:
+        application/json:
+          schema:
+            title: Data Or Error
+            oneOf:
+              - $ref: "#/components/schemas/data"
+              - $ref: "#/components/schemas/error"
+            discriminator:
+              propertyName: result
+
+  schemas:
+    error:
+      title: Error
+      type: object
+      properties:
+        page: { type: number }
+    metadata:
+      title: Pagination Metadata
+      type: object
+      properties:
+        page: { type: number }
+    data:
+      title: The Data AND Metadata
+      allOf:
+        - type: object
+          properties:
+            size: { type: integer }
+            thing: { type: string }
+        - $ref: "#/components/schemas/metadata"

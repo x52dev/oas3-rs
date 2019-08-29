@@ -37,6 +37,7 @@ pretty_assertions = "0.6"
 pretty_env_logger = "0.3"
 
 [features]
-default = ["conformance"]
+# default = ["conformance"]
+default = ["validation"]
 validation = []
 conformance = ["validation"]
