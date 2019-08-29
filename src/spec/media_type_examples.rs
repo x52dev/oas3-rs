@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 
 
-use crate::{Example, ObjectOrReference, Spec};
+use super::{Example, ObjectOrReference, Spec};
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[serde(untagged)]

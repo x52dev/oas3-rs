@@ -3,7 +3,7 @@ use std::{collections::BTreeMap, fmt, ops::Deref};
 use lazy_static::lazy_static;
 use serde_json::Value as JsonValue;
 
-use crate::{schema::Error as SchemaError, validation::Error, Schema, Spec};
+use crate::{spec::schema::Error as SchemaError, validation::Error, Schema, Spec};
 
 #[derive(Debug, Clone)]
 pub enum SchemaType {
@@ -11,29 +11,29 @@ pub enum SchemaType {
     Integer,
     Number,
     String,
-    Array(Box<SchemaValidator>),
-    Object(BTreeMap<String, SchemaValidator>),
+    Array(Box<SoloValidator>),
+    Object(BTreeMap<String, SoloValidator>),
     Unknown(String),
 }
 
 #[derive(Debug, Clone)]
-pub struct SchemaValidator {
+pub struct SoloValidator {
     pub schema_type: SchemaType,
     pub nullable: bool,
     pub required: Vec<String>,
 }
 
-impl SchemaValidator {
-    pub fn require(typ: SchemaType) -> SchemaValidator {
-        SchemaValidator {
+impl SoloValidator {
+    pub fn require(typ: SchemaType) -> SoloValidator {
+        SoloValidator {
             schema_type: typ,
             nullable: false,
             required: vec![],
         }
     }
 
-    pub fn nullable(typ: SchemaType) -> SchemaValidator {
-        SchemaValidator {
+    pub fn nullable(typ: SchemaType) -> SoloValidator {
+        SoloValidator {
             schema_type: typ,
             nullable: true,
             required: vec![],
@@ -47,8 +47,10 @@ impl SchemaValidator {
         }
     }
 
-    pub fn from_schema(schema: &Schema, spec: &Spec) -> Result<SchemaValidator, SchemaError> {
-        let schema_type = match &schema.schema_type.as_ref().expect("no schema type")[..] {
+    pub fn from_schema(schema: &Schema, spec: &Spec) -> Result<SoloValidator, SchemaError> {
+        let kind = schema.schema_type.as_ref().ok_or(SchemaError::NoType)?;
+
+        let schema_type = match &kind[..] {
             "boolean" => SchemaType::Boolean,
             "integer" => SchemaType::Integer,
             "number" => SchemaType::Number,
@@ -62,7 +64,7 @@ impl SchemaValidator {
 
                 let item_schema = item_schema.resolve(&spec)?;
 
-                SchemaType::Array(Box::new(SchemaValidator::from_schema(&item_schema, spec)?))
+                SchemaType::Array(Box::new(SoloValidator::from_schema(&item_schema, spec)?))
             }
 
             "object" => {
@@ -79,7 +81,6 @@ impl SchemaValidator {
             typ => SchemaType::Unknown(typ.to_owned()),
         };
 
-        let kind = schema.schema_type.as_ref().ok_or(SchemaError::NoType)?;
         let required = match &kind[..] {
             "object" => schema.required.clone(),
 
@@ -92,7 +93,7 @@ impl SchemaValidator {
             }
         };
 
-        Ok(SchemaValidator {
+        Ok(SoloValidator {
             schema_type,
             nullable: schema.nullable.unwrap_or(false),
             required,
@@ -255,7 +256,7 @@ mod tests {
 
         #[test]
         fn bool() {
-            let vltr = SchemaValidator::require(SchemaType::Boolean);
+            let vltr = SoloValidator::require(SchemaType::Boolean);
 
             type_check_valid_vs_invalid!(
                 vltr,
@@ -266,7 +267,7 @@ mod tests {
 
         #[test]
         fn integer() {
-            let vltr = SchemaValidator::require(SchemaType::Integer);
+            let vltr = SoloValidator::require(SchemaType::Integer);
 
             type_check_valid_vs_invalid!(
                 vltr,
@@ -277,7 +278,7 @@ mod tests {
 
         #[test]
         fn number() {
-            let vltr = SchemaValidator::require(SchemaType::Number);
+            let vltr = SoloValidator::require(SchemaType::Number);
 
             type_check_valid_vs_invalid!(
                 vltr,
@@ -288,7 +289,7 @@ mod tests {
 
         #[test]
         fn string() {
-            let vltr = SchemaValidator::require(SchemaType::String);
+            let vltr = SoloValidator::require(SchemaType::String);
 
             type_check_valid_vs_invalid!(
                 vltr,
@@ -299,7 +300,7 @@ mod tests {
 
         #[test]
         fn nullable() {
-            let vltr = SchemaValidator::nullable(SchemaType::Boolean);
+            let vltr = SoloValidator::nullable(SchemaType::Boolean);
 
             type_check_valid_vs_invalid!(
                 vltr,
@@ -310,8 +311,8 @@ mod tests {
 
         #[test]
         fn array() {
-            let vltr_int = SchemaValidator::require(SchemaType::Integer);
-            let vltr = SchemaValidator::require(SchemaType::Array(Box::new(vltr_int)));
+            let vltr_int = SoloValidator::require(SchemaType::Integer);
+            let vltr = SoloValidator::require(SchemaType::Array(Box::new(vltr_int)));
 
             type_check_valid_vs_invalid!(
                 vltr,
@@ -323,10 +324,10 @@ mod tests {
         #[test]
         fn object() {
             let validators = btreemap! {
-                "low".to_owned() => SchemaValidator::require(SchemaType::Number),
-                "high".to_owned() => SchemaValidator::require(SchemaType::Number),
+                "low".to_owned() => SoloValidator::require(SchemaType::Number),
+                "high".to_owned() => SoloValidator::require(SchemaType::Number),
             };
-            let vltr = SchemaValidator::require(SchemaType::Object(validators));
+            let vltr = SoloValidator::require(SchemaType::Object(validators));
 
             type_check_valid_vs_invalid!(
                 vltr,
@@ -335,9 +336,9 @@ mod tests {
             );
 
             let validators = btreemap! {
-                "low".to_owned() => SchemaValidator::require(SchemaType::Number),
+                "low".to_owned() => SoloValidator::require(SchemaType::Number),
             };
-            let vltr = SchemaValidator::require(SchemaType::Object(validators));
+            let vltr = SoloValidator::require(SchemaType::Object(validators));
 
             type_check_valid_vs_invalid!(
                 vltr,
@@ -346,10 +347,10 @@ mod tests {
             );
 
             let validators = btreemap! {
-                "name".to_owned() => SchemaValidator::require(SchemaType::String),
-                "price".to_owned() => SchemaValidator::require(SchemaType::Number),
+                "name".to_owned() => SoloValidator::require(SchemaType::String),
+                "price".to_owned() => SoloValidator::require(SchemaType::Number),
             };
-            let vltr = SchemaValidator::require(SchemaType::Object(validators));
+            let vltr = SoloValidator::require(SchemaType::Object(validators));
 
             type_check_valid_vs_invalid!(
                 vltr,
@@ -364,7 +365,7 @@ mod tests {
         pretty_env_logger::init();
 
         let required = vec!["low".to_owned()];
-        let vltr = SchemaValidator::require(SchemaType::Object(btreemap! {}))
+        let vltr = SoloValidator::require(SchemaType::Object(btreemap! {}))
             .with_required_fields(required);
 
         assert!(vltr.validate_required_fields(&OBJ_NUMS).is_ok());

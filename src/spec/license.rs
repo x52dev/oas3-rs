@@ -1,4 +1,4 @@
-use crate::Url;
+use super::Url;
 
 /// License information for the exposed API.
 ///

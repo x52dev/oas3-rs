@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use crate::{Header, ObjectOrReference};
+use super::{Header, ObjectOrReference};
 
 /// A single encoding definition applied to a single schema property.
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]

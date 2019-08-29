@@ -1,4 +1,4 @@
-use crate::Url;
+use super::Url;
 
 /// Allows referencing an external resource for extended documentation.
 ///

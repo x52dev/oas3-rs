@@ -1,6 +1,6 @@
 use http::Method;
 
-use crate::{ObjectOrReference, Operation, Parameter, Server};
+use super::{ObjectOrReference, Operation, Parameter, Server};
 
 /// Describes the operations available on a single path.
 ///

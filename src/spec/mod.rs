@@ -2,7 +2,57 @@ use http::Method;
 
 use std::{collections::BTreeMap, iter::Iterator};
 
-use crate::{Components, Error, ExternalDoc, Info, Operation, PathItem, Result, Server, Tag};
+mod components;
+mod contact;
+mod encoding;
+
+mod example;
+mod external_doc;
+mod flows;
+mod header;
+mod info;
+mod license;
+mod link;
+mod media_type;
+mod media_type_examples;
+mod operation;
+mod parameter;
+mod path_item;
+mod r#ref;
+mod request_body;
+mod response;
+mod security_scheme;
+pub mod schema;
+mod server;
+mod tag;
+mod url;
+
+pub use self::url::*;
+pub use components::*;
+pub use contact::*;
+pub use encoding::*;
+pub use example::*;
+pub use external_doc::*;
+pub use flows::*;
+pub use header::*;
+pub use info::*;
+pub use license::*;
+pub use link::*;
+pub use media_type::*;
+pub use media_type_examples::*;
+pub use operation::*;
+pub use parameter::*;
+pub use path_item::*;
+pub use r#ref::*;
+pub use request_body::*;
+pub use response::*;
+pub use security_scheme::*;
+pub use server::*;
+pub use tag::*;
+
+mod error;
+pub use error::Error;
+pub use schema::Schema;
 
 const OPENAPI_SUPPORTED_VERSION_RANGE: &str = "~3";
 
@@ -69,11 +119,11 @@ pub struct Spec {
 }
 
 impl Spec {
-    pub fn validate_version(&self) -> Result<semver::Version> {
+    pub fn validate_version(&self) -> Result<semver::Version, Error> {
         let spec_version = &self.openapi;
         let sem_ver = semver::Version::parse(spec_version)?;
         let required_version = semver::VersionReq::parse(OPENAPI_SUPPORTED_VERSION_RANGE).unwrap();
-        
+
         if required_version.matches(&sem_ver) {
             Ok(sem_ver)
         } else {
@@ -107,7 +157,5 @@ impl Spec {
         })
     }
 
-    pub fn primary_server(&self) -> Option<&Server> {
-        self.servers.first()
-    }
+    pub fn primary_server(&self) -> Option<&Server> { self.servers.first() }
 }

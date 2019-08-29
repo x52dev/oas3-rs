@@ -4,7 +4,29 @@ use derive_more::Display;
 use lazy_static::lazy_static;
 use regex::Regex;
 
-use crate::Spec;
+use super::Spec;
+
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+#[serde(untagged)]
+pub enum ObjectOrReference<T> {
+    Ref {
+        #[serde(rename = "$ref")]
+        ref_path: String,
+    },
+    Object(T),
+}
+
+impl<T> ObjectOrReference<T>
+where
+    T: FromRef,
+{
+    pub fn resolve(&self, spec: &Spec) -> StdResult<T, RefError> {
+        match self {
+            Self::Object(component) => Ok(component.clone()),
+            Self::Ref { ref_path } => T::from_ref(&spec, &ref_path),
+        }
+    }
+}
 
 #[derive(Clone, Debug, PartialEq, Error)]
 pub enum RefError {

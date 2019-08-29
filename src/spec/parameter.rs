@@ -1,4 +1,5 @@
-use crate::{FromRef, MediaType, RefError, RefPath, RefType, Schema, Spec};
+use super::{FromRef, MediaType, RefError, RefPath, RefType, Spec};
+use crate::Schema;
 
 // FIXME: Verify against OpenAPI 3.0.1
 /// Describes a single operation parameter.

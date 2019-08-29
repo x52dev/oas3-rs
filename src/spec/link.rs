@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use crate::Server;
+use super::Server;
 
 /// The Link object represents a possible design-time link for a response.
 ///

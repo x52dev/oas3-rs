@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use crate::{
+use super::{
     Callback, Error, ExternalDoc, FromRef, ObjectOrReference, Parameter, RefError, RequestBody,
     Response, Server, Spec,
 };
@@ -129,12 +129,13 @@ impl Operation {
     }
 
     pub fn get_parameters(&self, spec: &Spec) -> Result<Vec<Parameter>, Error> {
-        let params = self.parameters
+        let params = self
+            .parameters
             .iter()
             // TODO: find better error solution, maybe vec<result<_>>
             .filter_map(|oor| oor.resolve(&spec).map_err(|err| error!("{}", err)).ok())
             .collect();
-        
+
         Ok(params)
     }
 

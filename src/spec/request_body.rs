@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use crate::{FromRef, MediaType, RefError, RefPath, RefType, Spec};
+use super::{FromRef, MediaType, RefError, RefPath, RefType, Spec};
 
 /// Describes a single request body.
 ///

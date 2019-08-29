@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use crate::{
+use super::{
     FromRef, Header, Link, MediaType, ObjectOrReference, RefError, RefPath, RefType, Spec,
 };
 

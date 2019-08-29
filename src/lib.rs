@@ -39,105 +39,33 @@ extern crate err_derive;
 #[macro_use]
 extern crate log;
 
-
-use std::{fs::File, io::Read, path::Path, result::Result as StdResult};
+use std::{fs::File, io::Read, path::Path};
 
 use lazy_static::lazy_static;
 use regex::Regex;
 
 mod error;
-pub use error::Error;
-
-mod components;
-mod contact;
-mod encoding;
-mod example;
-mod external_doc;
-mod flows;
-mod header;
-mod info;
-mod license;
-mod link;
-mod media_type;
-mod media_type_examples;
-mod operation;
-mod parameter;
-mod path_item;
-mod ref_path;
-mod request_body;
-mod response;
-mod schema;
-mod security_scheme;
-mod server;
 mod spec;
-mod tag;
-mod url;
+
+pub use error::Error;
+pub use spec::Spec;
+pub use spec::Schema;
 
 #[cfg(feature = "validation")]
 pub mod validation;
 
-#[cfg(feature = "validation")]
+#[cfg(feature = "conformance")]
 pub mod conformance;
-
-pub use self::url::*;
-pub use components::*;
-pub use contact::*;
-pub use encoding::*;
-pub use example::*;
-pub use external_doc::*;
-pub use flows::*;
-pub use header::*;
-pub use info::*;
-pub use license::*;
-pub use link::*;
-pub use media_type::*;
-pub use media_type_examples::*;
-pub use operation::*;
-pub use parameter::*;
-pub use path_item::*;
-pub use ref_path::*;
-pub use request_body::*;
-pub use response::*;
-pub use schema::*;
-
-pub use security_scheme::*;
-pub use server::*;
-pub use spec::*;
-pub use tag::*;
-
-pub type Result<T> = StdResult<T, Error>;
 
 /// Version 3.0.1 of the OpenApi specification.
 ///
 /// Refer to the official
 /// [specification](https://github.com/OAI/OpenAPI-Specification/blob/0dd79f6/versions/3.0.1.md)
 /// for more information.
-pub type OpenApiV3 = Spec;
-
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
-#[serde(untagged)]
-pub enum ObjectOrReference<T> {
-    Ref {
-        #[serde(rename = "$ref")]
-        ref_path: String,
-    },
-    Object(T),
-}
-
-impl<T> ObjectOrReference<T>
-where
-    T: FromRef,
-{
-    pub fn resolve(&self, spec: &Spec) -> StdResult<T, RefError> {
-        match self {
-            Self::Object(component) => Ok(component.clone()),
-            Self::Ref { ref_path } => T::from_ref(&spec, &ref_path),
-        }
-    }
-}
+pub type OpenApiV3Spec = spec::Spec;
 
 /// deserialize an open api spec from a path
-pub fn from_path<P>(path: P) -> Result<OpenApiV3>
+pub fn from_path<P>(path: P) -> Result<OpenApiV3Spec, Error>
 where
     P: AsRef<Path>,
 {
@@ -145,18 +73,20 @@ where
 }
 
 /// deserialize an open api spec from type which implements Read
-pub fn from_reader<R>(read: R) -> Result<OpenApiV3>
+pub fn from_reader<R>(read: R) -> Result<OpenApiV3Spec, Error>
 where
     R: Read,
 {
-    Ok(serde_yaml::from_reader::<R, OpenApiV3>(read)?)
+    Ok(serde_yaml::from_reader::<R, OpenApiV3Spec>(read)?)
 }
 
 /// serialize to a yaml string
-pub fn to_yaml(spec: &OpenApiV3) -> Result<String> { Ok(serde_yaml::to_string(spec)?) }
+pub fn to_yaml(spec: &OpenApiV3Spec) -> Result<String, Error> { Ok(serde_yaml::to_string(spec)?) }
 
 /// serialize to a json string
-pub fn to_json(spec: &OpenApiV3) -> Result<String> { Ok(serde_json::to_string_pretty(spec)?) }
+pub fn to_json(spec: &OpenApiV3Spec) -> Result<String, Error> {
+    Ok(serde_json::to_string_pretty(spec)?)
+}
 
 #[cfg(test)]
 mod tests {

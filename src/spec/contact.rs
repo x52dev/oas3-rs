@@ -1,4 +1,4 @@
-use crate::Url;
+use super::Url;
 
 /// Contact information for the exposed API.
 ///

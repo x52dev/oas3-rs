@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 
-
-use crate::{Encoding, Error, Example, MediaTypeExamples, ObjectOrReference, Schema, Spec};
+use super::{Encoding, Error, Example, MediaTypeExamples, ObjectOrReference, Spec};
+use crate::Schema;
 
 /// Each Media Type Object provides schema and examples for the media type identified by its key.
 ///

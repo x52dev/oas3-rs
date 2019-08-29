@@ -1,5 +1,11 @@
+use crate::Spec;
+
 mod error;
-mod schema_validator;
+mod solo;
 
 pub use error::*;
-pub use schema_validator::*;
+pub use solo::*;
+
+pub trait Validate {
+    fn validate(&self, spec: &Spec) -> Result<(), Error>;
+}

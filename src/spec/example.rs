@@ -1,4 +1,4 @@
-use crate::{
+use super::{
     FromRef, Header, Link, MediaType, ObjectOrReference, RefError, RefPath, RefType, Spec,
 };
 
@@ -50,7 +50,7 @@ impl FromRef for Example {
                 .and_then(|cs| cs.examples.get(&refpath.name))
                 .ok_or_else(|| RefError::Unresolvable(path.to_owned()))
                 .and_then(|oor| oor.resolve(&spec)),
- 
+
             typ => Err(RefError::MismatchedType(typ, RefType::Example)),
         }
     }

@@ -1,4 +1,4 @@
-use crate::{Contact, License, Url};
+use super::{Contact, License, Url};
 
 /// General information about the API.
 ///

@@ -1,7 +1,7 @@
 use http::{Method, StatusCode};
 use serde_json::Value as JsonValue;
 
-use crate::schema::error::Error as SchemaError;
+use crate::spec::schema::Error as SchemaError;
 
 /// Validation Errors
 #[derive(Clone, PartialEq, Debug, Error)]
