@@ -1,6 +1,4 @@
-use super::{
-    FromRef, Header, Link, MediaType, ObjectOrReference, RefError, RefPath, RefType, Spec,
-};
+use super::{FromRef, Header, Link, MediaType, ObjectOrReference, Ref, RefError, RefType, Spec};
 
 /// See <https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#exampleObject>.
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
@@ -41,7 +39,7 @@ impl Example {
 
 impl FromRef for Example {
     fn from_ref(spec: &Spec, path: &str) -> Result<Self, RefError> {
-        let refpath = path.parse::<RefPath>()?;
+        let refpath = path.parse::<Ref>()?;
 
         match refpath.kind {
             RefType::Example => spec

@@ -1,3 +1,5 @@
+//! Data validation (JSON only)
+
 use crate::Spec;
 
 mod error;

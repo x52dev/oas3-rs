@@ -1,6 +1,6 @@
 use semver::{SemVerError, Version};
 
-use crate::{spec::schema::Error as SchemaError, spec::r#ref::RefError};
+use crate::spec::{r#ref::RefError, schema::Error as SchemaError};
 
 /// Spec Errors
 #[derive(Debug, Clone, PartialEq, Error)]

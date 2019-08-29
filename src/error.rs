@@ -2,7 +2,7 @@
 
 use std::io::Error as IoError;
 
-use crate::{validation::Error as ValidationError, spec::Error as SpecError};
+use crate::{spec::Error as SpecError, validation::Error as ValidationError};
 
 /// Top-level Errors
 #[derive(Debug, Error)]

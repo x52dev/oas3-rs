@@ -1,4 +1,4 @@
-use std::{process::exit, error::Error};
+use std::{error::Error, process::exit};
 
 fn main() {
     if let Some(path) = std::env::args().nth(1) {

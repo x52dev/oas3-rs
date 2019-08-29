@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use super::{FromRef, MediaType, RefError, RefPath, RefType, Spec};
+use super::{FromRef, MediaType, Ref, RefError, RefType, Spec};
 
 /// Describes a single request body.
 ///
@@ -27,7 +27,7 @@ impl FromRef for RequestBody {
     where
         Self: Sized,
     {
-        let refpath = path.parse::<RefPath>()?;
+        let refpath = path.parse::<Ref>()?;
 
         match refpath.kind {
             RefType::RequestBody => spec

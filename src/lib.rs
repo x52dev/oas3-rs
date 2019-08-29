@@ -45,11 +45,11 @@ use lazy_static::lazy_static;
 use regex::Regex;
 
 mod error;
+mod path;
 mod spec;
 
 pub use error::Error;
-pub use spec::Spec;
-pub use spec::Schema;
+pub use spec::{Schema, Spec};
 
 #[cfg(feature = "validation")]
 pub mod validation;

@@ -21,8 +21,8 @@ mod path_item;
 mod r#ref;
 mod request_body;
 mod response;
-mod security_scheme;
 pub mod schema;
+mod security_scheme;
 mod server;
 mod tag;
 mod url;
@@ -131,8 +131,7 @@ impl Spec {
         }
     }
 
-    // TODO: rename without get_
-    pub fn get_operation(&self, method: &http::Method, path: &str) -> Option<&Operation> {
+    pub fn operation(&self, method: &http::Method, path: &str) -> Option<&Operation> {
         use http::Method;
 
         let resource = self.paths.get(path)?;
@@ -150,9 +149,9 @@ impl Spec {
         }
     }
 
-    pub fn iter_operations(&self) -> impl Iterator<Item = (String, Method, &Operation)> {
+    pub fn operations(&self) -> impl Iterator<Item = (String, Method, &Operation)> {
         self.paths.iter().flat_map(|(path, item)| {
-            item.iter_methods()
+            item.methods()
                 .map(move |(method, op)| (path.to_owned(), method, op))
         })
     }

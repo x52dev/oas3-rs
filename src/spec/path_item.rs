@@ -82,7 +82,7 @@ pub struct PathItem {
 }
 
 impl PathItem {
-    pub fn iter_methods(&self) -> impl Iterator<Item = (Method, &Operation)> {
+    pub fn methods(&self) -> impl Iterator<Item = (Method, &Operation)> {
         let mut methods = vec![];
 
         #[rustfmt::skip]

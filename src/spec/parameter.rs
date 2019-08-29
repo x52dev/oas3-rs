@@ -1,4 +1,4 @@
-use super::{FromRef, MediaType, RefError, RefPath, RefType, Spec};
+use super::{FromRef, MediaType, Ref, RefError, RefType, Spec};
 use crate::Schema;
 
 // FIXME: Verify against OpenAPI 3.0.1
@@ -75,7 +75,7 @@ impl FromRef for Parameter {
     where
         Self: Sized,
     {
-        let refpath = path.parse::<RefPath>()?;
+        let refpath = path.parse::<Ref>()?;
 
         match refpath.kind {
             RefType::Parameter => spec

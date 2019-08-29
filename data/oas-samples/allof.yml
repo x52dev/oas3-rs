@@ -21,7 +21,7 @@ components:
       content:
         application/json:
           schema:
-            title: Data Or Error
+            title: Data and Metadata
             type: string
             allOf:
               - $ref: "#/components/schemas/data"
@@ -34,7 +34,7 @@ components:
       properties:
         page: { type: number }
     data:
-      title: The Data AND Metadata
+      title: The Data
       type: object
       properties:
         size: { type: integer }

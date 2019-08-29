@@ -31,7 +31,7 @@ impl fmt::Display for OperationSpec {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Parts { method, path } => write!(f, "{} {}", method, path),
-            Self::OperationId(op_id) => write!(f, "OpID: {}", op_id)
+            Self::OperationId(op_id) => write!(f, "OpID: {}", op_id),
         }
     }
 }

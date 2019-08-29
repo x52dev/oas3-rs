@@ -1,4 +1,4 @@
-use std::{fs::File, io::Read, path::Path, result::Result as StdResult, str::FromStr};
+use std::{fs::File, io::Read, path::Path, str::FromStr};
 
 use derive_more::Display;
 use lazy_static::lazy_static;
@@ -20,7 +20,7 @@ impl<T> ObjectOrReference<T>
 where
     T: FromRef,
 {
-    pub fn resolve(&self, spec: &Spec) -> StdResult<T, RefError> {
+    pub fn resolve(&self, spec: &Spec) -> Result<T, RefError> {
         match self {
             Self::Object(component) => Ok(component.clone()),
             Self::Ref { ref_path } => T::from_ref(&spec, &ref_path),
@@ -73,13 +73,13 @@ impl FromStr for RefType {
     }
 }
 
-pub struct RefPath {
+pub struct Ref {
     pub source: String,
     pub kind: RefType,
     pub name: String,
 }
 
-impl FromStr for RefPath {
+impl FromStr for Ref {
     type Err = RefError;
 
     fn from_str(path: &str) -> Result<Self, Self::Err> {
@@ -90,7 +90,7 @@ impl FromStr for RefPath {
 
         let parts = RE.captures(path).unwrap();
 
-        trace!("creating RefPath: {}/{}", &parts["type"], &parts["name"]);
+        trace!("creating Ref: {}/{}", &parts["type"], &parts["name"]);
 
         Ok(Self {
             source: parts["source"].to_owned(),

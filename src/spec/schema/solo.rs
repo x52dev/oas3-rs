@@ -3,7 +3,7 @@
 use std::collections::BTreeMap;
 
 use super::Error;
-use crate::spec::{FromRef, ObjectOrReference, RefError, RefPath, RefType, Spec};
+use crate::spec::{FromRef, ObjectOrReference, Ref, RefError, RefType, Spec};
 
 // FIXME: Verify against OpenAPI 3.0
 /// The Schema Object allows the definition of input and output data types.
@@ -89,7 +89,7 @@ pub struct Schema {
 
 impl FromRef for Schema {
     fn from_ref(spec: &Spec, path: &str) -> Result<Self, RefError> {
-        let refpath = path.parse::<RefPath>()?;
+        let refpath = path.parse::<Ref>()?;
 
         match refpath.kind {
             RefType::Schema => spec

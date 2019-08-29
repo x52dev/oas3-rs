@@ -1,6 +1,5 @@
 use std::collections::BTreeMap;
 
-
 use super::{Example, ObjectOrReference, Spec};
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]

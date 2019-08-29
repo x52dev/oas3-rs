@@ -28,7 +28,7 @@ pub struct MediaType {
 }
 
 impl MediaType {
-    pub fn get_schema(&self, spec: &Spec) -> Result<Schema, Error> {
+    pub fn schema(&self, spec: &Spec) -> Result<Schema, Error> {
         self.schema
             .as_ref()
             .unwrap()
@@ -36,7 +36,7 @@ impl MediaType {
             .map_err(Error::Ref)
     }
 
-    pub fn get_examples(&self, spec: &Spec) -> BTreeMap<String, Example> {
+    pub fn examples(&self, spec: &Spec) -> BTreeMap<String, Example> {
         self.examples
             .as_ref()
             .map(|examples| examples.resolve_all(&spec))

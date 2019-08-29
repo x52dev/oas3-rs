@@ -107,7 +107,7 @@ pub struct Operation {
 }
 
 impl Operation {
-    pub fn get_request_body(&self, spec: &Spec) -> Result<RequestBody, Error> {
+    pub fn request_body(&self, spec: &Spec) -> Result<RequestBody, Error> {
         self.request_body
             .as_ref()
             .unwrap()
@@ -115,7 +115,7 @@ impl Operation {
             .map_err(Error::Ref)
     }
 
-    pub fn get_responses(&self, spec: &Spec) -> BTreeMap<String, Response> {
+    pub fn responses(&self, spec: &Spec) -> BTreeMap<String, Response> {
         self.responses
             .iter()
             .filter_map(|(name, oor)| {
@@ -128,7 +128,7 @@ impl Operation {
             .collect()
     }
 
-    pub fn get_parameters(&self, spec: &Spec) -> Result<Vec<Parameter>, Error> {
+    pub fn parameters(&self, spec: &Spec) -> Result<Vec<Parameter>, Error> {
         let params = self
             .parameters
             .iter()
@@ -139,9 +139,9 @@ impl Operation {
         Ok(params)
     }
 
-    pub fn get_parameter(&self, search: &str, spec: &Spec) -> Result<Option<Parameter>, Error> {
+    pub fn parameter(&self, search: &str, spec: &Spec) -> Result<Option<Parameter>, Error> {
         let param = self
-            .get_parameters(&spec)?
+            .parameters(&spec)?
             .iter()
             .find(|param| param.name == search)
             .cloned();

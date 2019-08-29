@@ -1,8 +1,6 @@
 use std::collections::BTreeMap;
 
-use super::{
-    FromRef, Header, Link, MediaType, ObjectOrReference, RefError, RefPath, RefType, Spec,
-};
+use super::{FromRef, Header, Link, MediaType, ObjectOrReference, Ref, RefError, RefType, Spec};
 
 /// Describes a single response from an API Operation, including design-time, static `links`
 /// to operations based on the response.
@@ -41,7 +39,7 @@ pub struct Response {
 
 impl FromRef for Response {
     fn from_ref(spec: &Spec, path: &str) -> Result<Self, RefError> {
-        let refpath = path.parse::<RefPath>()?;
+        let refpath = path.parse::<Ref>()?;
 
         match refpath.kind {
             RefType::Response => spec
