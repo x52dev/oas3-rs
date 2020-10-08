@@ -1,3 +1,6 @@
+use derive_more::{Display, Error, From};
+use serde::{Deserialize, Serialize};
+
 /// Adds metadata to a single tag that is used by the
 /// [Operation Object](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#operationObject).
 /// It is not mandatory to have a Tag Object per tag defined in the Operation Object instances.

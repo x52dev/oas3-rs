@@ -1,8 +1,10 @@
 use std::{fs::File, io::Read, path::Path, str::FromStr};
 
-use derive_more::Display;
+use derive_more::{Display, Error, From};
 use lazy_static::lazy_static;
+use log::trace;
 use regex::Regex;
+use serde::{Deserialize, Serialize};
 
 use super::Spec;
 
@@ -28,17 +30,17 @@ where
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Error)]
+#[derive(Clone, Debug, PartialEq, Display, Error)]
 pub enum RefError {
-    #[error(display = "Invalid type: {}", _0)]
-    InvalidType(String),
+    #[display(fmt = "Invalid type: {}", _0)]
+    InvalidType(#[error(not(source))] String),
 
-    #[error(display = "Mismatched type: cannot reference a {} as a {}", _0, _1)]
+    #[display(fmt = "Mismatched type: cannot reference a {} as a {}", _0, _1)]
     MismatchedType(RefType, RefType),
 
     // TODO: use some kind of path structure
-    #[error(display = "Unresolvable path: {}", _0)]
-    Unresolvable(String),
+    #[display(fmt = "Unresolvable path: {}", _0)]
+    Unresolvable(#[error(not(source))] String),
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Display)]

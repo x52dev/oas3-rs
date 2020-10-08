@@ -1,5 +1,7 @@
 use std::collections::BTreeMap;
 
+use serde::{Deserialize, Serialize};
+
 use super::{Encoding, Error, Example, MediaTypeExamples, ObjectOrReference, Spec};
 use crate::Schema;
 

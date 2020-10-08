@@ -1,3 +1,6 @@
+use derive_more::{Display, Error, From};
+use serde::{Deserialize, Serialize};
+
 use super::Flows;
 
 /// Defines a security scheme that can be used by the operations. Supported schemes are
@@ -35,8 +38,8 @@ pub enum SecurityScheme {
 
 #[cfg(test)]
 mod tests {
+    use super::super::Url;
     use super::*;
-    use crate::Url;
 
     #[test]
     fn test_security_scheme_oauth_deser() {

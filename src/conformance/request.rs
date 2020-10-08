@@ -85,7 +85,9 @@ impl RequestSpec {
         }
     }
 
-    pub fn no_auth(self) -> Self { Self { auth: None, ..self } }
+    pub fn no_auth(self) -> Self {
+        Self { auth: None, ..self }
+    }
 
     pub fn add_param<N, V>(mut self, name: N, val: V) -> Self
     where

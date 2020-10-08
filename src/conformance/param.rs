@@ -22,7 +22,9 @@ impl ParamReplacement {
 }
 
 impl ParamReplacement {
-    pub fn used(&self) -> bool { self.used.get() }
+    pub fn used(&self) -> bool {
+        self.used.get()
+    }
 }
 
 #[derive(Debug, Clone, PartialEq)]

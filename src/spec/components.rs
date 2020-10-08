@@ -1,5 +1,8 @@
 use std::collections::BTreeMap;
 
+use derive_more::{Display, Error, From};
+use serde::{Deserialize, Serialize};
+
 use super::{
     schema::Schema, Callback, Example, Header, Link, ObjectOrReference, Parameter, RequestBody,
     Response, SecurityScheme,

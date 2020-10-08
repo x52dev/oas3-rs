@@ -1,10 +1,12 @@
 use bytes::Bytes;
 use http::{HeaderMap, HeaderValue, Method, StatusCode};
 use lazy_static::lazy_static;
+use log::debug;
 
 use crate::{
-    validation::{Error as ValidationError, SchemaValidator},
-    Error, Operation, RefError, Spec,
+    spec::{Error as SpecError, Operation, RefError},
+    validation::{Error as ValidationError, ValidationTree},
+    Error, Spec,
 };
 
 use super::{
@@ -77,7 +79,7 @@ impl ConformanceTestSpec {
             }
 
             OperationSpec::OperationId(op_id) => spec
-                .iter_operations()
+                .operations()
                 .find(|(path, method, op)| {
                     op.operation_id
                         .as_ref()
@@ -101,7 +103,7 @@ impl ConformanceTestSpec {
         for param in &self.request.params {
             // resolve in spec
             let parameter = op
-                .get_parameter(&param.name, &spec)?
+                .parameter(&param.name, &spec)?
                 .ok_or(ValidationError::ParameterNotFound(param.name.clone()))?;
 
             // validate position
@@ -161,34 +163,29 @@ impl ConformanceTestSpec {
                 ref media_type,
                 ref name,
             } => {
-                let req_body = op.get_request_body(&spec)?;
-                let media_spec =
-                    req_body
-                        .content
-                        .get(media_type)
-                        .ok_or(Error::Ref(RefError::Unresolvable(format!(
-                            "mediaType/{}",
-                            &name
-                        ))))?;
-                let schema = media_spec.get_schema(&spec)?;
-                let examples = media_spec.get_examples(&spec);
-                let example =
-                    examples
-                        .get(name)
-                        .ok_or(Error::Ref(RefError::Unresolvable(format!(
-                            "example/{}",
-                            &name
-                        ))))?;
+                let req_body = op.request_body(&spec)?;
+                let media_spec = req_body.content.get(media_type).ok_or(SpecError::Ref(
+                    RefError::Unresolvable(format!("mediaType/{}", &name)),
+                ))?;
+                let schema = media_spec.schema(&spec)?;
+                let examples = media_spec.examples(&spec);
+                let example = examples
+                    .get(name)
+                    .ok_or(SpecError::Ref(RefError::Unresolvable(format!(
+                        "example/{}",
+                        &name
+                    ))))?;
 
                 if let Some(ref ex) = example.value {
                     // check example validity
-                    let validator = schema.validator(&spec).map_err(ValidationError::Schema)?;
+                    let validator = ValidationTree::from_schema(&schema, spec)?;
 
                     debug!("validating example: {:?}", &ex);
                     debug!("against schema: {:?}", &schema);
                     debug!("with validator: {:?}", &validator);
 
-                    validator.validate_type(&ex)?;
+                    // TODO: restore
+                    // validator.validate(&ex)?;
                 }
 
                 let mut hdrs = HeaderMap::new();
@@ -231,14 +228,14 @@ impl ConformanceTestSpec {
 
                 ResponseSpecSource::Schema { status, media_type } => {
                     // traverse spec
-                    let responses = op.get_responses(&spec);
-                    let status_spec = responses.get(status.as_str()).ok_or(Error::Ref(
+                    let responses = op.responses(&spec);
+                    let status_spec = responses.get(status.as_str()).ok_or(SpecError::Ref(
                         RefError::Unresolvable(format!("status/{}", &status.as_u16())),
                     ))?;
-                    let media_spec = status_spec.content.get(media_type).ok_or(Error::Ref(
+                    let media_spec = status_spec.content.get(media_type).ok_or(SpecError::Ref(
                         RefError::Unresolvable(format!("mediaType/{}", &media_type)),
                     ))?;
-                    let schema = media_spec.get_schema(&spec)?;
+                    let schema = media_spec.schema(&spec)?;
 
                     // create validator
                     let validator = schema.validator(&spec).map_err(ValidationError::Schema)?;
@@ -256,23 +253,19 @@ impl ConformanceTestSpec {
                     name,
                 } => {
                     // traverse spec
-                    let reses = op.get_responses(&spec);
-                    let status_spec =
-                        reses
-                            .get(status.as_str())
-                            .ok_or(Error::Ref(RefError::Unresolvable(format!(
-                                "status/{}",
-                                &status.as_u16()
-                            ))))?;
-                    let media_spec = status_spec.content.get(media_type).ok_or(Error::Ref(
+                    let reses = op.responses(&spec);
+                    let status_spec = reses.get(status.as_str()).ok_or(SpecError::Ref(
+                        RefError::Unresolvable(format!("status/{}", &status.as_u16())),
+                    ))?;
+                    let media_spec = status_spec.content.get(media_type).ok_or(SpecError::Ref(
                         RefError::Unresolvable(format!("mediaType/{}", &media_type)),
                     ))?;
-                    let schema = media_spec.get_schema(&spec)?;
-                    let examples = media_spec.get_examples(&spec);
+                    let schema = media_spec.schema(&spec)?;
+                    let examples = media_spec.examples(&spec);
                     let example =
                         examples
                             .get(name)
-                            .ok_or(Error::Ref(RefError::Unresolvable(format!(
+                            .ok_or(SpecError::Ref(RefError::Unresolvable(format!(
                                 "example/{}",
                                 &name
                             ))))?;

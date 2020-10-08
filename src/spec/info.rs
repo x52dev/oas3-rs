@@ -1,4 +1,8 @@
-use super::{Contact, License, Url};
+use derive_more::{Display, Error, From};
+use serde::{Deserialize, Serialize};
+use url::Url;
+
+use super::{Contact, License};
 
 /// General information about the API.
 ///

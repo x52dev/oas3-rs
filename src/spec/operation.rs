@@ -1,5 +1,8 @@
 use std::collections::BTreeMap;
 
+use log::error;
+use serde::{Deserialize, Serialize};
+
 use super::{
     Callback, Error, ExternalDoc, FromRef, ObjectOrReference, Parameter, RefError, RequestBody,
     Response, Server, Spec,

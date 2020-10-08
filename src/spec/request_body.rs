@@ -1,5 +1,8 @@
 use std::collections::BTreeMap;
 
+use derive_more::{Display, Error, From};
+use serde::{Deserialize, Serialize};
+
 use super::{FromRef, MediaType, Ref, RefError, RefType, Spec};
 
 /// Describes a single request body.

@@ -3,7 +3,9 @@ use std::{fmt, ops::Deref};
 use http::{HeaderMap, Method, StatusCode};
 use reqwest::Request;
 
-use crate::{conformance::TestRequest, validation::Error as ValidationError, Operation, Spec};
+use crate::{
+    conformance::TestRequest, spec::Operation, validation::Error as ValidationError, Spec,
+};
 
 #[derive(Clone)]
 pub enum TestAuthentication {
@@ -14,7 +16,9 @@ pub enum TestAuthentication {
 
 impl TestAuthentication {
     /// Use the `Authorization: Bearer ...` method to provide authentication key/token.
-    pub fn bearer<T: Into<String>>(token: T) -> Self { Self::Bearer(token.into()) }
+    pub fn bearer<T: Into<String>>(token: T) -> Self {
+        Self::Bearer(token.into())
+    }
 
     // /// Shorthand for setting cookie headers.
     // pub fn cookies<T: Into<String>>(token: T) -> Self {
@@ -22,7 +26,9 @@ impl TestAuthentication {
     // }
 
     /// Provide a closure that transforms a `TestRequest` into an authenticated `TestRequest`.
-    pub fn custom(closure: fn(TestRequest) -> TestRequest) -> Self { Self::Custom(closure) }
+    pub fn custom(closure: fn(TestRequest) -> TestRequest) -> Self {
+        Self::Custom(closure)
+    }
 }
 
 impl fmt::Debug for TestAuthentication {

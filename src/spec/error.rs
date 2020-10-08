@@ -1,31 +1,21 @@
+use derive_more::{Display, Error, From};
 use semver::{SemVerError, Version};
+use serde::{Deserialize, Serialize};
 
 use crate::spec::{r#ref::RefError, schema::Error as SchemaError};
 
 /// Spec Errors
-#[derive(Debug, Clone, PartialEq, Error)]
+#[derive(Debug, Clone, PartialEq, Display, Error, From)]
 pub enum Error {
-    #[error(display = "Reference error")]
-    Ref(#[cause] RefError),
+    #[display(fmt = "Reference error")]
+    Ref(RefError),
 
-    #[error(display = "Schema error")]
-    Schema(#[cause] SchemaError),
+    #[display(fmt = "Schema error")]
+    Schema(SchemaError),
 
-    #[error(display = "Semver error")]
-    SemVerError(#[cause] SemVerError),
+    #[display(fmt = "Semver error")]
+    SemVerError(SemVerError),
 
-    #[error(display = "Unsupported spec file version ({})", _0)]
-    UnsupportedSpecFileVersion(Version),
-}
-
-impl From<RefError> for Error {
-    fn from(err: RefError) -> Self { Self::Ref(err) }
-}
-
-impl From<SemVerError> for Error {
-    fn from(e: SemVerError) -> Self { Error::SemVerError(e) }
-}
-
-impl From<SchemaError> for Error {
-    fn from(err: SchemaError) -> Self { Self::Schema(err) }
+    #[display(fmt = "Unsupported spec file version ({})", _0)]
+    UnsupportedSpecFileVersion(#[error(not(source))] Version),
 }

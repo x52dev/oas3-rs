@@ -1,4 +1,11 @@
 {
     "editor.detectIndentation": false,
-    "editor.tabSize": 4
+    "editor.tabSize": 4,
+    "cSpell.words": [
+        "Semver",
+        "dotenv",
+        "openapi",
+        "reqwest",
+        "rustfmt"
+    ]
 }

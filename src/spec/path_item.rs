@@ -1,4 +1,6 @@
+use derive_more::{Display, Error, From};
 use http::Method;
+use serde::{Deserialize, Serialize};
 
 use super::{ObjectOrReference, Operation, Parameter, Server};
 
@@ -82,21 +84,27 @@ pub struct PathItem {
 }
 
 impl PathItem {
-    pub fn methods(&self) -> impl Iterator<Item = (Method, &Operation)> {
+    pub fn methods(&self) -> impl IntoIterator<Item = (Method, &Operation)> {
         let mut methods = vec![];
 
-        #[rustfmt::skip]
-        {
-            if let Some(ref op) = self.get { methods.push((Method::GET, op)) }
-            if let Some(ref op) = self.put { methods.push((Method::PUT, op)) }
-            if let Some(ref op) = self.post { methods.push((Method::POST, op)) }
-            if let Some(ref op) = self.delete { methods.push((Method::DELETE, op)) }
-            if let Some(ref op) = self.options { methods.push((Method::OPTIONS, op)) }
-            if let Some(ref op) = self.head { methods.push((Method::HEAD, op)) }
-            if let Some(ref op) = self.patch { methods.push((Method::PATCH, op)) }
-            if let Some(ref op) = self.trace { methods.push((Method::TRACE, op)) }
+        macro_rules! push_method {
+            ($method:ident) => {{
+                if let Some(ref op) = self.trace {
+                    methods.push((Method::$method, op))
+                }
+            }};
         }
 
-        methods.into_iter()
+        push_method!(GET);
+        push_method!(PUT);
+        push_method!(POST);
+        push_method!(DELETE);
+        push_method!(OPTIONS);
+        push_method!(HEAD);
+        push_method!(PATCH);
+        push_method!(TRACE);
+        push_method!(TRACE);
+
+        methods
     }
 }

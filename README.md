@@ -10,7 +10,7 @@ add the following to your `Cargo.toml` file
 
 ```toml
 [dependencies]
-oas3 = "*"
+oas3 = "0.1"
 ```
 
 ## Usage

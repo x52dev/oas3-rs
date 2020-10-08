@@ -1,5 +1,5 @@
 pub mod error;
-pub mod solo;
+pub mod schema;
 
 pub use error::*;
-pub use solo::*;
+pub use schema::*;

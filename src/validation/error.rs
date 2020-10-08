@@ -1,47 +1,55 @@
+use derive_more::{Display, Error, From};
 use http::{Method, StatusCode};
+use serde::{Deserialize, Serialize};
 use serde_json::Value as JsonValue;
 
-use crate::spec::schema::Error as SchemaError;
+use crate::{
+    path::Path,
+    spec::schema::{Error as SchemaError, Type as SchemaType},
+};
 
 /// Validation Errors
-#[derive(Clone, PartialEq, Debug, Error)]
+#[derive(Clone, PartialEq, Debug, Display, Error)]
 pub enum Error {
     //
     // Wrapped Errors
     //
-    #[error(display = "Schema error")]
-    Schema(#[cause] SchemaError),
+    #[display(fmt = "Schema error")]
+    Schema(SchemaError),
 
     //
     // Leaf Errors
     //
-    #[error(display = "Not JSON")]
+    #[display(fmt = "Not JSON")]
     NotJson,
 
-    #[error(display = "{} is not a {}", _0, _1)]
-    TypeMismatch(JsonValue, &'static str),
+    #[display(fmt = "{} is not a {:?}", _0, _1)]
+    TypeMismatch(Path, SchemaType),
 
-    #[error(display = "Array item type mismatch: {}", _0)]
-    ArrayItemTypeMismatch(JsonValue, #[cause] Box<Error>),
+    #[display(fmt = "Array item type mismatch: {}", _0)]
+    ArrayItemTypeMismatch(JsonValue, #[error(source)] Box<Error>),
 
-    #[error(display = "Extraneous field: {}", _0)]
-    ExtraneousField(String),
+    #[display(fmt = "Extraneous field: {}", _0)]
+    ExtraneousField(#[error(not(source))] String),
 
-    #[error(display = "Status mismatch: expected {}; got {}", _0, _1)]
+    #[display(fmt = "Status mismatch: expected {}; got {}", _0, _1)]
     StatusMismatch(StatusCode, StatusCode),
 
-    #[error(display = "Required field missing: {}", _0)]
-    RequiredFieldMissing(String),
+    #[display(fmt = "Required field missing: {}", _0)]
+    RequiredFieldMissing(#[error(not(source))] Path),
 
-    #[error(display = "Operation not found: {} {}", _0, _1)]
+    #[display(fmt = "Non-nullable field was null: {}", _0)]
+    InvalidNull(#[error(not(source))] Path),
+
+    #[display(fmt = "Operation not found: {} {}", _0, _1)]
     OperationNotFound(Method, String),
 
-    #[error(display = "Operation ID not found: {}", _0)]
-    OperationIdNotFound(String),
+    #[display(fmt = "Operation ID not found: {}", _0)]
+    OperationIdNotFound(#[error(not(source))] String),
 
-    #[error(display = "Parameter not found: {}", _0)]
-    ParameterNotFound(String),
+    #[display(fmt = "Parameter not found: {}", _0)]
+    ParameterNotFound(#[error(not(source))] String),
 
-    #[error(display = "Invalid parameter location: {}", _0)]
-    InvalidParameterLocation(String),
+    #[display(fmt = "Invalid parameter location: {}", _0)]
+    InvalidParameterLocation(#[error(not(source))] String),
 }

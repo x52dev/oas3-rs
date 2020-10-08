@@ -1,4 +1,3 @@
-#![feature(todo_macro)]
 #![allow(dead_code, unused_variables)]
 
 use http::Method;
@@ -36,5 +35,9 @@ fn main() {
         .schema(&spec)
         .unwrap();
 
-    println!("{:?}", &schema);
+    // let v = ValidatorTree::from_schema(&schema, &spec).unwrap();
+    // v.validate(valid).unwrap();
+    // v.validate(invalid1).unwrap();
+    // v.validate(invalid2).unwrap();
+    // v.validate(invalid3).unwrap();
 }

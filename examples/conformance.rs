@@ -1,15 +1,16 @@
-#![feature(todo_macro)]
 #![allow(dead_code, unused_variables)]
 
+#[cfg(feature = "conformance")]
 use oas3::conformance::{
     ConformanceTestSpec, OperationSpec, RequestSpec, ResponseSpec, TestRunner,
 };
 
+#[cfg(feature = "conformance")]
 fn main() {
     let _ = dotenv::dotenv();
     pretty_env_logger::init();
 
-    let spec = oas3::from_path("./data/oas-samples/petstore.yaml").expect("api spec parse error");
+    let spec = oas3::from_path("./data/oas-samples/pet-store.yaml").expect("api spec parse error");
     let base_url: &str = &spec.primary_server().expect("no primary server").url;
     let mut runner = TestRunner::new(base_url, spec.clone());
 
@@ -38,4 +39,9 @@ fn main() {
     runner.run_queued_tests();
     runner.print_results();
     println!("");
+}
+
+#[cfg(feature = "validation")]
+fn main() {
+    println!("run this example with the `conformance` feature enabled");
 }

@@ -1,6 +1,8 @@
 use std::collections::BTreeMap;
 
-use super::Url;
+use derive_more::{Display, Error, From};
+use serde::{Deserialize, Serialize};
+use url::Url;
 
 /// Allows configuration of the supported OAuth Flows.
 /// See [https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#oauth-flows-object]

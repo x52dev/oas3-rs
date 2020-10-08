@@ -1,9 +1,14 @@
+use derive_more::{Display, Error, From};
+
 /// Schema Errors
-#[derive(Debug, Clone, PartialEq, Error)]
+#[derive(Debug, Clone, PartialEq, Display, Error)]
 pub enum Error {
-    #[error(display = "Missing type property")]
+    #[display(fmt = "Missing type property")]
     NoType,
 
-    #[error(display = "Required fields specified on a non-object schema")]
+    #[display(fmt = "Unknown type: {}", _0)]
+    UnknownType(#[error(not(source))] String),
+
+    #[display(fmt = "Required fields specified on a non-object schema")]
     RequiredSpecifiedOnNonObject,
 }

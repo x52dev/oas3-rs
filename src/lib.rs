@@ -29,15 +29,8 @@
 //! error_chain users.
 //!
 
-#![feature(todo_macro, const_fn, stmt_expr_attributes, custom_inner_attributes)]
 #![allow(unused_imports, dead_code, unused_variables)]
-
-#[macro_use]
-extern crate serde_derive;
-#[macro_use]
-extern crate err_derive;
-#[macro_use]
-extern crate log;
+#![deny(rust_2018_idioms)]
 
 use std::{fs::File, io::Read, path::Path};
 
@@ -81,7 +74,9 @@ where
 }
 
 /// serialize to a yaml string
-pub fn to_yaml(spec: &OpenApiV3Spec) -> Result<String, Error> { Ok(serde_yaml::to_string(spec)?) }
+pub fn to_yaml(spec: &OpenApiV3Spec) -> Result<String, Error> {
+    Ok(serde_yaml::to_string(spec)?)
+}
 
 /// serialize to a json string
 pub fn to_json(spec: &OpenApiV3Spec) -> Result<String, Error> {

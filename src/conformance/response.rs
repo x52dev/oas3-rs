@@ -3,7 +3,7 @@ use http::{HeaderMap, StatusCode};
 use serde_json::Value as JsonValue;
 
 use super::{OperationSpec, TestOperation};
-use crate::validation::{Error as ValidationError, SchemaValidator};
+use crate::validation::{Error as ValidationError, ValidationTree};
 
 #[derive(Debug, Clone)]
 pub enum ResponseSpecSource {
@@ -107,5 +107,7 @@ pub struct TestResponse {
 }
 
 impl TestResponse {
-    pub fn body(&self) -> Option<JsonValue> { self.body.clone() }
+    pub fn body(&self) -> Option<JsonValue> {
+        self.body.clone()
+    }
 }

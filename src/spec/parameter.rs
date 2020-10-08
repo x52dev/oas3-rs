@@ -1,3 +1,6 @@
+use derive_more::{Display, Error, From};
+use serde::{Deserialize, Serialize};
+
 use super::{FromRef, MediaType, Ref, RefError, RefType, Spec};
 use crate::Schema;
 

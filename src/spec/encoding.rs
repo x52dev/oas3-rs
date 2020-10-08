@@ -1,5 +1,8 @@
 use std::collections::BTreeMap;
 
+use derive_more::{Display, Error, From};
+use serde::{Deserialize, Serialize};
+
 use super::{Header, ObjectOrReference};
 
 /// A single encoding definition applied to a single schema property.

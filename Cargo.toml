@@ -1,43 +1,38 @@
 [package]
 name = "oas3"
 version = "0.1.0"
-edition = "2018"
-authors = [
-  "rob <rob@cryptofacilities.com>",
-  "softprops <d.tangren@gmail.com>"
-]
+authors = ["Rob Ede <robjtede@icloud.com>", "softprops <d.tangren@gmail.com>"]
 description = "Structures and tools to parse, navigate and validate OpenAPI v3 specifications."
-# repository = "https://github.com/softprops/openapi"
-keywords = ["oas", "oas3", "openapi", "openapi3", "swagger", "roast"]
+keywords = ["oas3", "openapi", "swagger", "api", "validation"]
 license = "MIT"
+edition = "2018"
+
+[features]
+default = ["validation"]
+validation = []
+conformance = ["validation"]
 
 [dependencies]
-bytes = "0.4"
-colored = "1"
-derive_more = "0.15"
-err-derive = "0.1"
-http = "0.1"
+bytes = "0.5"
+colored = "2"
+derive_more = "0.99"
+http = "0.2"
 lazy_static = "1"
 log = "0.4"
 maplit = "1"
 prettytable-rs = "0.8"
 regex = "1"
 reqwest = "0.9"
-semver = "0.9"
+semver = "0.11"
 serde = "1"
 serde_derive = "1"
 serde_json = "1"
 serde_yaml = "0.8"
-url = "1.7"
-url_serde = "0.2"
+url = { version = "2", features = ["serde"] }
 
 [dev-dependencies]
-dotenv = "0.14"
+color-eyre = "0.5"
+dotenv = "0.15"
+eyre = "0.6"
 pretty_assertions = "0.6"
-pretty_env_logger = "0.3"
-
-[features]
-# default = ["conformance"]
-default = ["validation"]
-validation = []
-conformance = ["validation"]
+pretty_env_logger = "0.4"

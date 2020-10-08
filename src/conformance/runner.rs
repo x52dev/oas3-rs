@@ -42,7 +42,9 @@ impl TestRunner {
         self.queue.append(&mut tests.to_owned().into())
     }
 
-    pub fn add_test(&mut self, test: ConformanceTestSpec) { self.queue.push_back(test); }
+    pub fn add_test(&mut self, test: ConformanceTestSpec) {
+        self.queue.push_back(test);
+    }
 
     pub fn immediate_test(&mut self, test: ConformanceTestSpec) {
         self.add_test(test);
@@ -135,7 +137,9 @@ impl TestRunner {
         }
     }
 
-    pub fn results(&self) -> &[TestResult] { &self.results }
+    pub fn results(&self) -> &[TestResult] {
+        &self.results
+    }
 
     pub fn last_response_body(&self) -> Option<JsonValue> {
         let (_, res) = self.results.last().unwrap();
@@ -178,7 +182,9 @@ impl TestRunner {
         table.printstd();
     }
 
-    pub fn clear_results(&mut self) { self.results.clear(); }
+    pub fn clear_results(&mut self) {
+        self.results.clear();
+    }
 }
 
 pub fn format_error(err: &dyn StdError) -> ColoredString {

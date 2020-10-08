@@ -1,3 +1,7 @@
+use derive_more::{Display, Error, From};
+use serde::{Deserialize, Serialize};
+
+
 use crate::Schema;
 
 /// The Header Object follows the structure of the

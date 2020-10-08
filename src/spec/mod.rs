@@ -1,6 +1,8 @@
-use http::Method;
-
 use std::{collections::BTreeMap, iter::Iterator};
+
+use derive_more::{Display, Error, From};
+use http::Method;
+use serde::{Deserialize, Serialize};
 
 mod components;
 mod contact;
@@ -25,9 +27,7 @@ pub mod schema;
 mod security_scheme;
 mod server;
 mod tag;
-mod url;
 
-pub use self::url::*;
 pub use components::*;
 pub use contact::*;
 pub use encoding::*;
@@ -152,9 +152,12 @@ impl Spec {
     pub fn operations(&self) -> impl Iterator<Item = (String, Method, &Operation)> {
         self.paths.iter().flat_map(|(path, item)| {
             item.methods()
+                .into_iter()
                 .map(move |(method, op)| (path.to_owned(), method, op))
         })
     }
 
-    pub fn primary_server(&self) -> Option<&Server> { self.servers.first() }
+    pub fn primary_server(&self) -> Option<&Server> {
+        self.servers.first()
+    }
 }

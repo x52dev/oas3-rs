@@ -1,4 +1,6 @@
-use super::Url;
+use derive_more::{Display, Error, From};
+use serde::{Deserialize, Serialize};
+use url::Url;
 
 /// Contact information for the exposed API.
 ///

@@ -2,7 +2,7 @@ use std::fmt;
 
 use http::{Method, StatusCode};
 
-use crate::{validation::Error as ValidationError, Operation, Spec};
+use crate::{spec::Operation, validation::Error as ValidationError, Spec};
 
 #[derive(Debug, Clone)]
 pub enum OperationSpec {
@@ -18,13 +18,25 @@ impl OperationSpec {
         }
     }
 
-    pub fn get<P: Into<String>>(path: P) -> Self { Self::new(Method::GET, path) }
-    pub fn post<P: Into<String>>(path: P) -> Self { Self::new(Method::POST, path) }
-    pub fn patch<P: Into<String>>(path: P) -> Self { Self::new(Method::PATCH, path) }
-    pub fn put<P: Into<String>>(path: P) -> Self { Self::new(Method::PUT, path) }
-    pub fn delete<P: Into<String>>(path: P) -> Self { Self::new(Method::DELETE, path) }
+    pub fn get<P: Into<String>>(path: P) -> Self {
+        Self::new(Method::GET, path)
+    }
+    pub fn post<P: Into<String>>(path: P) -> Self {
+        Self::new(Method::POST, path)
+    }
+    pub fn patch<P: Into<String>>(path: P) -> Self {
+        Self::new(Method::PATCH, path)
+    }
+    pub fn put<P: Into<String>>(path: P) -> Self {
+        Self::new(Method::PUT, path)
+    }
+    pub fn delete<P: Into<String>>(path: P) -> Self {
+        Self::new(Method::DELETE, path)
+    }
 
-    pub fn operation_id<P: Into<String>>(op_id: P) -> Self { Self::OperationId(op_id.into()) }
+    pub fn operation_id<P: Into<String>>(op_id: P) -> Self {
+        Self::OperationId(op_id.into())
+    }
 }
 
 impl fmt::Display for OperationSpec {
@@ -51,7 +63,7 @@ impl TestOperation {
     }
 
     pub fn resolve_operation<'a>(&self, spec: &'a Spec) -> Result<&'a Operation, ValidationError> {
-        spec.get_operation(&self.method, &self.path).ok_or_else(|| {
+        spec.operation(&self.method, &self.path).ok_or_else(|| {
             ValidationError::OperationNotFound(self.method.clone(), self.path.clone())
         })
     }

@@ -1,3 +1,6 @@
+use derive_more::{Display, Error, From};
+use serde::{Deserialize, Serialize};
+
 use super::{FromRef, Header, Link, MediaType, ObjectOrReference, Ref, RefError, RefType, Spec};
 
 /// See <https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#exampleObject>.

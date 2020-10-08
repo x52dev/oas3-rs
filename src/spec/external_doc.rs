@@ -1,4 +1,6 @@
-use super::Url;
+use derive_more::{Display, Error, From};
+use serde::{Deserialize, Serialize};
+use url::Url;
 
 /// Allows referencing an external resource for extended documentation.
 ///
