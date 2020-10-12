@@ -1,11 +1,14 @@
 [package]
 name = "oas3"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Rob Ede <robjtede@icloud.com>", "softprops <d.tangren@gmail.com>"]
-description = "Structures and tools to parse, navigate and validate OpenAPI v3 specifications."
-keywords = ["oas3", "openapi", "swagger", "api", "validation"]
-license = "MIT"
 edition = "2018"
+description = "Structures and tools to parse, navigate and validate OpenAPI v3 specifications."
+readme = "README.md"
+repository = "https://github.com/robjtede/oas3-rs"
+license = "MIT"
+keywords = ["oas3", "openapi", "swagger", "api", "validation"]
+categories = ["data-structures", "development-tools::testing", "parsing"]
 
 [features]
 default = ["validation", "conformance"]
