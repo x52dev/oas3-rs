@@ -4,6 +4,11 @@
 
 Based on v3 parts of [openapi](https://crates.io/crates/openapi) crate by [softprops](https://crates.io/users/softprops).
 
+Additional features:
+- Validation constructors
+- Example request/response validation
+- Live API conformance testing
+
 ## Install
 
 add the following to your `Cargo.toml` file

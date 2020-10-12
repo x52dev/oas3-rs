@@ -12,6 +12,7 @@
         "noncomposite",
         "openapi",
         "petstore",
+        "println",
         "reqwest",
         "rustfmt",
         "valtree",
