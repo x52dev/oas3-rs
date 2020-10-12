@@ -76,7 +76,7 @@ impl ConformanceTestSpec {
 
     pub fn resolve_test_operation<'a>(&self, spec: &'a Spec) -> Result<TestOperation, Error> {
         trace!("resolve_test_operation: {:?}", &self.operation);
-        
+
         let test_op = match &self.operation {
             OperationSpec::Parts { method, path } => {
                 TestOperation::new(method.clone(), path.clone())
@@ -142,7 +142,7 @@ impl ConformanceTestSpec {
 
     pub fn resolve_request(&self, spec: &Spec) -> Result<TestRequest, Error> {
         trace!("resolving request: {:?}", &self.operation);
-        
+
         let test_op = self.resolve_test_operation(&spec)?;
         let op = test_op.resolve_operation(&spec)?;
 
@@ -321,21 +321,21 @@ mod tests {
 
     #[test]
     fn new_conformance_test_spec() {
-        let test0: ConformanceTestSpec = ConformanceTestSpec::named(
+        ConformanceTestSpec::named(
             "basic login",
             OperationSpec::post("/token"),
             RequestSpec::from_example("application/json", "basic"),
             ResponseSpec::from_schema(200, "application/json"),
         );
 
-        let test1: ConformanceTestSpec = ConformanceTestSpec::named(
+        ConformanceTestSpec::named(
             "verify expired",
             OperationSpec::post("/verify"),
             RequestSpec::from_json_example("expired"),
             ResponseSpec::from_example(200, "application/json", "expired"),
         );
 
-        let test2: ConformanceTestSpec = ConformanceTestSpec::named(
+        ConformanceTestSpec::named(
             "is not logged in",
             OperationSpec::get("/isloggedin"),
             RequestSpec::from_bad_raw("not json"),

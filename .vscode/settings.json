@@ -11,6 +11,7 @@
         "maplit",
         "noncomposite",
         "openapi",
+        "petstore",
         "reqwest",
         "rustfmt",
         "valtree",

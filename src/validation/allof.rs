@@ -46,7 +46,7 @@ mod tests {
     use crate::validation::RequiredFields;
 
     #[test]
-    fn allof_validatation() {
+    fn all_of_validation() {
         let path = Path::default();
 
         let req1 = RequiredFields::new(vec!["name".to_owned()]);

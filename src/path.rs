@@ -3,19 +3,23 @@ use std::fmt;
 #[derive(Debug, Clone)]
 pub struct Path {
     parts: Vec<String>,
-    seperator: char,
+    separator: char,
 }
 
 impl Path {
     pub fn new(sep: char) -> Self {
         Self {
             parts: vec![],
-            seperator: sep,
+            separator: sep,
         }
     }
 
+    pub fn is_root(&self) -> bool {
+        self.parts.is_empty()
+    }
+
     /// Add path part
-    pub fn push<T: Into<String>>(&mut self, part: T) {
+    pub fn push(&mut self, part: impl Into<String>) {
         self.parts.push(part.into());
     }
 
@@ -36,14 +40,14 @@ impl Default for Path {
     fn default() -> Self {
         Self {
             parts: vec![],
-            seperator: '/',
+            separator: '/',
         }
     }
 }
 
 impl fmt::Display for Path {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let path = self.parts.join(&self.seperator.to_string());
+        let path = self.parts.join(&self.separator.to_string());
         write!(f, "{}", path)
     }
 }

@@ -37,6 +37,9 @@ pub enum Error {
 
     #[display(fmt = "Required field missing: {}", _0)]
     RequiredFieldMissing(#[error(not(source))] Path),
+    
+    #[display(fmt = "Type did not match any `anyOf` variant: {}", _0)]
+    AnyOfNoMatch(#[error(not(source))] Path),
 
     #[display(fmt = "Non-nullable field was null: {}", _0)]
     InvalidNull(#[error(not(source))] Path),

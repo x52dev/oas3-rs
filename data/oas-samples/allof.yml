@@ -22,7 +22,6 @@ components:
         application/json:
           schema:
             title: Data and Metadata
-            type: string
             allOf:
               - $ref: "#/components/schemas/data"
               - $ref: "#/components/schemas/metadata"

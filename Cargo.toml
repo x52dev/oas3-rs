@@ -8,7 +8,7 @@ license = "MIT"
 edition = "2018"
 
 [features]
-default = ["validation"]
+default = ["validation", "conformance"]
 validation = []
 conformance = ["validation"]
 

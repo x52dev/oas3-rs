@@ -24,7 +24,7 @@ pub use allof::*;
 pub use r#type::*;
 pub use required::*;
 
-pub trait Validate {
+pub trait Validate: Debug {
     fn validate(&self, val: &JsonValue, path: Path) -> Result<(), Error>;
 }
 

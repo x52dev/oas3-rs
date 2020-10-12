@@ -10,7 +10,7 @@ pub struct DataType {
 }
 
 impl DataType {
-    fn new(type_: SchemaType) -> Self {
+    pub fn new(type_: SchemaType) -> Self {
         Self {
             r#type: type_,
             nullable: false,
@@ -34,6 +34,10 @@ impl DataType {
     }
     pub fn object() -> Self {
         Self::new(SchemaType::Object)
+    }
+
+    pub fn set_nullable(self, nullable: bool) -> Self {
+        Self { nullable, ..self }
     }
 
     pub fn nullable(self) -> Self {
