@@ -234,7 +234,7 @@ impl ValidationTree {
                             v.validate_inner(item, child_path)?;
                         }
                     }
-                    _ => return Err(Error::TypeMismatch(Path::new('.'), SchemaType::Array)),
+                    _ => return Err(Error::TypeMismatch(path.clone(), SchemaType::Array)),
                 }
 
                 Ok(())
@@ -529,7 +529,7 @@ components:
 
         let test = json!(123);
         valtree.validate(&test).unwrap();
-        
+
         valtree.validate(&NULL).unwrap_err();
 
         let schema = get_schema(&spec, "list");
@@ -542,7 +542,7 @@ components:
 
         let test = json!([123, "456", 789]);
         valtree.validate(&test).unwrap();
-        
+
         let test = json!([123, null, 789]);
         valtree.validate(&test).unwrap_err();
     }

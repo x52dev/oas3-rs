@@ -47,8 +47,12 @@ impl Default for Path {
 
 impl fmt::Display for Path {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let path = self.parts.join(&self.separator.to_string());
-        write!(f, "{}", path)
+        if self.is_root() {
+            f.write_str("{ROOT}")
+        } else {
+            let path = self.parts.join(&self.separator.to_string());
+            f.write_str(&path)
+        }
     }
 }
 

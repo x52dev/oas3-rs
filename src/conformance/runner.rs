@@ -136,6 +136,7 @@ impl TestRunner {
         trace!("run queued tests");
 
         while let Some(test) = self.queue.pop_front() {
+            println!("{} tests remaining", self.queue.len() + 1);
             trace!("run test: {:?}", &test);
 
             match test.resolve(&self.spec) {
