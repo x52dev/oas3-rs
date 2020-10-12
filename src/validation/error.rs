@@ -5,7 +5,7 @@ use serde_json::Value as JsonValue;
 
 use crate::{
     path::Path,
-    spec::schema::{Error as SchemaError, Type as SchemaType},
+    spec::{Error as SchemaError, SchemaType},
 };
 
 /// Validation Errors

@@ -1,11 +1,20 @@
 {
-    "editor.detectIndentation": false,
-    "editor.tabSize": 4,
     "cSpell.words": [
+        "Deque",
+        "INTS",
+        "NUMS",
+        "STRS",
         "Semver",
+        "btreemap",
+        "deserializable",
         "dotenv",
+        "maplit",
+        "noncomposite",
         "openapi",
         "reqwest",
-        "rustfmt"
-    ]
+        "rustfmt",
+        "valtree",
+        "valtrees"
+    ],
+    "rust-analyzer.diagnostics.disabled": ["unresolved-import"]
 }

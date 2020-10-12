@@ -1,6 +1,6 @@
 use std::{fmt, ops::Deref};
 
-use http::{HeaderMap, Method, StatusCode};
+use http::{header, HeaderMap, HeaderValue, Method, StatusCode};
 use reqwest::Request;
 
 use crate::{
@@ -16,14 +16,24 @@ pub enum TestAuthentication {
 
 impl TestAuthentication {
     /// Use the `Authorization: Bearer ...` method to provide authentication key/token.
-    pub fn bearer<T: Into<String>>(token: T) -> Self {
+    pub fn bearer(token: impl Into<String>) -> Self {
         Self::Bearer(token.into())
     }
 
-    // /// Shorthand for setting cookie headers.
-    // pub fn cookies<T: Into<String>>(token: T) -> Self {
-    //     Self::Bearer(token.into())
-    // }
+    /// Shorthand for setting cookie header.
+    pub fn cookie(cookies: Vec<impl AsRef<str>>) -> Self {
+        let headers: HeaderMap = cookies
+            .into_iter()
+            .map(|cookie| {
+                (
+                    header::COOKIE,
+                    HeaderValue::from_str(cookie.as_ref()).unwrap(),
+                )
+            })
+            .collect();
+
+        Self::Headers(headers)
+    }
 
     /// Provide a closure that transforms a `TestRequest` into an authenticated `TestRequest`.
     pub fn custom(closure: fn(TestRequest) -> TestRequest) -> Self {
@@ -32,10 +42,10 @@ impl TestAuthentication {
 }
 
 impl fmt::Debug for TestAuthentication {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Custom(_) => write!(f, "[custom auth transformer]"),
-            debuggable => write!(f, "{:?}", debuggable),
+            other => write!(f, "{:?}", other),
         }
     }
 }

@@ -42,6 +42,6 @@ impl MediaType {
         self.examples
             .as_ref()
             .map(|examples| examples.resolve_all(&spec))
-            .unwrap_or_else(|| BTreeMap::new())
+            .unwrap_or_else(BTreeMap::new)
     }
 }

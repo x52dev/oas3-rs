@@ -1,8 +1,11 @@
-use std::{collections::VecDeque, env, error::Error as StdError, ops::Deref, string::ToString};
+use std::{
+    collections::VecDeque, env, error::Error as StdError, future::Future, ops::Deref,
+    string::ToString,
+};
 
 use colored::{ColoredString, Colorize};
 use http::{Method, StatusCode};
-use log::{debug, info};
+use log::{debug, info, trace};
 use prettytable::{cell, row, Table};
 use serde_json::Value as JsonValue;
 use url::Url;
@@ -46,12 +49,12 @@ impl TestRunner {
         self.queue.push_back(test);
     }
 
-    pub fn immediate_test(&mut self, test: ConformanceTestSpec) {
+    pub fn immediate_test(&mut self, test: ConformanceTestSpec) -> impl Future<Output = ()> + '_ {
         self.add_test(test);
-        self.run_queued_tests();
+        self.run_queued_tests()
     }
 
-    pub fn send_request(&self, req: &TestRequest) -> Result<TestResponse, Error> {
+    pub async fn send_request(&self, req: &TestRequest) -> Result<TestResponse, Error> {
         let client = reqwest::Client::new();
 
         let method: reqwest::Method = req.operation.method.as_str().parse().unwrap();
@@ -82,31 +85,35 @@ impl TestRunner {
 
         // TODO: add other param types to request
 
-        let mut res = client
+        let res = client
             .request(method, &url.to_string())
             .headers(req.headers.clone())
             .body(req.body.to_vec())
-            .send()?;
+            .send()
+            .await?;
+
+        let status = res.status();
+        let headers = res.headers().clone();
 
         let body_is_empty = res.content_length().map(|x| x == 0).unwrap_or(false);
         let body = if body_is_empty {
             None
         } else {
-            Some(res.json().map_err(|_| ValidationError::NotJson)?)
+            Some(res.json().await.map_err(|_| ValidationError::NotJson)?)
         };
 
         Ok(TestResponse {
-            status: res.status(),
-            headers: res.headers().clone(),
+            status,
+            headers,
             body,
         })
     }
 
-    fn run_test(&self, test: ResolvedConformanceTestSpec) -> Result<TestResponse, Error> {
+    async fn run_test(&self, test: ResolvedConformanceTestSpec) -> Result<TestResponse, Error> {
         debug!("request: {:?}", &test.request);
         debug!("response spec: {:?}", &test.response);
 
-        let res = self.send_request(&test.request)?;
+        let res = self.send_request(&test.request).await?;
 
         // validate response status
         test.response.validate_status(&res.status)?;
@@ -125,12 +132,16 @@ impl TestRunner {
 
     /// Runs tests in queue serially, removing them from the queue and appending the results and
     /// original test specs in the result list.
-    pub fn run_queued_tests(&mut self) {
+    pub async fn run_queued_tests(&mut self) {
+        trace!("run queued tests");
+
         while let Some(test) = self.queue.pop_front() {
+            trace!("run test: {:?}", &test);
+
             match test.resolve(&self.spec) {
                 Ok(resolved_test) => {
                     self.results
-                        .push((test.clone(), self.run_test(resolved_test)));
+                        .push((test.clone(), self.run_test(resolved_test).await));
                 }
                 Err(err) => self.results.push((test.clone(), Err(err))),
             }

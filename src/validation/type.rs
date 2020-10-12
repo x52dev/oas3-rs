@@ -1,9 +1,9 @@
 use serde_json::Value as JsonValue;
 
 use super::{Error, Validate};
-use crate::{path::Path, spec::schema::Type as SchemaType, Spec};
+use crate::{path::Path, spec::SchemaType, Spec};
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct DataType {
     r#type: SchemaType,
     nullable: bool,
@@ -92,7 +92,7 @@ mod tests {
 
         valid_vs_invalid!(
             v,
-            &[&TRU],
+            &[&TRUE],
             &[&NULL, &INTEGER, &STRING, &ARRAY_INTS, &OBJ_EMPTY],
         );
     }
@@ -104,7 +104,7 @@ mod tests {
         valid_vs_invalid!(
             v,
             &[&INTEGER],
-            &[&FLOAT, &NULL, &TRU, &STRING, &ARRAY_INTS, &OBJ_EMPTY],
+            &[&FLOAT, &NULL, &TRUE, &STRING, &ARRAY_INTS, &OBJ_EMPTY],
         );
     }
 
@@ -115,7 +115,7 @@ mod tests {
         valid_vs_invalid!(
             v,
             &[&INTEGER, &FLOAT],
-            &[&NULL, &TRU, &STRING, &ARRAY_INTS, &OBJ_EMPTY],
+            &[&NULL, &TRUE, &STRING, &ARRAY_INTS, &OBJ_EMPTY],
         );
     }
 
@@ -126,7 +126,7 @@ mod tests {
         valid_vs_invalid!(
             v,
             &[&STRING],
-            &[&NULL, &TRU, &INTEGER, &FLOAT, &ARRAY_INTS, &OBJ_EMPTY],
+            &[&NULL, &TRUE, &INTEGER, &FLOAT, &ARRAY_INTS, &OBJ_EMPTY],
         );
     }
 
@@ -136,7 +136,7 @@ mod tests {
 
         valid_vs_invalid!(
             v,
-            &[&TRU, &NULL],
+            &[&TRUE, &NULL],
             &[&FLOAT, &STRING, &ARRAY_INTS, &OBJ_EMPTY],
         );
 
@@ -145,7 +145,7 @@ mod tests {
         valid_vs_invalid!(
             v,
             &[&STRING, &NULL],
-            &[&FLOAT, &TRU, &ARRAY_INTS, &OBJ_EMPTY],
+            &[&FLOAT, &TRUE, &ARRAY_INTS, &OBJ_EMPTY],
         );
     }
 
@@ -156,7 +156,7 @@ mod tests {
         valid_vs_invalid!(
             v,
             &[&ARRAY_INTS, &ARRAY_STRS],
-            &[&TRU, &NULL, &FLOAT, &STRING, &OBJ_EMPTY],
+            &[&TRUE, &NULL, &FLOAT, &STRING, &OBJ_EMPTY],
         );
     }
 

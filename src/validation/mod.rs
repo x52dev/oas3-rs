@@ -42,8 +42,8 @@ pub mod tests {
     lazy_static! {
         // primitives
         pub static ref NULL: JsonValue = json!(null);
-        pub static ref TRU: JsonValue = json!(true);
-        pub static ref FALS: JsonValue = json!(false);
+        pub static ref TRUE: JsonValue = json!(true);
+        pub static ref FALSE: JsonValue = json!(false);
         pub static ref INTEGER: JsonValue = json!(1);
         pub static ref FLOAT: JsonValue = json!(1.1);
         pub static ref STRING: JsonValue = json!("im a string");

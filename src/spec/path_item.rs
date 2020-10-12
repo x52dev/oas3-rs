@@ -88,22 +88,22 @@ impl PathItem {
         let mut methods = vec![];
 
         macro_rules! push_method {
-            ($method:ident) => {{
-                if let Some(ref op) = self.trace {
+            ($field:ident, $method:ident) => {{
+                if let Some(ref op) = self.$field {
                     methods.push((Method::$method, op))
                 }
             }};
         }
 
-        push_method!(GET);
-        push_method!(PUT);
-        push_method!(POST);
-        push_method!(DELETE);
-        push_method!(OPTIONS);
-        push_method!(HEAD);
-        push_method!(PATCH);
-        push_method!(TRACE);
-        push_method!(TRACE);
+        push_method!(get, GET);
+        push_method!(put, PUT);
+        push_method!(post, POST);
+        push_method!(delete, DELETE);
+        push_method!(options, OPTIONS);
+        push_method!(head, HEAD);
+        push_method!(patch, PATCH);
+        push_method!(trace, TRACE);
+        push_method!(trace, TRACE);
 
         methods
     }

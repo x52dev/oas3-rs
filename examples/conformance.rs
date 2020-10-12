@@ -1,16 +1,17 @@
 #![allow(dead_code, unused_variables)]
 
-#[cfg(feature = "conformance")]
 use oas3::conformance::{
     ConformanceTestSpec, OperationSpec, RequestSpec, ResponseSpec, TestRunner,
 };
 
-#[cfg(feature = "conformance")]
-fn main() {
-    let _ = dotenv::dotenv();
+#[tokio::main]
+async fn main() -> eyre::Result<()> {
+    color_eyre::install()?;
+
+    dotenv::dotenv().ok();
     pretty_env_logger::init();
 
-    let spec = oas3::from_path("./data/oas-samples/pet-store.yaml").expect("api spec parse error");
+    let spec = oas3::from_path("./data/oas-samples/pet-store.yml").expect("api spec parse error");
     let base_url: &str = &spec.primary_server().expect("no primary server").url;
     let mut runner = TestRunner::new(base_url, spec.clone());
 
@@ -22,7 +23,7 @@ fn main() {
             ResponseSpec::from_json_schema(200),
         ),
         ConformanceTestSpec::named(
-            "get single pet",
+            "get single pet (failure example)",
             OperationSpec::operation_id("getPetById"),
             RequestSpec::empty().add_param("petId", "9199424981609313390"),
             ResponseSpec::from_status(200),
@@ -36,12 +37,9 @@ fn main() {
     ]);
 
     println!("");
-    runner.run_queued_tests();
+    runner.run_queued_tests().await;
     runner.print_results();
     println!("");
-}
 
-#[cfg(feature = "validation")]
-fn main() {
-    println!("run this example with the `conformance` feature enabled");
+    Ok(())
 }

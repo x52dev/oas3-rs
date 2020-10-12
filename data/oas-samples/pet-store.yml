@@ -172,11 +172,8 @@ paths:
         "200":
           description: "successful operation"
           content:
-            {
-              application/xml: { schema: { $ref: "#/components/schemas/Pet" } },
-              application/json:
-                { schema: { $ref: "#/components/schemas/Pet" } },
-            }
+            application/xml: { schema: { $ref: "#/components/schemas/Pet" } }
+            application/json: { schema: { $ref: "#/components/schemas/Pet" } }
         "400":
           description: "Invalid ID supplied"
         "404":

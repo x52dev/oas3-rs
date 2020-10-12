@@ -70,11 +70,11 @@ impl ResponseSpec {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct TestResponseSpec {
     pub operation: TestOperation,
     pub status: StatusCode,
-    pub body_validator: Option<SchemaValidator>,
+    pub body_validator: Option<ValidationTree>,
 }
 
 impl TestResponseSpec {
@@ -90,9 +90,8 @@ impl TestResponseSpec {
     }
 
     pub fn validate_body(&self, body: &JsonValue) -> Result<(), ValidationError> {
-        if let Some(ref vltr) = self.body_validator {
-            vltr.validate_type(body)?;
-            vltr.validate_required_fields(body)?;
+        if let Some(ref validator) = self.body_validator {
+            validator.validate(body)?;
         }
 
         Ok(())

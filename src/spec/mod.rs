@@ -2,12 +2,14 @@ use std::{collections::BTreeMap, iter::Iterator};
 
 use derive_more::{Display, Error, From};
 use http::Method;
+use log::{debug, trace};
 use serde::{Deserialize, Serialize};
 
 mod components;
 mod contact;
 mod encoding;
 
+mod error;
 mod example;
 mod external_doc;
 mod flows;
@@ -23,7 +25,7 @@ mod path_item;
 mod r#ref;
 mod request_body;
 mod response;
-pub mod schema;
+mod schema;
 mod security_scheme;
 mod server;
 mod tag;
@@ -50,9 +52,8 @@ pub use security_scheme::*;
 pub use server::*;
 pub use tag::*;
 
-mod error;
 pub use error::Error;
-pub use schema::Schema;
+pub use schema::{Error as SchemaError, Schema, Type as SchemaType};
 
 const OPENAPI_SUPPORTED_VERSION_RANGE: &str = "~3";
 
@@ -150,11 +151,28 @@ impl Spec {
     }
 
     pub fn operations(&self) -> impl Iterator<Item = (String, Method, &Operation)> {
-        self.paths.iter().flat_map(|(path, item)| {
-            item.methods()
-                .into_iter()
-                .map(move |(method, op)| (path.to_owned(), method, op))
-        })
+        let paths = &self.paths;
+
+        debug!("num paths: {}", paths.len());
+
+        let ops = paths
+            .iter()
+            .flat_map(|(path, item)| {
+                debug!(
+                    "path: {}, methods: {}",
+                    path,
+                    item.methods().into_iter().collect::<Vec<_>>().len()
+                );
+
+                item.methods()
+                    .into_iter()
+                    .map(move |(method, op)| (path.to_owned(), method, op))
+            })
+            .collect::<Vec<_>>();
+
+        debug!("num ops: {}", ops.len());
+
+        ops.into_iter()
     }
 
     pub fn primary_server(&self) -> Option<&Server> {

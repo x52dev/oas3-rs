@@ -1,7 +1,7 @@
 use bytes::Bytes;
 use http::{HeaderMap, HeaderValue, Method, StatusCode};
 use lazy_static::lazy_static;
-use log::debug;
+use log::{debug, trace};
 
 use crate::{
     spec::{Error as SpecError, Operation, RefError},
@@ -59,6 +59,8 @@ impl ConformanceTestSpec {
     }
 
     pub fn resolve(&self, spec: &Spec) -> Result<ResolvedConformanceTestSpec, Error> {
+        trace!("resolving: {:?}", &self.operation);
+
         let mut req = self.resolve_request(&spec)?;
 
         if let Some(TestAuthentication::Custom(transformer)) = self.request.auth {
@@ -73,6 +75,8 @@ impl ConformanceTestSpec {
     }
 
     pub fn resolve_test_operation<'a>(&self, spec: &'a Spec) -> Result<TestOperation, Error> {
+        trace!("resolve_test_operation: {:?}", &self.operation);
+        
         let test_op = match &self.operation {
             OperationSpec::Parts { method, path } => {
                 TestOperation::new(method.clone(), path.clone())
@@ -81,6 +85,8 @@ impl ConformanceTestSpec {
             OperationSpec::OperationId(op_id) => spec
                 .operations()
                 .find(|(path, method, op)| {
+                    trace!("checking {} {} ({:?})", &method, &path, &op);
+
                     op.operation_id
                         .as_ref()
                         .map(|id| id == op_id)
@@ -135,6 +141,8 @@ impl ConformanceTestSpec {
     }
 
     pub fn resolve_request(&self, spec: &Spec) -> Result<TestRequest, Error> {
+        trace!("resolving request: {:?}", &self.operation);
+        
         let test_op = self.resolve_test_operation(&spec)?;
         let op = test_op.resolve_operation(&spec)?;
 
@@ -238,7 +246,7 @@ impl ConformanceTestSpec {
                     let schema = media_spec.schema(&spec)?;
 
                     // create validator
-                    let validator = schema.validator(&spec).map_err(ValidationError::Schema)?;
+                    let validator = ValidationTree::from_schema(&schema, spec)?;
 
                     TestResponseSpec {
                         operation: test_op.clone(),
@@ -271,7 +279,7 @@ impl ConformanceTestSpec {
                             ))))?;
 
                     // create validator
-                    let validator = schema.validator(&spec).map_err(ValidationError::Schema)?;
+                    let validator = ValidationTree::from_schema(&schema, spec)?;
 
                     if let Some(ref ex) = example.value {
                         // check example validity
@@ -280,7 +288,7 @@ impl ConformanceTestSpec {
                         debug!("against schema: {:?}", &schema);
                         debug!("with validator: {:?}", &validator);
 
-                        validator.validate_type(&ex).map_err(Error::Validation)?;
+                        validator.validate(&ex).map_err(Error::Validation)?;
                     }
 
                     let mut hdrs = HeaderMap::new();
@@ -300,7 +308,7 @@ impl ConformanceTestSpec {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct ResolvedConformanceTestSpec {
     pub unresolved: ConformanceTestSpec,
     pub request: TestRequest,

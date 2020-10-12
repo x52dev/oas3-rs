@@ -3,13 +3,15 @@ use serde::{Deserialize, Serialize};
 
 use super::Flows;
 
-/// Defines a security scheme that can be used by the operations. Supported schemes are
-/// HTTP authentication, an API key (either as a header or as a query parameter),
-///OAuth2's common flows (implicit, password, application and access code) as defined
-/// in [RFC6749](https://tools.ietf.org/html/rfc6749), and
-/// [OpenID Connect Discovery](https://tools.ietf.org/html/draft-ietf-oauth-discovery-06).
+/// Defines a security scheme that can be used by the operations. Supported schemes are HTTP
+/// authentication, an API key (either as a header or as a query parameter), OAuth2's common flows
+/// (implicit, password, application and access code) as defined in [RFC6749], and
+/// [OpenID Connect Discovery].
 ///
 /// See <https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#securitySchemeObject>.
+///
+/// [RFC6749]: https://tools.ietf.org/html/rfc6749
+/// [OpenID Connect Discovery]: https://tools.ietf.org/html/draft-ietf-oauth-discovery-06
 
 #[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
@@ -38,8 +40,8 @@ pub enum SecurityScheme {
 
 #[cfg(test)]
 mod tests {
-    use super::super::Url;
     use super::*;
+    use url::Url;
 
     #[test]
     fn test_security_scheme_oauth_deser() {

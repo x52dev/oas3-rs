@@ -1,21 +1,22 @@
-use std::collections::BTreeMap;
+use std::{collections::BTreeMap, fmt};
 
 use super::{Error, Validate};
 use crate::{
     path::Path,
-    spec::schema::{Error as SchemaError, Type as SchemaType},
+    spec::{Error as SchemaError, SchemaType},
     Schema, Spec,
 };
 
 use serde_json::Value as JsonValue;
 
+#[derive(Debug)]
 pub enum ValidationBranch {
     Leaf,
     List(Box<ValidationTree>),
     Map(BTreeMap<String, ValidationTree>),
-    AllOf(Vec<Box<ValidationTree>>),
-    OneOf(Vec<Box<ValidationTree>>),
-    AnyOf(Vec<Box<ValidationTree>>),
+    AllOf(Vec<ValidationTree>),
+    OneOf(Vec<ValidationTree>),
+    AnyOf(Vec<ValidationTree>),
 }
 
 pub struct ValidationTree {
@@ -24,9 +25,11 @@ pub struct ValidationTree {
 }
 
 impl ValidationTree {
-    pub fn from_schema(schema: &Schema, spec: &Spec) -> Result<(), SchemaError> {
-        // TODO ?
-        Ok(())
+    pub fn from_schema(schema: &Schema, spec: &Spec) -> Result<ValidationTree, SchemaError> {
+        Ok(ValidationTree {
+            validators: vec![],
+            branch: ValidationBranch::Leaf,
+        })
     }
 
     fn first_noncomposite_type_is_object(&self) -> bool {
@@ -56,7 +59,7 @@ impl ValidationTree {
             v.validate(&val, path.clone())?
         }
 
-        // trigger subvaltrees validation
+        // trigger sub-valtrees validation
         match &self.branch {
             ValidationBranch::AllOf(vs) => {
                 // val must be an object (TODO: should it be possible
@@ -66,13 +69,13 @@ impl ValidationTree {
                     .ok_or_else(|| Error::TypeMismatch(path.clone(), SchemaType::Object))?;
 
                 for v in vs {
-                    // each subvaltree must be object type
+                    // each sub-valtree must be object type
                     if !v.first_noncomposite_type_is_object() {
                         // TODO: error variant
                         panic!("TODO: error composite type is not object-based")
                     }
 
-                    // match this val against each subvaltree ignoring extraneous
+                    // match this val against each sub-valtree ignoring extraneous
                     // field errors (TODO: this enables false positive cases)
                 }
 
@@ -81,7 +84,7 @@ impl ValidationTree {
                 Ok(())
             }
             ValidationBranch::OneOf(vs) => {
-                // match this val against subvaltrees
+                // match this val against sub-valtrees
                 // error if more than one match
 
                 // error if any self validations
@@ -89,7 +92,7 @@ impl ValidationTree {
                 Ok(())
             }
             ValidationBranch::AnyOf(vs) => {
-                // match this val against subvaltrees
+                // match this val against sub-valtrees
                 // error if none match
 
                 // error if any self validations
@@ -98,17 +101,29 @@ impl ValidationTree {
             }
             ValidationBranch::List(v) => {
                 // val must be list
-                // check each val list item against subvaltree
+                // check each val list item against sub-valtree
 
                 Ok(())
             }
-            ValidationBranch::Map(vmap) => {
+            ValidationBranch::Map(validator_map) => {
                 //
 
                 Ok(())
             }
             ValidationBranch::Leaf => Ok(()),
         }
+    }
+}
+
+impl fmt::Debug for ValidationTree {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("ValidationTree")
+            .field(
+                "validators",
+                &format!("[validator list ({} items)]", self.validators.len()),
+            )
+            .field("branch", &self.branch)
+            .finish()
     }
 }
 
@@ -133,7 +148,7 @@ mod tests {
     }
 
     #[test]
-    fn valtree_single_allof_required() {
+    fn valtree_single_all_of_required() {
         let req1 = RequiredFields::new(vec![s("name")]);
         let req2 = RequiredFields::new(vec![s("price")]);
 
@@ -190,15 +205,12 @@ mod tests {
             "product": OBJ_MIXED.clone()
         });
 
-        let req2 = RequiredFields::new(vec![s("name")]);
-
         let vt = ValidationTree {
             validators: vec![Box::new(RequiredFields::new(vec![s("product")]))],
             branch: ValidationBranch::Leaf,
         };
 
-        assert!(vt.validate(&OBJ_MIXED).is_ok());
-        assert!(vt.validate(&OBJ_MIXED2).is_ok());
+        assert!(vt.validate(&multi).is_ok());
 
         assert!(vt.validate(&NULL).is_err());
         assert!(vt.validate(&OBJ_EMPTY).is_err());

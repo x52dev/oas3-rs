@@ -1,7 +1,9 @@
+use std::fmt;
+
 use serde_json::Value as JsonValue;
 
 use super::{Error, Validate};
-use crate::{path::Path, spec::schema::Type as SchemaType, Spec};
+use crate::{path::Path, spec::SchemaType, Spec};
 
 pub struct AllOf {
     validators: Vec<Box<dyn Validate>>,
@@ -10,6 +12,17 @@ pub struct AllOf {
 impl AllOf {
     pub fn new(vs: Vec<Box<dyn Validate>>) -> Self {
         Self { validators: vs }
+    }
+}
+
+impl fmt::Debug for AllOf {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("AllOf")
+            .field(
+                "validators",
+                &format!("[validator list ({} items)]", self.validators.len()),
+            )
+            .finish()
     }
 }
 

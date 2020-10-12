@@ -1,12 +1,17 @@
 use std::fmt;
 
+use derive_more::Display;
+use log::debug;
 use http::{Method, StatusCode};
 
 use crate::{spec::Operation, validation::Error as ValidationError, Spec};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Display)]
 pub enum OperationSpec {
+    #[display(fmt = "{} {}", method, path)]
     Parts { method: Method, path: String },
+
+    #[display(fmt = "OpID: {}", _0)]
     OperationId(String),
 }
 
@@ -39,15 +44,6 @@ impl OperationSpec {
     }
 }
 
-impl fmt::Display for OperationSpec {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Parts { method, path } => write!(f, "{} {}", method, path),
-            Self::OperationId(op_id) => write!(f, "OpID: {}", op_id),
-        }
-    }
-}
-
 #[derive(Debug, Clone)]
 pub struct TestOperation {
     pub method: Method,
@@ -63,6 +59,8 @@ impl TestOperation {
     }
 
     pub fn resolve_operation<'a>(&self, spec: &'a Spec) -> Result<&'a Operation, ValidationError> {
+        debug!("resolving op {:?}", &self);
+        
         spec.operation(&self.method, &self.path).ok_or_else(|| {
             ValidationError::OperationNotFound(self.method.clone(), self.path.clone())
         })
