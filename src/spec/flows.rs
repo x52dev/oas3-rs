@@ -1,6 +1,5 @@
 use std::collections::BTreeMap;
 
-use derive_more::{Display, Error, From};
 use serde::{Deserialize, Serialize};
 use url::Url;
 

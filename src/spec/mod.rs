@@ -1,8 +1,8 @@
 use std::{collections::BTreeMap, iter::Iterator};
 
-use derive_more::{Display, Error, From};
+use derive_more::Error;
 use http::Method;
-use log::{debug, trace};
+use log::debug;
 use serde::{Deserialize, Serialize};
 
 mod components;
@@ -133,8 +133,6 @@ impl Spec {
     }
 
     pub fn operation(&self, method: &http::Method, path: &str) -> Option<&Operation> {
-        use http::Method;
-
         let resource = self.paths.get(path)?;
 
         match *method {

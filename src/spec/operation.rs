@@ -4,8 +4,7 @@ use log::error;
 use serde::{Deserialize, Serialize};
 
 use super::{
-    Callback, Error, ExternalDoc, FromRef, ObjectOrReference, Parameter, RefError, RequestBody,
-    Response, Server, Spec,
+    Callback, Error, ExternalDoc, ObjectOrReference, Parameter, RequestBody, Response, Server, Spec,
 };
 
 /// Describes a single API operation on a path.

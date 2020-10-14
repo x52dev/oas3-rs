@@ -2,7 +2,7 @@
 
 use std::collections::BTreeMap;
 
-use derive_more::{Display, Error, From};
+use derive_more::{Display, Error};
 use serde::{Deserialize, Serialize};
 
 use crate::spec::{FromRef, ObjectOrReference, Ref, RefError, RefType, Spec};

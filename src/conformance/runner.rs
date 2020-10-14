@@ -1,19 +1,19 @@
 use std::{
-    collections::VecDeque, env, error::Error as StdError, future::Future, ops::Deref,
-    string::ToString,
+    collections::VecDeque, error::Error as StdError, future::Future, ops::Deref, string::ToString,
+    sync::atomic::AtomicUsize, sync::atomic::Ordering, sync::Arc,
 };
 
 use colored::{ColoredString, Colorize};
-use http::{Method, StatusCode};
-use log::{debug, info, trace};
+use futures_util::{stream, FutureExt as _, StreamExt as _};
+use log::{debug, trace};
 use prettytable::{cell, row, Table};
 use serde_json::Value as JsonValue;
 use url::Url;
 
 use crate::{
     conformance::{
-        ConformanceTestSpec, OperationSpec, ParamPosition, RequestSource, RequestSpec,
-        ResolvedConformanceTestSpec, ResponseSpec, TestAuthentication, TestRequest, TestResponse,
+        ConformanceTestSpec, ParamPosition, ResolvedConformanceTestSpec, TestAuthentication,
+        TestRequest, TestResponse,
     },
     validation::Error as ValidationError,
     Error, Spec,
@@ -135,18 +135,38 @@ impl TestRunner {
     pub async fn run_queued_tests(&mut self) {
         trace!("run queued tests");
 
-        while let Some(test) = self.queue.pop_front() {
-            println!("{} tests remaining", self.queue.len() + 1);
-            trace!("run test: {:?}", &test);
+        let spec = self.spec.clone();
+        let num = Arc::new(AtomicUsize::new(self.queue.len()));
 
-            match test.resolve(&self.spec) {
-                Ok(resolved_test) => {
-                    self.results
-                        .push((test.clone(), self.run_test(resolved_test).await));
-                }
-                Err(err) => self.results.push((test.clone(), Err(err))),
+        let resolved_tests = self
+            .queue
+            .drain(..)
+            .map(|test_spec| (test_spec.clone(), test_spec.resolve(&spec)))
+            .collect::<Vec<_>>();
+
+        let mut ok_tests = vec![];
+
+        for (test_spec, test) in resolved_tests {
+            match test {
+                Ok(test) => ok_tests.push((test_spec, test)),
+                Err(err) => self.results.push((test_spec, Err(err))),
             }
         }
+
+        let mut test_results = stream::iter(ok_tests.drain(..))
+            .map(|(test_spec, test)| {
+                let num = Arc::clone(&num).fetch_sub(1, Ordering::SeqCst);
+
+                println!("running test: {}", num);
+                trace!("run test: {:?}", &test);
+
+                self.run_test(test).map(|result| (test_spec, result))
+            })
+            .buffered(8)
+            .collect::<Vec<_>>()
+            .await;
+
+        self.results.append(&mut test_results);
     }
 
     pub fn results(&self) -> &[TestResult] {

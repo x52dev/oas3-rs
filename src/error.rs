@@ -3,7 +3,6 @@
 use std::io;
 
 use derive_more::{Display, Error, From};
-use serde::{Deserialize, Serialize};
 
 use crate::{spec::Error as SpecError, validation::Error as ValidationError};
 

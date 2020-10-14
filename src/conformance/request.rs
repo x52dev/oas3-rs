@@ -1,7 +1,7 @@
 use bytes::Bytes;
 use http::HeaderMap;
 
-use super::{OperationSpec, ParamReplacement, TestAuthentication, TestOperation, TestParam};
+use super::{ParamReplacement, TestAuthentication, TestOperation, TestParam};
 
 #[derive(Debug, Clone)]
 pub enum RequestSource {

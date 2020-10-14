@@ -1,8 +1,6 @@
-use std::fmt;
-
 use derive_more::Display;
+use http::Method;
 use log::debug;
-use http::{Method, StatusCode};
 
 use crate::{spec::Operation, validation::Error as ValidationError, Spec};
 
@@ -60,7 +58,7 @@ impl TestOperation {
 
     pub fn resolve_operation<'a>(&self, spec: &'a Spec) -> Result<&'a Operation, ValidationError> {
         debug!("resolving op {:?}", &self);
-        
+
         spec.operation(&self.method, &self.path).ok_or_else(|| {
             ValidationError::OperationNotFound(self.method.clone(), self.path.clone())
         })

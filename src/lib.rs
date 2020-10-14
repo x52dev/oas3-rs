@@ -16,14 +16,10 @@
 //!
 //! [OpenAPI v3]: https://github.com/OAI/OpenAPI-Specification
 
-#![allow(unused_imports, dead_code, unused_variables)]
-#![warn(missing_debug_implementations)]
 #![deny(rust_2018_idioms, nonstandard_style)]
+#![warn(missing_debug_implementations)]
 
 use std::{fs::File, io::Read, path::Path};
-
-use lazy_static::lazy_static;
-use regex::Regex;
 
 mod error;
 mod path;

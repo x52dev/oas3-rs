@@ -1,6 +1,5 @@
 use derive_more::{Display, Error, From};
 use semver::{SemVerError, Version};
-use serde::{Deserialize, Serialize};
 
 use crate::spec::{r#ref::RefError, schema::Error as SchemaError};
 

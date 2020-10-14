@@ -1,13 +1,13 @@
 use std::{collections::BTreeMap, fmt};
 
-use super::{DataType, Error, RequiredFields, Validate};
+use super::{AggregateError, DataType, Error, RequiredFields, Validate};
 use crate::{
     path::Path,
     spec::{Error as SchemaError, SchemaType},
     Schema, Spec,
 };
 
-use log::{debug, trace};
+use log::{trace};
 use serde_json::Value as JsonValue;
 
 #[derive(Debug)]
@@ -136,6 +136,7 @@ impl ValidationTree {
         Ok(valtree)
     }
 
+    #[allow(dead_code)]
     fn first_noncomposite_type_is_object(&self) -> bool {
         match &self.branch {
             ValidationBranch::Object(_) => true,
@@ -155,13 +156,14 @@ impl ValidationTree {
         }
     }
 
+    /// top level validation entry-point
     pub fn validate(&self, val: &JsonValue) -> Result<(), Error> {
         let path = Path::new('.');
         self.validate_inner(val, path)
     }
 
+    /// trigger sub-valtrees validation
     fn validate_inner(&self, val: &JsonValue, path: Path) -> Result<(), Error> {
-        // trigger sub-valtrees validation
         match &self.branch {
             ValidationBranch::AllOf(vs) => {
                 // TODO: error if any self validations
@@ -188,12 +190,10 @@ impl ValidationTree {
 
                     match v.validate_inner(val, path.clone()) {
                         // TODO: in allOf schemas extraneous fields should be evaluated as a whole
-                        Ok(_) | Err(Error::ExtraneousField(_)) => continue,
+                        Ok(_) | Err(Error::UndocumentedField(_)) => continue,
                         Err(err) => return Err(err),
                     }
                 }
-
-                // error if any self validations
 
                 Ok(())
             }
@@ -206,18 +206,22 @@ impl ValidationTree {
                 // error if more than one match
 
                 let mut matched = false;
+                let mut errors = AggregateError::empty();
 
                 for v in vs {
-                    if let Ok(_) = v.validate_inner(val, path.clone()) {
-                        matched = true;
-                        break;
+                    match v.validate_inner(val, path.clone()) {
+                        Ok(_) => {
+                            matched = true;
+                            break;
+                        }
+                        Err(err) => errors.push(err),
                     }
                 }
 
                 return if matched {
                     Ok(())
                 } else {
-                    Err(Error::AnyOfNoMatch(path))
+                    Err(Error::OneOfNoMatch(path, errors))
                 };
             }
 
@@ -249,15 +253,16 @@ impl ValidationTree {
                 match val {
                     JsonValue::Object(items) => {
                         for (prop, val) in items {
+                            let child_path = path.extend(prop);
+
                             if let Some(validator) = validator_map.get(prop) {
-                                let child_path = path.extend(prop);
                                 validator.validate_inner(val, child_path)?;
                             } else {
-                                return Err(Error::ExtraneousField(prop.to_owned()));
+                                return Err(Error::UndocumentedField(child_path.to_string()));
                             }
                         }
                     }
-                    val => return Err(Error::TypeMismatch(path, SchemaType::Array)),
+                    _ => return Err(Error::TypeMismatch(path, SchemaType::Object)),
                 }
 
                 Ok(())
@@ -293,7 +298,7 @@ mod tests {
     use serde_json::json;
 
     use super::{super::tests::*, *};
-    use crate::validation::{AllOf, RequiredFields};
+    use crate::validation::{RequiredFields};
 
     fn get_schema(spec: &Spec, name: &str) -> Schema {
         spec.components
@@ -318,25 +323,6 @@ mod tests {
         assert!(vt.validate(&OBJ_NUMS).is_err());
     }
 
-    #[test]
-    fn valtree_single_all_of_required() {
-        let req1 = RequiredFields::new(vec![s("name")]);
-        let req2 = RequiredFields::new(vec![s("price")]);
-
-        let v = AllOf::new(vec![Box::new(req1), Box::new(req2)]);
-
-        let vt = ValidationTree {
-            validators: vec![Box::new(v)],
-            branch: ValidationBranch::Leaf,
-        };
-
-        assert!(vt.validate(&OBJ_MIXED).is_ok());
-        assert!(vt.validate(&OBJ_MIXED2).is_ok());
-
-        assert!(vt.validate(&NULL).is_err());
-        assert!(vt.validate(&OBJ_EMPTY).is_err());
-        assert!(vt.validate(&OBJ_NUMS).is_err());
-    }
 
     #[test]
     fn valtree_check_first_noncomposite_type() {
@@ -505,16 +491,12 @@ components:
   schemas:
     data:
       title: Data
-      anyOf:
-      - { type: number }
-      - { type: string }
+      anyOf: [{ type: number }, { type: string }]
     list:
       title: Data List
       type: array
       items:
-        anyOf:
-        - { type: number }
-        - { type: string }
+        anyOf: [{ type: number }, { type: string }]
 "#;
 
         let spec = crate::from_reader(spec_str.as_bytes()).unwrap();

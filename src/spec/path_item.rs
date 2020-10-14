@@ -1,4 +1,3 @@
-use derive_more::{Display, Error, From};
 use http::Method;
 use serde::{Deserialize, Serialize};
 

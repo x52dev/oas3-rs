@@ -1,7 +1,7 @@
 use serde_json::Value as JsonValue;
 
 use super::{Error, Validate};
-use crate::{path::Path, spec::SchemaType, Spec};
+use crate::{path::Path, spec::SchemaType};
 
 #[derive(Debug, Clone)]
 pub struct DataType {

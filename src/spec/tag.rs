@@ -1,4 +1,3 @@
-use derive_more::{Display, Error, From};
 use serde::{Deserialize, Serialize};
 
 /// Adds metadata to a single tag that is used by the

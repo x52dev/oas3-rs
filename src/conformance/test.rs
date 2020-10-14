@@ -1,10 +1,9 @@
 use bytes::Bytes;
-use http::{HeaderMap, HeaderValue, Method, StatusCode};
-use lazy_static::lazy_static;
+use http::{HeaderMap};
 use log::{debug, trace};
 
 use crate::{
-    spec::{Error as SpecError, Operation, RefError},
+    spec::{Error as SpecError, RefError},
     validation::{Error as ValidationError, ValidationTree},
     Error, Spec,
 };
@@ -92,7 +91,7 @@ impl ConformanceTestSpec {
                         .map(|id| id == op_id)
                         .unwrap_or(false)
                 })
-                .map(|(path, method, op)| TestOperation::new(method.clone(), path.clone()))
+                .map(|(path, method, _op)| TestOperation::new(method.clone(), path.clone()))
                 .ok_or_else(|| ValidationError::OperationIdNotFound(op_id.clone()))?,
         };
 
@@ -301,7 +300,7 @@ impl ConformanceTestSpec {
                     }
                 }
 
-                ResponseSpecSource::Exactly(ref data) => todo!(),
+                ResponseSpecSource::Exactly(ref _data) => todo!(),
             };
 
         Ok(res_spec)

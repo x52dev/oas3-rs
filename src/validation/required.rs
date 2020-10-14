@@ -1,9 +1,7 @@
-use std::fmt;
-
 use serde_json::Value as JsonValue;
 
 use super::{Error, Validate};
-use crate::{path::Path, spec::SchemaType, Spec};
+use crate::{path::Path, spec::SchemaType};
 
 #[derive(Debug, Clone)]
 pub struct RequiredFields {
@@ -15,7 +13,6 @@ impl RequiredFields {
         Self { fields: vs }
     }
 }
-
 
 impl Validate for RequiredFields {
     fn validate(&self, val: &JsonValue, path: Path) -> Result<(), Error> {
@@ -40,9 +37,7 @@ mod tests {
     use super::{super::tests::*, *};
 
     #[test]
-    fn requred_fields_validation() {
-        let path = Path::default();
-
+    fn required_fields_validation() {
         let v = RequiredFields::new(vec!["name".to_owned(), "price".to_owned()]);
 
         valid_vs_invalid!(

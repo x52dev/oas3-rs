@@ -1,12 +1,16 @@
-use std::{fs::File, io::Read, path::Path, str::FromStr};
+use std::str::FromStr;
 
-use derive_more::{Display, Error, From};
-use lazy_static::lazy_static;
+use derive_more::{Display, Error};
 use log::trace;
+use once_cell::sync::Lazy;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 
 use super::Spec;
+
+static RE_REF: Lazy<Regex> = Lazy::new(|| {
+    Regex::new("^(?P<source>[^#]*)#/components/(?P<type>[^/]+)/(?P<name>.+)$").unwrap()
+});
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[serde(untagged)]
@@ -85,12 +89,7 @@ impl FromStr for Ref {
     type Err = RefError;
 
     fn from_str(path: &str) -> Result<Self, Self::Err> {
-        lazy_static! {
-            static ref RE: Regex =
-                Regex::new("^(?P<source>[^#]*)#/components/(?P<type>[^/]+)/(?P<name>.+)$").unwrap();
-        }
-
-        let parts = RE.captures(path).unwrap();
+        let parts = RE_REF.captures(path).unwrap();
 
         trace!("creating Ref: {}/{}", &parts["type"], &parts["name"]);
 

@@ -1,11 +1,8 @@
-use std::{fmt, ops::Deref};
+use std::fmt;
 
-use http::{header, HeaderMap, HeaderValue, Method, StatusCode};
-use reqwest::Request;
+use http::{header, HeaderMap, HeaderValue};
 
-use crate::{
-    conformance::TestRequest, spec::Operation, validation::Error as ValidationError, Spec,
-};
+use crate::conformance::TestRequest;
 
 #[derive(Clone)]
 pub enum TestAuthentication {

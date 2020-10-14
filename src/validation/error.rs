@@ -1,12 +1,45 @@
-use derive_more::{Display, Error, From};
+use std::fmt;
+
+use derive_more::{Display, Error};
 use http::{Method, StatusCode};
-use serde::{Deserialize, Serialize};
 use serde_json::Value as JsonValue;
 
 use crate::{
     path::Path,
     spec::{Error as SchemaError, SchemaType},
 };
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct AggregateError {
+    errors: Vec<Error>,
+}
+
+impl AggregateError {
+    pub fn new(errors: Vec<Error>) -> Self {
+        Self { errors }
+    }
+
+    pub fn empty() -> Self {
+        Self { errors: vec![] }
+    }
+
+    pub fn push(&mut self, err: Error) {
+        self.errors.push(err)
+    }
+}
+
+impl fmt::Display for AggregateError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let errs = self
+            .errors
+            .iter()
+            .map(|err| format!("  => {}", err.to_string()))
+            .collect::<Vec<_>>()
+            .join("\n");
+
+        f.write_str(&errs)
+    }
+}
 
 /// Validation Errors
 #[derive(Clone, PartialEq, Debug, Display, Error)]
@@ -29,17 +62,17 @@ pub enum Error {
     #[display(fmt = "Array item type mismatch: {}", _0)]
     ArrayItemTypeMismatch(JsonValue, #[error(source)] Box<Error>),
 
-    #[display(fmt = "Extraneous field: {}", _0)]
-    ExtraneousField(#[error(not(source))] String),
+    #[display(fmt = "Undocumented field: {}", _0)]
+    UndocumentedField(#[error(not(source))] String),
 
     #[display(fmt = "Status mismatch: expected {}; got {}", _0, _1)]
     StatusMismatch(StatusCode, StatusCode),
 
     #[display(fmt = "Required field missing: {}", _0)]
     RequiredFieldMissing(#[error(not(source))] Path),
-    
-    #[display(fmt = "Type did not match any `anyOf` variant: {}", _0)]
-    AnyOfNoMatch(#[error(not(source))] Path),
+
+    #[display(fmt = "Type did not match any `anyOf` variant: {}\n{}", _0, _1)]
+    OneOfNoMatch(Path, AggregateError),
 
     #[display(fmt = "Non-nullable field was null: {}", _0)]
     InvalidNull(#[error(not(source))] Path),
