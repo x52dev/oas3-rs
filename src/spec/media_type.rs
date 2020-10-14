@@ -7,7 +7,7 @@ use crate::Schema;
 
 /// Each Media Type Object provides schema and examples for the media type identified by its key.
 ///
-/// See <https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#media-type-object>.
+/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#media-type-object>.
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
 pub struct MediaType {
     /// The schema defining the type used for the request body.

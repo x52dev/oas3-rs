@@ -1,8 +1,7 @@
-
 use http::{HeaderMap, StatusCode};
 use serde_json::Value as JsonValue;
 
-use super::{TestOperation};
+use super::TestOperation;
 use crate::validation::{Error as ValidationError, ValidationTree};
 
 #[derive(Debug, Clone)]

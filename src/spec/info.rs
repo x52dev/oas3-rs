@@ -6,12 +6,16 @@ use super::{Contact, License};
 /// General information about the API.
 ///
 ///
-/// See <https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#infoObject>.
+/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#infoObject>.
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
 // #[serde(rename_all = "lowercase")]
 pub struct Info {
     /// The title of the application.
     pub title: String,
+
+    /// A short description of the application. CommonMark syntax MAY be used for rich text representation.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub summary: Option<String>,
 
     /// A short description of the application. CommonMark syntax MAY be used for rich text representation.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -22,7 +26,7 @@ pub struct Info {
     pub terms_of_service: Option<Url>,
 
     /// The version of the OpenAPI document (which is distinct from the [OpenAPI Specification
-    /// version](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#oasVersion)
+    /// version](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#oasVersion)
     /// or the API implementation version).
     pub version: String,
 

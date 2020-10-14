@@ -7,7 +7,7 @@ use crate::{
     Schema, Spec,
 };
 
-use log::{trace};
+use log::trace;
 use serde_json::Value as JsonValue;
 
 #[derive(Debug)]
@@ -218,11 +218,11 @@ impl ValidationTree {
                     }
                 }
 
-                return if matched {
+                if matched {
                     Ok(())
                 } else {
                     Err(Error::OneOfNoMatch(path, errors))
-                };
+                }
             }
 
             ValidationBranch::Array(v) => {
@@ -233,12 +233,12 @@ impl ValidationTree {
 
                 match val {
                     JsonValue::Array(items) => {
-                        for (i, item) in items.into_iter().enumerate() {
+                        for (i, item) in items.iter().enumerate() {
                             let child_path = path.extend(format!("[{}]", i));
                             v.validate_inner(item, child_path)?;
                         }
                     }
-                    _ => return Err(Error::TypeMismatch(path.clone(), SchemaType::Array)),
+                    _ => return Err(Error::TypeMismatch(path, SchemaType::Array)),
                 }
 
                 Ok(())
@@ -298,7 +298,7 @@ mod tests {
     use serde_json::json;
 
     use super::{super::tests::*, *};
-    use crate::validation::{RequiredFields};
+    use crate::validation::RequiredFields;
 
     fn get_schema(spec: &Spec, name: &str) -> Schema {
         spec.components
@@ -322,7 +322,6 @@ mod tests {
         assert!(vt.validate(&OBJ_MIXED).is_ok());
         assert!(vt.validate(&OBJ_NUMS).is_err());
     }
-
 
     #[test]
     fn valtree_check_first_noncomposite_type() {

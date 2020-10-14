@@ -1,4 +1,4 @@
-//! Schema specification for [OpenAPI 3.0.1](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md)
+//! Schema specification for [OpenAPI 3.0.1](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md)
 
 use std::collections::BTreeMap;
 
@@ -41,7 +41,7 @@ pub enum Type {
 /// [JSON Schema Validation](https://tools.ietf.org/html/draft-wright-json-schema-validation-00).
 /// Unless stated otherwise, the property definitions follow the JSON Schema.
 ///
-/// See <https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#schemaObject>.
+/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#schemaObject>.
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
 pub struct Schema {
     //
@@ -78,10 +78,10 @@ pub struct Schema {
     pub properties: BTreeMap<String, ObjectOrReference<Schema>>,
 
     /// Value can be boolean or object. Inline or referenced schema MUST be of a
-    /// [Schema Object](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#schemaObject)
+    /// [Schema Object](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#schemaObject)
     /// and not a standard JSON Schema.
     ///
-    /// See <https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#properties>.
+    /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#properties>.
     #[serde(rename = "additionalProperties")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub additional_properties: Option<Box<ObjectOrReference<Schema>>>,

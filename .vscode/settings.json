@@ -3,6 +3,7 @@
         "Deque",
         "INTS",
         "NUMS",
+        "SPDX",
         "STRS",
         "Semver",
         "btreemap",

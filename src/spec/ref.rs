@@ -79,6 +79,7 @@ impl FromStr for RefType {
     }
 }
 
+#[derive(Debug, Clone)]
 pub struct Ref {
     pub source: String,
     pub kind: RefType,

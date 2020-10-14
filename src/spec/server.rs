@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 /// An object representing a Server.
 ///
-/// See <https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#serverObject>.
+/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#serverObject>.
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
 pub struct Server {
     /// A URL to the target host. This URL supports Server Variables and MAY be relative, to
@@ -26,7 +26,7 @@ pub struct Server {
 
 /// An object representing a Server Variable for server URL template substitution.
 ///
-/// See <https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#serverVariableObject>.
+/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#serverVariableObject>.
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
 pub struct ServerVariable {
     /// The default value to use for substitution, and to send, if an alternate value is not

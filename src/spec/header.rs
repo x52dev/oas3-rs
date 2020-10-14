@@ -1,17 +1,21 @@
 use serde::{Deserialize, Serialize};
 
-
 use crate::Schema;
 
-/// The Header Object follows the structure of the
-/// [Parameter Object](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#parameterObject)
-/// with the following changes:
+// TODO: update to 3.1 spec including JSON Schema conformance.
+
+/// The Header Object mostly follows the structure of the [Parameter Object].
+///
+/// Deviations from Parameter Object:
 /// 1. `name` MUST NOT be specified, it is given in the corresponding `headers` map.
 /// 1. `in` MUST NOT be specified, it is implicitly in `header`.
 /// 1. All traits that are affected by the location MUST be applicable to a location of
-///    `header` (for example, [`style`](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#parameterStyle)).
+///    `header` (for example, [`style`]).
 ///
-/// See <https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#headerObject>.
+/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#headerObject>.
+///
+/// [Parameter Object]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameterObject
+/// [`style`]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameterStyle
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
 pub struct Header {
     // FIXME: Is the third change properly implemented?

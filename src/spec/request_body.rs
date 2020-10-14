@@ -6,7 +6,7 @@ use super::{FromRef, MediaType, Ref, RefError, RefType, Spec};
 
 /// Describes a single request body.
 ///
-/// See <https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#requestBodyObject>.
+/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#requestBodyObject>.
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
 pub struct RequestBody {
     /// A brief description of the request body. This could contain examples of use.

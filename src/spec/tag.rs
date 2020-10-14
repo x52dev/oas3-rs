@@ -1,10 +1,10 @@
 use serde::{Deserialize, Serialize};
 
 /// Adds metadata to a single tag that is used by the
-/// [Operation Object](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#operationObject).
+/// [Operation Object](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#operationObject).
 /// It is not mandatory to have a Tag Object per tag defined in the Operation Object instances.
 ///
-/// See <https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#tagObject>.
+/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#tagObject>.
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
 pub struct Tag {
     /// The name of the tag.
@@ -19,5 +19,5 @@ pub struct Tag {
     // #[serde(skip_serializing_if = "Vec::is_empty")]
     // pub external_docs: Vec<ExternalDoc>,
 
-    // TODO: Add "Specification Extensions" https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#specificationExtensions}
+    // TODO: Add "Specification Extensions" https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specificationExtensions}
 }

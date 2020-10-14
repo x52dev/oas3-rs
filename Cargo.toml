@@ -11,9 +11,9 @@ keywords = ["oas3", "openapi", "swagger", "api", "validation"]
 categories = ["data-structures", "development-tools::testing", "parsing"]
 
 [features]
-default = ["validation", "conformance"]
+default = ["validation"]
 validation = []
-conformance = ["validation"]
+conformance = ["validation", "reqwest"]
 
 [dependencies]
 bytes = "0.5"
@@ -26,7 +26,7 @@ log = "0.4"
 maplit = "1"
 prettytable-rs = "0.8"
 regex = "1"
-reqwest = { version = "0.10", features = ["json"] }
+reqwest = { version = "0.10", optional = true, features = ["json"] }
 semver = "0.11"
 serde = "1"
 serde_derive = "1"

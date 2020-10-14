@@ -6,7 +6,7 @@ use derive_more::{Display, Error, From};
 
 use crate::{spec::Error as SpecError, validation::Error as ValidationError};
 
-/// Top-level Errors
+/// Top-level errors.
 #[derive(Debug, Display, Error, From)]
 pub enum Error {
     #[display(fmt = "I/O error")]
@@ -18,12 +18,13 @@ pub enum Error {
     #[display(fmt = "JSON error")]
     Serialize(serde_json::Error),
 
-    #[display(fmt = "Reqwest error")]
-    Reqwest(reqwest::Error),
-
     #[display(fmt = "Spec error")]
     Spec(SpecError),
 
     #[display(fmt = "Validation error")]
     Validation(ValidationError),
+
+    #[cfg(feature = "conformance")]
+    #[display(fmt = "Reqwest error")]
+    Reqwest(reqwest::Error),
 }

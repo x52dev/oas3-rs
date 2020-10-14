@@ -1,5 +1,5 @@
 use bytes::Bytes;
-use http::{HeaderMap};
+use http::HeaderMap;
 use log::{debug, trace};
 
 use crate::{

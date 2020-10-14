@@ -1,10 +1,10 @@
-//! Data validation (JSON only)
+//! Data validation for JSON structures.
 
 use std::fmt::Debug;
 
 use serde_json::Value as JsonValue;
 
-use crate::{path::Path};
+use crate::path::Path;
 
 #[cfg(test)]
 #[macro_use]
@@ -28,6 +28,7 @@ pub trait Validate: Debug {
 
 #[cfg(test)]
 pub mod tests {
+    use once_cell::sync::Lazy;
     use serde_json::json;
 
     use super::*;
@@ -37,21 +38,22 @@ pub mod tests {
     }
 
     // primitives
-    pub const NULL: JsonValue = json!(null);
-    pub const TRUE: JsonValue = json!(true);
-    pub const FALSE: JsonValue = json!(false);
-    pub const INTEGER: JsonValue = json!(1);
-    pub const FLOAT: JsonValue = json!(1.1);
-    pub const STRING: JsonValue = json!("im a string");
+    pub static NULL: Lazy<JsonValue> = Lazy::new(|| json!(null));
+    pub static TRUE: Lazy<JsonValue> = Lazy::new(|| json!(true));
+    pub static FALSE: Lazy<JsonValue> = Lazy::new(|| json!(false));
+    pub static INTEGER: Lazy<JsonValue> = Lazy::new(|| json!(1));
+    pub static FLOAT: Lazy<JsonValue> = Lazy::new(|| json!(1.1));
+    pub static STRING: Lazy<JsonValue> = Lazy::new(|| json!("im a string"));
 
     // arrays
-    pub const ARRAY_INTS: JsonValue = json!([1, 2]);
-    pub const ARRAY_STRS: JsonValue = json!(["one", "two"]);
-    pub const ARRAY_MIXED: JsonValue = json!(["one", 2]);
+    pub static ARRAY_INTS: Lazy<JsonValue> = Lazy::new(|| json!([1, 2]));
+    pub static ARRAY_STRS: Lazy<JsonValue> = Lazy::new(|| json!(["one", "two"]));
+    pub static ARRAY_MIXED: Lazy<JsonValue> = Lazy::new(|| json!(["one", 2]));
 
     // objects
-    pub const OBJ_EMPTY: JsonValue = json!({});
-    pub const OBJ_NUMS: JsonValue = json!({ "quantity": 83, "price": 1.5 });
-    pub const OBJ_MIXED: JsonValue = json!({ "name": "milk", "price": 1.2 });
-    pub const OBJ_MIXED2: JsonValue = json!({ "name": "milk", "quantity": 32, "price": 1.2 });
+    pub static OBJ_EMPTY: Lazy<JsonValue> = Lazy::new(|| json!({}));
+    pub static OBJ_NUMS: Lazy<JsonValue> = Lazy::new(|| json!({ "quantity": 83, "price": 1.5 }));
+    pub static OBJ_MIXED: Lazy<JsonValue> = Lazy::new(|| json!({ "name": "milk", "price": 1.2 }));
+    pub static OBJ_MIXED2: Lazy<JsonValue> =
+        Lazy::new(|| json!({ "name": "milk", "quantity": 32, "price": 1.2 }));
 }

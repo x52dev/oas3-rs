@@ -2,7 +2,11 @@ use serde::{Deserialize, Serialize};
 
 use super::{FromRef, Ref, RefError, RefType, Spec};
 
-/// See <https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#exampleObject>.
+/// Multi-purpose example objects.
+///
+/// Will be validated against schema when used in conformance testing.
+///
+/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#exampleObject>.
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
 pub struct Example {
     /// Short description for the example.
@@ -27,7 +31,7 @@ pub struct Example {
     // #[serde(skip_serializing_if = "Option::is_none")]
     // pub externalValue: Option<String>,
 
-    // TODO: Add "Specification Extensions" https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#specificationExtensions}
+    // TODO: Add "Specification Extensions" https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specificationExtensions}
 }
 
 impl Example {

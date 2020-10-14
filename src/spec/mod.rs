@@ -1,3 +1,7 @@
+//! Structures used in parsing and navigating OpenAPI specifications.
+//!
+//! High-level structures include [`Spec`], [`Components`] & [`Schema`].
+
 use std::{collections::BTreeMap, iter::Iterator};
 
 use derive_more::Error;
@@ -57,16 +61,16 @@ pub use schema::{Error as SchemaError, Schema, Type as SchemaType};
 
 const OPENAPI_SUPPORTED_VERSION_RANGE: &str = "~3";
 
-/// top level document
+/// A complete OpenAPI specification.
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
 pub struct Spec {
     /// This string MUST be the [semantic version number](https://semver.org/spec/v2.0.0.html)
     /// of the
-    /// [OpenAPI Specification version](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#versions)
+    /// [OpenAPI Specification version](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#versions)
     /// that the OpenAPI document uses. The `openapi` field SHOULD be used by tooling
     /// specifications and clients to interpret the OpenAPI document. This is not related to
     /// the API
-    /// [`info.version`](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#infoVersion)
+    /// [`info.version`](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#infoVersion)
     /// string.
     pub openapi: String,
 
@@ -76,9 +80,9 @@ pub struct Spec {
     /// An array of Server Objects, which provide connectivity information to a target server.
     /// If the `servers` property is not provided, or is an empty array, the default value would
     /// be a
-    /// [Server Object](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#serverObject)
+    /// [Server Object](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#serverObject)
     /// with a
-    /// [url](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#serverUrl)
+    /// [url](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#serverUrl)
     /// value of `/`.
     // FIXME: Provide a default value as specified in documentation instead of `None`.
     #[serde(default)]
@@ -87,9 +91,9 @@ pub struct Spec {
 
     /// Holds the relative paths to the individual endpoints and their operations. The path is
     /// appended to the URL from the
-    /// [`Server Object`](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#serverObject)
+    /// [`Server Object`](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#serverObject)
     /// in order to construct the full URL. The Paths MAY be empty, due to
-    /// [ACL constraints](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#securityFiltering).
+    /// [ACL constraints](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#securityFiltering).
     pub paths: BTreeMap<String, PathItem>,
 
     /// An element to hold various schemas for the specification.
@@ -106,18 +110,31 @@ pub struct Spec {
     /// A list of tags used by the specification with additional metadata.
     ///The order of the tags can be used to reflect on their order by the parsing tools.
     /// Not all tags that are used by the
-    /// [Operation Object](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#operationObject)
+    /// [Operation Object](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#operationObject)
     /// must be declared. The tags that are not declared MAY be organized randomly or
     /// based on the tools' logic. Each tag name in the list MUST be unique.
     #[serde(default)]
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub tags: Vec<Tag>,
 
+    /// The incoming webhooks that MAY be received as part of this API and that the API consumer MAY
+    /// choose to implement. Closely related to the callbacks feature, this section describes
+    /// requests initiated other than by an API call, for example by an out of band registration.
+    /// The key name is a unique string to refer to each webhook, while the (optionally referenced)
+    /// Path Item Object describes a request that may be initiated by the API provider and the
+    /// expected responses. An example is available.
+    ///
+    /// See <>.
+    #[serde(default)]
+    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+    pub webhooks: BTreeMap<String, PathItem>,
+
     /// Additional external documentation.
     #[serde(skip_serializing_if = "Option::is_none", rename = "externalDocs")]
     pub external_docs: Option<ExternalDoc>,
-    // TODO: Add "Specification Extensions" https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#specificationExtensions}
 }
+
+// TODO: Add "Specification Extensions" https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specificationExtensions}
 
 impl Spec {
     pub fn validate_version(&self) -> Result<semver::Version, Error> {
@@ -159,7 +176,7 @@ impl Spec {
                 debug!(
                     "path: {}, methods: {}",
                     path,
-                    item.methods().into_iter().collect::<Vec<_>>().len()
+                    item.methods().into_iter().count()
                 );
 
                 item.methods()

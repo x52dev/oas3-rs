@@ -1,4 +1,4 @@
-//! Structures and tools to parse, navigate and validate [OpenAPI v3] specifications.
+//! Structures and tools to parse, navigate and validate [OpenAPI v3.1] specifications.
 //!
 //! # Example
 //!
@@ -9,12 +9,7 @@
 //! }
 //! ```
 //!
-//! # Errors
-//!
-//! Operations typically result in a `openapi::Result` Type which is an alias for Rust's built-in
-//! Result with the Err Type fixed to the [`openapi::errors::Error`] enum type.
-//!
-//! [OpenAPI v3]: https://github.com/OAI/OpenAPI-Specification
+//! [OpenAPI v3.1]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md
 
 #![deny(rust_2018_idioms, nonstandard_style)]
 #![warn(missing_debug_implementations)]
@@ -23,7 +18,7 @@ use std::{fs::File, io::Read, path::Path};
 
 mod error;
 mod path;
-mod spec;
+pub mod spec;
 
 pub use error::Error;
 pub use spec::{Schema, Spec};
@@ -34,14 +29,14 @@ pub mod validation;
 #[cfg(feature = "conformance")]
 pub mod conformance;
 
-/// Version 3.0.1 of the OpenApi specification.
+/// Version 3.1.0 of the OpenAPI specification.
 ///
-/// Refer to the official
-/// [specification](https://github.com/OAI/OpenAPI-Specification/blob/0dd79f6/versions/3.0.1.md)
-/// for more information.
+/// Refer to the official [specification] for more information.
+///
+/// [specification]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md
 pub type OpenApiV3Spec = spec::Spec;
 
-/// deserialize an open api spec from a path
+/// Try deserializing an OpenAPI spec (YAML or JSON) from a file, giving the path.
 pub fn from_path<P>(path: P) -> Result<OpenApiV3Spec, Error>
 where
     P: AsRef<Path>,
@@ -49,7 +44,7 @@ where
     from_reader(File::open(path)?)
 }
 
-/// deserialize an open api spec from type which implements Read
+/// Try deserializing an OpenAPI spec (YAML or JSON) from a [`Read`] type.
 pub fn from_reader<R>(read: R) -> Result<OpenApiV3Spec, Error>
 where
     R: Read,
@@ -57,12 +52,12 @@ where
     Ok(serde_yaml::from_reader::<R, OpenApiV3Spec>(read)?)
 }
 
-/// serialize to a yaml string
+/// Try serializing to a YAML string.
 pub fn to_yaml(spec: &OpenApiV3Spec) -> Result<String, Error> {
     Ok(serde_yaml::to_string(spec)?)
 }
 
-/// serialize to a json string
+/// Try serializing to a JSON string.
 pub fn to_json(spec: &OpenApiV3Spec) -> Result<String, Error> {
     Ok(serde_json::to_string_pretty(spec)?)
 }
@@ -176,5 +171,45 @@ mod tests {
                 api_filename
             );
         }
+    }
+
+    #[test]
+    fn test_json_from_reader() {
+        let yaml = r#"openapi: "3"
+paths: {}
+info:
+  title: Test API
+  version: "0.1"
+components:
+  schemas:
+    assets:
+      title: Assets
+      type: array
+      items: { type: integer }"#;
+
+        let json = r#"{
+  "openapi": "3",
+  "paths": {},
+  "info": {
+    "title": "Test API",
+    "version": "0.1"
+  },
+  "components": {
+    "schemas": {
+      "assets": {
+        "title": "Assets",
+        "type": "array",
+        "items": {
+          "type": "integer"
+        }
+      }
+    }
+  }
+}"#;
+
+        assert_eq!(
+            from_reader(json.as_bytes()).unwrap(),
+            from_reader(yaml.as_bytes()).unwrap()
+        );
     }
 }

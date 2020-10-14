@@ -7,7 +7,7 @@ use super::Flows;
 /// (implicit, password, application and access code) as defined in [RFC6749], and
 /// [OpenID Connect Discovery].
 ///
-/// See <https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#securitySchemeObject>.
+/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#securitySchemeObject>.
 ///
 /// [RFC6749]: https://tools.ietf.org/html/rfc6749
 /// [OpenID Connect Discovery]: https://tools.ietf.org/html/draft-ietf-oauth-discovery-06
@@ -22,14 +22,17 @@ pub enum SecurityScheme {
         #[serde(rename = "in")]
         location: String,
     },
+
     #[serde(rename = "http")]
     Http {
         scheme: String,
         #[serde(rename = "bearerFormat")]
         bearer_format: String,
     },
+
     #[serde(rename = "oauth2")]
     OAuth2 { flows: Flows },
+
     #[serde(rename = "openIdConnect")]
     OpenIdConnect {
         #[serde(rename = "openIdConnectUrl")]

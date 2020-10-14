@@ -31,4 +31,4 @@ fn main() {
 }
 ```
 
-[oas3-spec]: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md
+[oas3-spec]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md
