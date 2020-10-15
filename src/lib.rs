@@ -17,7 +17,6 @@
 use std::{fs::File, io::Read, path::Path};
 
 mod error;
-mod path;
 pub mod spec;
 
 pub use error::Error;

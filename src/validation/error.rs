@@ -4,10 +4,8 @@ use derive_more::{Display, Error};
 use http::{Method, StatusCode};
 use serde_json::Value as JsonValue;
 
-use crate::{
-    path::Path,
-    spec::{Error as SchemaError, SchemaType},
-};
+use super::Path;
+use crate::spec::{Error as SchemaError, SchemaType};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct AggregateError {

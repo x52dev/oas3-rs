@@ -1,8 +1,7 @@
 use std::{collections::BTreeMap, fmt};
 
-use super::{AggregateError, DataType, Error, RequiredFields, Validate};
+use super::{AggregateError, DataType, Error, Path, RequiredFields, Validate};
 use crate::{
-    path::Path,
     spec::{Error as SchemaError, SchemaType},
     Schema, Spec,
 };

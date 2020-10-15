@@ -1,6 +1,6 @@
 macro_rules! valid_vs_invalid {
     ($validator:expr, $valid:expr, $invalid:expr,) => {{
-        use crate::path::Path;
+        use crate::validation::Path;
 
         let valid: &[&JsonValue] = $valid;
         let invalid: &[&JsonValue] = $invalid;

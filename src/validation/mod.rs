@@ -4,23 +4,21 @@ use std::fmt::Debug;
 
 use serde_json::Value as JsonValue;
 
-use crate::path::Path;
-
 #[cfg(test)]
 #[macro_use]
 mod test_macros;
 
 mod error;
-pub use error::*;
-
-mod validator;
-pub use validator::*;
-
+mod path;
 mod required;
 mod r#type;
+mod validator;
 
+pub use error::*;
+pub use path::Path;
 pub use r#type::*;
 pub use required::*;
+pub use validator::*;
 
 pub trait Validate: Debug {
     fn validate(&self, val: &JsonValue, path: Path) -> Result<(), Error>;

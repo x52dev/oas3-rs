@@ -29,7 +29,7 @@ impl Path {
     }
 
     /// Shorthand for extending path for passing down in recursive functions.
-    pub fn extend<T: Into<String>>(&self, part: T) -> Self {
+    pub fn extend(&self, part: impl Into<String>) -> Self {
         let mut new = self.clone();
         new.parts.push(part.into());
         new

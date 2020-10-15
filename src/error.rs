@@ -4,7 +4,9 @@ use std::io;
 
 use derive_more::{Display, Error, From};
 
-use crate::{spec::Error as SpecError, validation::Error as ValidationError};
+use crate::spec::Error as SpecError;
+#[cfg(feature = "validation")]
+use crate::validation::Error as ValidationError;
 
 /// Top-level errors.
 #[derive(Debug, Display, Error, From)]
@@ -21,6 +23,7 @@ pub enum Error {
     #[display(fmt = "Spec error")]
     Spec(SpecError),
 
+    #[cfg(feature = "validation")]
     #[display(fmt = "Validation error")]
     Validation(ValidationError),
 
