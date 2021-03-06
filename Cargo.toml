@@ -11,16 +11,21 @@ keywords = ["oas3", "openapi", "swagger", "api", "validation"]
 categories = ["data-structures", "development-tools::testing", "parsing"]
 
 [features]
-default = ["validation"]
+default = ["full"]
 validation = []
-conformance = ["validation", "reqwest", "prettytable-rs", "colored"]
+conformance = [
+    "validation",
+    "reqwest",
+    "prettytable-rs",
+    "colored",
+    "bytes",
+    "futures-util",
+]
+full = ["validation", "conformance"]
 
 [dependencies]
-bytes = "0.5"
 derive_more = "0.99"
-futures-util = "0.3"
 http = "0.2"
-once_cell = "1"
 log = "0.4"
 regex = "1"
 semver = "0.11"
@@ -28,19 +33,23 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 serde_yaml = "0.8"
 url = { version = "2", features = ["serde"] }
+
 # conformance
+bytes = { version = "1", optional = true }
+futures-util = { version = "0.3", optional = true }
 colored = { version = "2", optional = true }
 prettytable-rs = { version = "0.8", optional = true }
-reqwest = { version = "0.10", optional = true, features = ["json"] }
+reqwest = { version = "0.11", optional = true, features = ["json"] }
 
 [dev-dependencies]
+once_cell = "1"
 color-eyre = "0.5"
 dotenv = "0.15"
 eyre = "0.6"
 maplit = "1"
 pretty_assertions = "0.6"
 pretty_env_logger = "0.4"
-tokio = { version = "0.2", features = ["full"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
 
 [[example]]
 name = "conformance"

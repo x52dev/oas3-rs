@@ -1,0 +1,12 @@
+{
+    "recommendations": [
+        // Main
+        "matklad.rust-analyzer",
+        "redhat.vscode-yaml",
+        // Optional
+        "vadimcn.vscode-lldb",
+        "serayuzgur.crates",
+        "jedeop.crates-completer",
+        "tamasfe.even-better-toml",
+    ]
+}

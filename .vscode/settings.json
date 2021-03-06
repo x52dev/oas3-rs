@@ -20,5 +20,13 @@
         "valtree",
         "valtrees"
     ],
-    "rust-analyzer.diagnostics.disabled": ["unresolved-import"]
+    "rust-analyzer.diagnostics.disabled": [
+        "unresolved-import"
+    ],
+    "rust-analyzer.assist.importMergeBehavior": "last",
+    "yaml.format.singleQuote": true,
+    "yaml.format.bracketSpacing": true,
+    "yaml.schemas": {
+        "./schema.json": "rest.yaml"
+    }
 }

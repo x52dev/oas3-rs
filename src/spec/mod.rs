@@ -149,7 +149,7 @@ impl Spec {
         }
     }
 
-    pub fn operation(&self, method: &http::Method, path: &str) -> Option<&Operation> {
+    pub fn operation(&self, method: &Method, path: &str) -> Option<&Operation> {
         let resource = self.paths.get(path)?;
 
         match *method {
