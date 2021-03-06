@@ -6,6 +6,7 @@
         "SPDX",
         "STRS",
         "Semver",
+        "allof",
         "btreemap",
         "deserializable",
         "dotenv",

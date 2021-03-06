@@ -11,7 +11,7 @@ keywords = ["oas3", "openapi", "swagger", "api", "validation"]
 categories = ["data-structures", "development-tools::testing", "parsing"]
 
 [features]
-default = ["full"]
+default = ["validation"]
 validation = []
 conformance = [
     "validation",
