@@ -2,15 +2,10 @@ use std::str::FromStr;
 
 use derive_more::{Display, Error};
 use log::trace;
-use once_cell::sync::Lazy;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 
 use super::Spec;
-
-static RE_REF: Lazy<Regex> = Lazy::new(|| {
-    Regex::new("^(?P<source>[^#]*)#/components/(?P<type>[^/]+)/(?P<name>.+)$").unwrap()
-});
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[serde(untagged)]
@@ -90,7 +85,10 @@ impl FromStr for Ref {
     type Err = RefError;
 
     fn from_str(path: &str) -> Result<Self, Self::Err> {
-        let parts = RE_REF.captures(path).unwrap();
+        let re_ref =
+            Regex::new("^(?P<source>[^#]*)#/components/(?P<type>[^/]+)/(?P<name>.+)$").unwrap();
+
+        let parts = re_ref.captures(path).unwrap();
 
         trace!("creating Ref: {}/{}", &parts["type"], &parts["name"]);
 
