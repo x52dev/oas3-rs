@@ -4,7 +4,7 @@ use http::Method;
 use serde_json::json;
 
 fn main() {
-    let _ = dotenv::dotenv();
+    let _ = dotenvy::dotenv();
     pretty_env_logger::init();
 
     let valid = json!({
