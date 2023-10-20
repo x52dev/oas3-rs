@@ -7,7 +7,7 @@ use serde_json::Value as JsonValue;
 use super::Path;
 use crate::spec::{Error as SchemaError, SchemaType};
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug)]
 pub struct AggregateError {
     errors: Vec<Error>,
 }
@@ -40,7 +40,7 @@ impl fmt::Display for AggregateError {
 }
 
 /// Validation Errors
-#[derive(Clone, PartialEq, Debug, Display, Error)]
+#[derive(Debug, Display, Error)]
 pub enum Error {
     //
     // Wrapped Errors

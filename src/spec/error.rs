@@ -1,10 +1,10 @@
 use derive_more::{Display, Error, From};
-use semver::{SemVerError, Version};
+use semver::{Error as SemVerError, Version};
 
 use crate::spec::{r#ref::RefError, schema::Error as SchemaError};
 
 /// Spec Errors
-#[derive(Debug, Clone, PartialEq, Display, Error, From)]
+#[derive(Debug, Display, Error, From)]
 pub enum Error {
     #[display(fmt = "Reference error")]
     Ref(RefError),
