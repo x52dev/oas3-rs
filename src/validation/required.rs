@@ -1,7 +1,7 @@
 use serde_json::Value as JsonValue;
 
-use super::{Error, Validate, Path};
-use crate::{spec::SchemaType};
+use super::{Error, Path, Validate};
+use crate::spec::SchemaType;
 
 #[derive(Debug, Clone)]
 pub struct RequiredFields {

@@ -12,6 +12,7 @@
         "petstore",
         "prettytable",
         "println",
+        "refpath",
         "reqwest",
         "rustfmt",
         "semver",

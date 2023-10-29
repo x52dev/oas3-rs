@@ -8,7 +8,7 @@ use oas3::conformance::{
 async fn main() -> eyre::Result<()> {
     color_eyre::install()?;
 
-    dotenv::dotenv().ok();
+    dotenvy::dotenv().ok();
     pretty_env_logger::init();
 
     let spec = oas3::from_path("./data/oas-samples/pet-store.yml").expect("api spec parse error");
@@ -36,10 +36,10 @@ async fn main() -> eyre::Result<()> {
         ),
     ]);
 
-    println!("");
+    println!();
     runner.run_queued_tests().await;
     runner.print_results();
-    println!("");
+    println!();
 
     Ok(())
 }

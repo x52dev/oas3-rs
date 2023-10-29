@@ -29,7 +29,7 @@ where
     pub fn resolve(&self, spec: &Spec) -> Result<T, RefError> {
         match self {
             Self::Object(component) => Ok(component.clone()),
-            Self::Ref { ref_path } => T::from_ref(&spec, &ref_path),
+            Self::Ref { ref_path } => T::from_ref(spec, ref_path),
         }
     }
 }

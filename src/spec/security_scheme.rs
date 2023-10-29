@@ -68,7 +68,7 @@ mod tests {
           }
         }"#;
 
-        let obj: SecurityScheme = serde_json::from_str(&IMPLICIT_OAUTH2_SAMPLE).unwrap();
+        let obj: SecurityScheme = serde_json::from_str(IMPLICIT_OAUTH2_SAMPLE).unwrap();
         match obj {
             SecurityScheme::OAuth2 { flows } => {
                 assert!(flows.implicit.is_some());
@@ -93,7 +93,7 @@ mod tests {
                 assert!(implicit.scopes.contains_key("write:pets"));
                 assert!(implicit.scopes.contains_key("read:pets"));
             }
-            _ => assert!(false, "wrong security scheme type"),
+            _ => panic!("wrong security scheme type"),
         }
     }
 }

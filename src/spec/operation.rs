@@ -113,7 +113,7 @@ impl Operation {
         self.request_body
             .as_ref()
             .unwrap()
-            .resolve(&spec)
+            .resolve(spec)
             .map_err(Error::Ref)
     }
 
@@ -121,7 +121,7 @@ impl Operation {
         self.responses
             .iter()
             .filter_map(|(name, oor)| {
-                oor.resolve(&spec)
+                oor.resolve(spec)
                     .map(|obj| (name.clone(), obj))
                     // TODO: find better error solution
                     .map_err(|err| error!("{}", err))
@@ -135,7 +135,7 @@ impl Operation {
             .parameters
             .iter()
             // TODO: find better error solution, maybe vec<result<_>>
-            .filter_map(|oor| oor.resolve(&spec).map_err(|err| error!("{}", err)).ok())
+            .filter_map(|oor| oor.resolve(spec).map_err(|err| error!("{}", err)).ok())
             .collect();
 
         Ok(params)
@@ -143,7 +143,7 @@ impl Operation {
 
     pub fn parameter(&self, search: &str, spec: &Spec) -> Result<Option<Parameter>, Error> {
         let param = self
-            .parameters(&spec)?
+            .parameters(spec)?
             .iter()
             .find(|param| param.name == search)
             .cloned();

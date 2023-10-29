@@ -49,7 +49,7 @@ impl FromRef for Response {
                 .as_ref()
                 .and_then(|cs| cs.responses.get(&refpath.name))
                 .ok_or_else(|| RefError::Unresolvable(path.to_owned()))
-                .and_then(|oor| oor.resolve(&spec)),
+                .and_then(|oor| oor.resolve(spec)),
 
             typ => Err(RefError::MismatchedType(typ, RefType::Response)),
         }

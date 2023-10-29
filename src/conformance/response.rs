@@ -81,10 +81,7 @@ impl TestResponseSpec {
         if &self.status == val {
             Ok(())
         } else {
-            Err(ValidationError::StatusMismatch(
-                self.status.clone(),
-                val.clone(),
-            ))
+            Err(ValidationError::StatusMismatch(self.status, *val))
         }
     }
 

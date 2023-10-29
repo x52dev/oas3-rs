@@ -6,7 +6,7 @@ use std::{
 use colored::{ColoredString, Colorize};
 use futures_util::{stream, FutureExt as _, StreamExt as _};
 use log::{debug, trace};
-use prettytable::{cell, row, Table};
+use prettytable::{row, Table};
 use serde_json::Value as JsonValue;
 use url::Url;
 

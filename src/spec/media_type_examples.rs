@@ -57,7 +57,7 @@ impl MediaTypeExamples {
             Self::Examples { examples } => examples
                 .iter()
                 .filter_map(|(name, oor)| {
-                    oor.resolve(&spec)
+                    oor.resolve(spec)
                         .map(|obj| (name.clone(), obj))
                         .map_err(|err| error!("{}", err))
                         .ok()

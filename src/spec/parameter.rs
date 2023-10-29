@@ -85,7 +85,7 @@ impl FromRef for Parameter {
                 .as_ref()
                 .and_then(|cs| cs.parameters.get(&refpath.name))
                 .ok_or_else(|| RefError::Unresolvable(path.to_owned()))
-                .and_then(|oor| oor.resolve(&spec)),
+                .and_then(|oor| oor.resolve(spec)),
 
             typ => Err(RefError::MismatchedType(typ, RefType::Parameter)),
         }

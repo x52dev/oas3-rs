@@ -64,8 +64,8 @@ impl ValidationTree {
                     .properties
                     .iter()
                     .map(|(prop, schema)| {
-                        let sub_schema = schema.resolve(&spec).unwrap();
-                        let valtree = ValidationTree::from_schema(&sub_schema, &spec).unwrap();
+                        let sub_schema = schema.resolve(spec).unwrap();
+                        let valtree = ValidationTree::from_schema(&sub_schema, spec).unwrap();
                         (prop.clone(), valtree)
                     })
                     .collect();
@@ -84,8 +84,8 @@ impl ValidationTree {
                 trace!("adding array validators");
 
                 if let Some(schema_ref) = schema.items.as_ref() {
-                    let sub_schema = schema_ref.resolve(&spec).unwrap();
-                    let vls = ValidationTree::from_schema(&sub_schema, &spec).unwrap();
+                    let sub_schema = schema_ref.resolve(spec).unwrap();
+                    let vls = ValidationTree::from_schema(&sub_schema, spec).unwrap();
 
                     valtree.branch = ValidationBranch::Array(Box::new(vls))
                 }
@@ -99,7 +99,7 @@ impl ValidationTree {
                     let vs = schema
                         .all_of
                         .iter()
-                        .map(|schema_ref| schema_ref.resolve(&spec).unwrap())
+                        .map(|schema_ref| schema_ref.resolve(spec).unwrap())
                         .map(|schema| ValidationTree::from_schema(&schema, spec).unwrap())
                         .collect();
 
@@ -111,7 +111,7 @@ impl ValidationTree {
                     let vs = schema
                         .any_of
                         .iter()
-                        .map(|schema_ref| schema_ref.resolve(&spec).unwrap())
+                        .map(|schema_ref| schema_ref.resolve(spec).unwrap())
                         .map(|schema| ValidationTree::from_schema(&schema, spec).unwrap())
                         .collect();
 
@@ -123,7 +123,7 @@ impl ValidationTree {
                     let vs = schema
                         .one_of
                         .iter()
-                        .map(|schema_ref| schema_ref.resolve(&spec).unwrap())
+                        .map(|schema_ref| schema_ref.resolve(spec).unwrap())
                         .map(|schema| ValidationTree::from_schema(&schema, spec).unwrap())
                         .collect();
 
@@ -227,7 +227,7 @@ impl ValidationTree {
             ValidationBranch::Array(v) => {
                 // validate own valtree level and throw any errors
                 for v in &self.validators {
-                    v.validate(&val, path.clone())?
+                    v.validate(val, path.clone())?
                 }
 
                 match val {
@@ -246,7 +246,7 @@ impl ValidationTree {
             ValidationBranch::Object(validator_map) => {
                 // validate own valtree level and throw any errors
                 for v in &self.validators {
-                    v.validate(&val, path.clone())?
+                    v.validate(val, path.clone())?
                 }
 
                 match val {
@@ -270,7 +270,7 @@ impl ValidationTree {
             ValidationBranch::Leaf => {
                 // validate own valtree level and throw any errors
                 for v in &self.validators {
-                    v.validate(&val, path.clone())?
+                    v.validate(val, path.clone())?
                 }
 
                 Ok(())
@@ -306,7 +306,7 @@ mod tests {
             .schemas
             .get(name)
             .unwrap()
-            .resolve(&spec)
+            .resolve(spec)
             .unwrap()
     }
 

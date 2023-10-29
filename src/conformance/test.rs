@@ -60,7 +60,7 @@ impl ConformanceTestSpec {
     pub fn resolve(&self, spec: &Spec) -> Result<ResolvedConformanceTestSpec, Error> {
         trace!("resolving: {:?}", &self.operation);
 
-        let mut req = self.resolve_request(&spec)?;
+        let mut req = self.resolve_request(spec)?;
 
         if let Some(TestAuthentication::Custom(transformer)) = self.request.auth {
             req = transformer(req);
@@ -69,11 +69,11 @@ impl ConformanceTestSpec {
         Ok(ResolvedConformanceTestSpec {
             unresolved: self.clone(),
             request: req,
-            response: self.resolve_response_spec(&spec)?,
+            response: self.resolve_response_spec(spec)?,
         })
     }
 
-    pub fn resolve_test_operation<'a>(&self, spec: &'a Spec) -> Result<TestOperation, Error> {
+    pub fn resolve_test_operation(&self, spec: &Spec) -> Result<TestOperation, Error> {
         trace!("resolve_test_operation: {:?}", &self.operation);
 
         let test_op = match &self.operation {
@@ -99,8 +99,8 @@ impl ConformanceTestSpec {
     }
 
     pub fn resolve_params(&self, spec: &Spec) -> Result<Vec<TestParam>, Error> {
-        let test_op = self.resolve_test_operation(&spec)?;
-        let op = test_op.resolve_operation(&spec)?;
+        let test_op = self.resolve_test_operation(spec)?;
+        let op = test_op.resolve_operation(spec)?;
 
         let mut test_params = vec![];
 
@@ -108,7 +108,7 @@ impl ConformanceTestSpec {
         for param in &self.request.params {
             // resolve in spec
             let parameter = op
-                .parameter(&param.name, &spec)?
+                .parameter(&param.name, spec)?
                 .ok_or(ValidationError::ParameterNotFound(param.name.clone()))?;
 
             // validate position
@@ -142,14 +142,14 @@ impl ConformanceTestSpec {
     pub fn resolve_request(&self, spec: &Spec) -> Result<TestRequest, Error> {
         trace!("resolving request: {:?}", &self.operation);
 
-        let test_op = self.resolve_test_operation(&spec)?;
-        let op = test_op.resolve_operation(&spec)?;
+        let test_op = self.resolve_test_operation(spec)?;
+        let op = test_op.resolve_operation(spec)?;
 
         let mut req = match self.request.source {
             RequestSource::Empty => TestRequest {
                 operation: test_op.clone(),
                 headers: HeaderMap::new(),
-                params: self.resolve_params(&spec)?,
+                params: self.resolve_params(spec)?,
                 body: Bytes::new(),
             },
 
@@ -161,7 +161,7 @@ impl ConformanceTestSpec {
                 TestRequest {
                     operation: test_op.clone(),
                     headers: HeaderMap::new(),
-                    params: self.resolve_params(&spec)?,
+                    params: self.resolve_params(spec)?,
                     body: data.clone(),
                 }
             }
@@ -170,12 +170,12 @@ impl ConformanceTestSpec {
                 ref media_type,
                 ref name,
             } => {
-                let req_body = op.request_body(&spec)?;
+                let req_body = op.request_body(spec)?;
                 let media_spec = req_body.content.get(media_type).ok_or(SpecError::Ref(
                     RefError::Unresolvable(format!("mediaType/{}", &name)),
                 ))?;
-                let schema = media_spec.schema(&spec)?;
-                let examples = media_spec.examples(&spec);
+                let schema = media_spec.schema(spec)?;
+                let examples = media_spec.examples(spec);
                 let example = examples
                     .get(name)
                     .ok_or(SpecError::Ref(RefError::Unresolvable(format!(
@@ -201,7 +201,7 @@ impl ConformanceTestSpec {
                 TestRequest {
                     operation: test_op.clone(),
                     headers: hdrs,
-                    params: self.resolve_params(&spec)?,
+                    params: self.resolve_params(spec)?,
                     body: example.as_bytes().into(),
                 }
             }
@@ -222,34 +222,34 @@ impl ConformanceTestSpec {
     }
 
     pub fn resolve_response_spec(&self, spec: &Spec) -> Result<TestResponseSpec, Error> {
-        let test_op = self.resolve_test_operation(&spec)?;
-        let op = test_op.resolve_operation(&spec)?;
+        let test_op = self.resolve_test_operation(spec)?;
+        let op = test_op.resolve_operation(spec)?;
 
         let res_spec =
             match &self.response_spec.source {
                 ResponseSpecSource::Status(status) => TestResponseSpec {
                     operation: test_op.clone(),
-                    status: status.clone(),
+                    status: *status,
                     body_validator: None,
                 },
 
                 ResponseSpecSource::Schema { status, media_type } => {
                     // traverse spec
-                    let responses = op.responses(&spec);
+                    let responses = op.responses(spec);
                     let status_spec = responses.get(status.as_str()).ok_or(SpecError::Ref(
                         RefError::Unresolvable(format!("status/{}", &status.as_u16())),
                     ))?;
                     let media_spec = status_spec.content.get(media_type).ok_or(SpecError::Ref(
                         RefError::Unresolvable(format!("mediaType/{}", &media_type)),
                     ))?;
-                    let schema = media_spec.schema(&spec)?;
+                    let schema = media_spec.schema(spec)?;
 
                     // create validator
                     let validator = ValidationTree::from_schema(&schema, spec)?;
 
                     TestResponseSpec {
                         operation: test_op.clone(),
-                        status: status.clone(),
+                        status: *status,
                         body_validator: Some(validator),
                     }
                 }
@@ -260,15 +260,15 @@ impl ConformanceTestSpec {
                     name,
                 } => {
                     // traverse spec
-                    let reses = op.responses(&spec);
+                    let reses = op.responses(spec);
                     let status_spec = reses.get(status.as_str()).ok_or(SpecError::Ref(
                         RefError::Unresolvable(format!("status/{}", &status.as_u16())),
                     ))?;
                     let media_spec = status_spec.content.get(media_type).ok_or(SpecError::Ref(
                         RefError::Unresolvable(format!("mediaType/{}", &media_type)),
                     ))?;
-                    let schema = media_spec.schema(&spec)?;
-                    let examples = media_spec.examples(&spec);
+                    let schema = media_spec.schema(spec)?;
+                    let examples = media_spec.examples(spec);
                     let example =
                         examples
                             .get(name)
@@ -287,7 +287,7 @@ impl ConformanceTestSpec {
                         debug!("against schema: {:?}", &schema);
                         debug!("with validator: {:?}", &validator);
 
-                        validator.validate(&ex).map_err(Error::Validation)?;
+                        validator.validate(ex).map_err(Error::Validation)?;
                     }
 
                     let mut hdrs = HeaderMap::new();
@@ -295,7 +295,7 @@ impl ConformanceTestSpec {
 
                     TestResponseSpec {
                         operation: test_op.clone(),
-                        status: status.clone(),
+                        status: *status,
                         body_validator: Some(validator),
                     }
                 }

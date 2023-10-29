@@ -34,14 +34,14 @@ impl MediaType {
         self.schema
             .as_ref()
             .unwrap()
-            .resolve(&spec)
+            .resolve(spec)
             .map_err(Error::Ref)
     }
 
     pub fn examples(&self, spec: &Spec) -> BTreeMap<String, Example> {
         self.examples
             .as_ref()
-            .map(|examples| examples.resolve_all(&spec))
-            .unwrap_or_else(BTreeMap::new)
+            .map(|examples| examples.resolve_all(spec))
+            .unwrap_or_default()
     }
 }

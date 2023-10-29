@@ -9,13 +9,13 @@ fn main() {
 
     let valid = json!({
         "thing": "car",
-        "size": 3.14,
+        "size": 3.1,
         "page": 1
     });
 
     let invalid1 = json!({
         "thing": "car",
-        "size": 3.14,
+        "size": 3.1,
     });
 
     let invalid2 = json!({
