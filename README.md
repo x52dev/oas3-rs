@@ -15,7 +15,7 @@ add the following to your `Cargo.toml` file
 
 ```toml
 [dependencies]
-oas3 = "0.1"
+oas3 = "0.3"
 ```
 
 ## Usage
