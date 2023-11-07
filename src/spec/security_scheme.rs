@@ -27,7 +27,7 @@ pub enum SecurityScheme {
     Http {
         scheme: String,
         #[serde(rename = "bearerFormat")]
-        bearer_format: String,
+        bearer_format: Option<String>,
     },
 
     #[serde(rename = "oauth2")]
@@ -44,6 +44,20 @@ pub enum SecurityScheme {
 mod tests {
     use super::*;
     use url::Url;
+
+    #[test]
+    fn test_http_basic_deser() {
+        const HTTP_BASIC_SAMPLE: &str = r#"{"type": "http", "scheme": "basic"}"#;
+        let obj: SecurityScheme = serde_json::from_str(&HTTP_BASIC_SAMPLE).unwrap();
+
+        assert!(matches!(
+            obj,
+            SecurityScheme::Http {
+                scheme,
+                bearer_format: None,
+            } if scheme == "basic"
+        ));
+    }
 
     #[test]
     fn test_security_scheme_oauth_deser() {
