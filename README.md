@@ -1,10 +1,11 @@
 # OAS3
 
-> Structures and tools to parse, navigate and validate [OpenAPI v3 Spec][oas3-spec] files. 
+> Structures and tools to parse, navigate and validate [OpenAPI v3 Spec][oas3-spec] files.
 
-Based on v3 parts of [openapi](https://crates.io/crates/openapi) crate by [softprops](https://crates.io/users/softprops).
+Based on v3 parts of the [`openapi`](https://crates.io/crates/openapi) crate by [softprops](https://crates.io/users/softprops).
 
 Additional features:
+
 - Validation constructors
 - Example request/response validation
 - Live API conformance testing
