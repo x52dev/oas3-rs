@@ -3,3 +3,4 @@ Cargo.lock
 *.bk
 .env
 .DS_Store
+watch.sh
