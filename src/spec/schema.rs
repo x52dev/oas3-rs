@@ -114,6 +114,7 @@ pub struct Schema {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub default: Option<serde_json::Value>,
 
+    #[serde(default)]
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub examples: Vec<serde_json::Value>,
 
