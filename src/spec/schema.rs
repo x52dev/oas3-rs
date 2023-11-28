@@ -1,4 +1,4 @@
-//! Schema specification for [OpenAPI 3.0.1](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md)
+//! Schema specification for [OpenAPI 3.1.0](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md)
 
 use std::collections::BTreeMap;
 
@@ -29,9 +29,31 @@ pub enum Type {
     String,
     Array,
     Object,
+    Null,
 }
 
-// FIXME: Verify against OpenAPI 3.0
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum Encoding {
+    Base16,
+    Hex,
+    Base32,
+    Base32Hex,
+    Base64,
+    Base64Url,
+
+    #[serde(rename = "quoted-printable")]
+    QuotedPrintable,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum SchemaOrBool {
+    Schema(Schema),
+    Bool(bool),
+}
+
+// FIXME: Verify against OpenAPI 3.1
 /// The Schema Object allows the definition of input and output data types.
 /// These types can be objects, but also primitives and arrays.
 /// This object is an extended subset of the
@@ -60,9 +82,6 @@ pub struct Schema {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub schema_type: Option<Type>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub nullable: Option<bool>,
-
     //
     // structure
     //
@@ -77,14 +96,17 @@ pub struct Schema {
     #[serde(skip_serializing_if = "BTreeMap::is_empty")]
     pub properties: BTreeMap<String, ObjectOrReference<Schema>>,
 
-    /// Value can be boolean or object. Inline or referenced schema MUST be of a
-    /// [Schema Object](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#schemaObject)
-    /// and not a standard JSON Schema.
-    ///
-    /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#properties>.
     #[serde(rename = "additionalProperties")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub additional_properties: Option<Box<ObjectOrReference<Schema>>>,
+    pub additional_properties: Option<Box<ObjectOrReference<SchemaOrBool>>>,
+
+    #[serde(rename = "contentEncoding")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub content_encoding: Option<Encoding>,
+
+    #[serde(rename = "contentMediaType")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub content_media_type: Option<String>,
 
     //
     // additional metadata
@@ -92,8 +114,8 @@ pub struct Schema {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub default: Option<serde_json::Value>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub example: Option<serde_json::Value>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub examples: Vec<serde_json::Value>,
 
     //
     // validation requirements
@@ -118,14 +140,14 @@ pub struct Schema {
 
     #[serde(rename = "exclusiveMaximum")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub exclusive_maximum: Option<bool>,
+    pub exclusive_maximum: Option<serde_json::Number>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maximum: Option<serde_json::Number>,
 
     #[serde(rename = "exclusiveMinimum")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub exclusive_minimum: Option<bool>,
+    pub exclusive_minimum: Option<serde_json::Number>,
 
     #[serde(rename = "minLength")]
     #[serde(skip_serializing_if = "Option::is_none")]

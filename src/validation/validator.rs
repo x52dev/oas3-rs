@@ -39,8 +39,8 @@ impl ValidationTree {
         if let Some(type_) = schema.schema_type {
             trace!("restricting data type: {:?}", type_);
 
-            let type_val = if let Some(nullable) = schema.nullable {
-                DataType::new(type_).set_nullable(nullable)
+            let type_val = if type_ == SchemaType::Null {
+                DataType::new(type_).set_nullable(true)
             } else {
                 DataType::new(type_)
             };
