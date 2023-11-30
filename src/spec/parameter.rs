@@ -47,18 +47,17 @@ pub struct Parameter {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub schema: Option<Schema>,
-
-//    #[serde(skip_serializing_if = "Option::is_none")]
-//    #[serde(rename = "uniqueItems")]
-//    pub unique_items: Option<bool>,
-//
-//    /// string, number, boolean, integer, array, file ( only for formData )
-//    #[serde(skip_serializing_if = "Option::is_none")]
-//    #[serde(rename = "type")]
-//    pub param_type: Option<String>,
-//
-//    #[serde(skip_serializing_if = "Option::is_none")]
-//    pub format: Option<String>,
+    //    #[serde(skip_serializing_if = "Option::is_none")]
+    //    #[serde(rename = "uniqueItems")]
+    //    pub unique_items: Option<bool>,
+    //
+    //    /// string, number, boolean, integer, array, file ( only for formData )
+    //    #[serde(skip_serializing_if = "Option::is_none")]
+    //    #[serde(rename = "type")]
+    //    pub param_type: Option<String>,
+    //
+    //    #[serde(skip_serializing_if = "Option::is_none")]
+    //    pub format: Option<String>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
