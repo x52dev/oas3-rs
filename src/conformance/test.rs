@@ -112,14 +112,11 @@ impl ConformanceTestSpec {
                 .ok_or(ValidationError::ParameterNotFound(param.name.clone()))?;
 
             // validate position
-            let pos = match parameter.location.as_ref() {
-                "query" => ParamPosition::Query,
-                "header" => ParamPosition::Header,
-                "path" => ParamPosition::Path,
-                "cookie" => ParamPosition::Cookie,
-                pos_str => Err(ValidationError::InvalidParameterLocation(
-                    pos_str.to_owned(),
-                ))?,
+            let pos = match parameter.location {
+                crate::spec::ParamLoc::Path => ParamPosition::Path,
+                crate::spec::ParamLoc::Query => ParamPosition::Query,
+                crate::spec::ParamLoc::Header => ParamPosition::Header,
+                crate::spec::ParamLoc::Cookie => ParamPosition::Cookie,
             };
 
             // TODO: validate type
