@@ -1,0 +1,25 @@
+{
+    "cSpell.words": [
+        "btreemap",
+        "deque",
+        "deserializable",
+        "dotenv",
+        "ints",
+        "maplit",
+        "noncomposite",
+        "nums",
+        "openapi",
+        "petstore",
+        "prettytable",
+        "println",
+        "refpath",
+        "reqwest",
+        "rustfmt",
+        "semver",
+        "spdx",
+        "strs",
+        "structs",
+        "valtree",
+        "valtrees"
+    ]
+}

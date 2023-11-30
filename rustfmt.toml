@@ -1,0 +1,7 @@
+edition = "2018"
+
+# https://github.com/rust-lang/rustfmt/blob/HEAD/Configurations.md#fn_single_line
+# fn_single_line = true
+
+# https://github.com/rust-lang/rustfmt/blob/HEAD/Configurations.md#merge_imports
+# merge_imports = true
