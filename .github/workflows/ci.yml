@@ -22,7 +22,7 @@ jobs:
       fail-fast: false
       matrix:
         toolchain:
-          - { name: msrv, version: '1.68' }
+          - { name: msrv, version: "1.68" }
           - { name: stable, version: stable }
 
     name: Test / ${{ matrix.toolchain.name }}
