@@ -21,6 +21,5 @@
         "structs",
         "valtree",
         "valtrees"
-    ],
-    "rust-analyzer.diagnostics.disabled": ["unresolved-import"]
+    ]
 }
