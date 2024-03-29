@@ -63,6 +63,13 @@ pub struct Parameter {
     /// `header` - `simple`; for cookie - `form`.
     #[serde(skip_serializing_if = "Option::is_none")]
     style: Option<ParameterStyle>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    explode: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "in")]
+    param_in: Option<String>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
@@ -70,6 +77,7 @@ pub struct Parameter {
 enum ParameterStyle {
     Form,
     Simple,
+    DeepObject,
 }
 
 impl FromRef for Parameter {
