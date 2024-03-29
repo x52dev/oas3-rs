@@ -14,7 +14,9 @@
 #![deny(rust_2018_idioms, nonstandard_style)]
 #![warn(missing_debug_implementations)]
 
+use serde::de::{Visitor, Deserializer, MapAccess};
 use std::{fs::File, io::Read, path::Path};
+use std::fmt;
 
 mod error;
 pub mod spec;
@@ -61,6 +63,36 @@ pub fn to_json(spec: &OpenApiV3Spec) -> Result<String, Error> {
     Ok(serde_json::to_string_pretty(spec)?)
 }
 
+pub fn deserialize_extensions<'de, D>(deserializer: D) -> Result<serde_yaml::Value, D::Error>
+where
+    D: Deserializer<'de>
+{
+
+    struct ExtraFieldsVisitor;
+
+    impl<'de> Visitor<'de> for ExtraFieldsVisitor {
+        type Value = serde_yaml::Value;
+
+        fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+            formatter.write_str("extensions")
+        }
+
+        fn visit_map<M>(self, mut access: M) -> Result<Self::Value, M::Error>
+            where
+                M: MapAccess<'de>,
+        {
+            let mut map = serde_yaml::Mapping::new();
+            while let Some((key, value)) = access.next_entry()? {
+                map.insert(key, value);
+            }
+
+            Ok(map.into())
+        }
+    }
+
+    deserializer.deserialize_map(ExtraFieldsVisitor)
+}
+
 #[cfg(test)]
 mod tests {
     use std::{
@@ -70,6 +102,7 @@ mod tests {
     };
 
     use pretty_assertions::assert_eq;
+    use crate::spec::{Components, ObjectOrReference};
 
     use super::*;
 

@@ -1,11 +1,13 @@
 //! Schema specification for [OpenAPI 3.0.1](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md)
 
 use std::collections::BTreeMap;
+use std::fmt::Write;
 
 use derive_more::{Display, Error};
 use serde::{Deserialize, Serialize};
 
 use crate::spec::{FromRef, ObjectOrReference, Ref, RefError, RefType, Spec};
+use crate::deserialize_extensions;
 
 /// Schema Errors
 #[derive(Debug, Clone, PartialEq, Display, Error)]
@@ -29,6 +31,12 @@ pub enum Type {
     String,
     Array,
     Object,
+}
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+#[serde(untagged)]
+pub enum ObjectOrFalse<T> {
+    False(bool),
+    Object(T),
 }
 
 // FIXME: Verify against OpenAPI 3.0
@@ -84,7 +92,7 @@ pub struct Schema {
     /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#properties>.
     #[serde(rename = "additionalProperties")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub additional_properties: Option<Box<ObjectOrReference<Schema>>>,
+    pub additional_properties: Option<Box<ObjectOrFalse<ObjectOrReference<Schema>>>>,
 
     //
     // additional metadata
@@ -104,7 +112,7 @@ pub struct Schema {
     #[serde(default)]
     #[serde(rename = "enum")]
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    pub enum_values: Vec<String>,
+    pub enum_values: Vec<serde_yaml::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pattern: Option<String>,

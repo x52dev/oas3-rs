@@ -1,6 +1,7 @@
 use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
+use crate::deserialize_extensions;
 
 use super::{
     schema::Schema, Callback, Example, Header, Link, ObjectOrReference, Parameter, PathItem,
@@ -64,5 +65,8 @@ pub struct Components {
     #[serde(default)]
     #[serde(skip_serializing_if = "BTreeMap::is_empty")]
     pub callbacks: BTreeMap<String, ObjectOrReference<Callback>>,
-    // TODO: Add "Specification Extensions" https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specificationExtensions}
+
+    #[serde(default)]
+    #[serde(deserialize_with = "deserialize_extensions")]
+    pub extensions: serde_yaml::Value,
 }
