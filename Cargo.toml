@@ -11,6 +11,7 @@ categories = ["data-structures", "development-tools::testing", "parsing"]
 repository = "https://github.com/x52dev/oas3-rs"
 license = "MIT"
 edition = "2021"
+rust-version = "1.65"
 
 [features]
 default = ["validation"]
