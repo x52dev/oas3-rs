@@ -27,16 +27,13 @@ jobs:
         with:
           components: clippy
 
-      - name: Install cargo-hack
+      - name: Install just, cargo-hack
         uses: taiki-e/install-action@v2.33.22
         with:
-          tool: cargo-hack
+          tool: just,cargo-hack
 
       - name: Check with Clippy
-        run: |
-          cargo clippy --workspace --no-default-features
-          cargo clippy --workspace --no-default-features --all-features
-          cargo hack --feature-powerset --depth=3 clippy --workspace
+        run: just clippy
 
   rustfmt:
     runs-on: ubuntu-latest

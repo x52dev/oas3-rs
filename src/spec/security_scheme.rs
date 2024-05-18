@@ -48,7 +48,7 @@ mod tests {
     #[test]
     fn test_http_basic_deser() {
         const HTTP_BASIC_SAMPLE: &str = r#"{"type": "http", "scheme": "basic"}"#;
-        let obj: SecurityScheme = serde_json::from_str(&HTTP_BASIC_SAMPLE).unwrap();
+        let obj: SecurityScheme = serde_json::from_str(HTTP_BASIC_SAMPLE).unwrap();
 
         assert!(matches!(
             obj,
