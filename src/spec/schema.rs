@@ -1,12 +1,10 @@
 //! Schema specification for [OpenAPI 3.0.1](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md)
 
 use std::collections::BTreeMap;
-use std::fmt::Write;
 
 use derive_more::{Display, Error};
 use serde::{Deserialize, Serialize};
 
-use crate::deserialize_extensions;
 use crate::spec::{FromRef, ObjectOrReference, Ref, RefError, RefType, Spec};
 
 /// Schema Errors
