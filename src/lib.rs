@@ -14,9 +14,9 @@
 #![deny(rust_2018_idioms, nonstandard_style)]
 #![warn(missing_debug_implementations)]
 
-use serde::de::{Visitor, Deserializer, MapAccess};
-use std::{fs::File, io::Read, path::Path};
+use serde::de::{Deserializer, MapAccess, Visitor};
 use std::fmt;
+use std::{fs::File, io::Read, path::Path};
 
 mod error;
 pub mod spec;
@@ -65,9 +65,8 @@ pub fn to_json(spec: &OpenApiV3Spec) -> Result<String, Error> {
 
 pub fn deserialize_extensions<'de, D>(deserializer: D) -> Result<serde_yaml::Value, D::Error>
 where
-    D: Deserializer<'de>
+    D: Deserializer<'de>,
 {
-
     struct ExtraFieldsVisitor;
 
     impl<'de> Visitor<'de> for ExtraFieldsVisitor {
@@ -78,8 +77,8 @@ where
         }
 
         fn visit_map<M>(self, mut access: M) -> Result<Self::Value, M::Error>
-            where
-                M: MapAccess<'de>,
+        where
+            M: MapAccess<'de>,
         {
             let mut map = serde_yaml::Mapping::new();
             while let Some((key, value)) = access.next_entry()? {
@@ -101,8 +100,8 @@ mod tests {
         path,
     };
 
-    use pretty_assertions::assert_eq;
     use crate::spec::{Components, ObjectOrReference};
+    use pretty_assertions::assert_eq;
 
     use super::*;
 

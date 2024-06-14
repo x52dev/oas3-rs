@@ -6,8 +6,8 @@ use std::fmt::Write;
 use derive_more::{Display, Error};
 use serde::{Deserialize, Serialize};
 
-use crate::spec::{FromRef, ObjectOrReference, Ref, RefError, RefType, Spec};
 use crate::deserialize_extensions;
+use crate::spec::{FromRef, ObjectOrReference, Ref, RefError, RefType, Spec};
 
 /// Schema Errors
 #[derive(Debug, Clone, PartialEq, Display, Error)]

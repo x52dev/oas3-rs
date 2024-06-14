@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 
-use serde::{Deserialize, Serialize};
 use crate::deserialize_extensions;
+use serde::{Deserialize, Serialize};
 
 use super::{
     schema::Schema, Callback, Example, Header, Link, ObjectOrReference, Parameter, PathItem,
