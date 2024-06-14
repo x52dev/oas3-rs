@@ -100,7 +100,6 @@ mod tests {
         path,
     };
 
-    use crate::spec::{Components, ObjectOrReference};
     use pretty_assertions::assert_eq;
 
     use super::*;
