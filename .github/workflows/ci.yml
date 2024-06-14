@@ -1,11 +1,11 @@
 name: CI
 
 on:
-  push:
-    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened]
   merge_group:
     types: [checks_requested]
-  pull_request:
+  push:
     branches: [main]
 
 permissions:
@@ -16,13 +16,19 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  read_msrv:
+    name: Read MSRV
+    uses: actions-rust-lang/msrv/.github/workflows/msrv.yml@main
+
   test:
+    needs: read_msrv
+
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         toolchain:
-          - { name: msrv, version: "1.68" }
+          - { name: msrv, version: "${{ needs.read_msrv.outputs.msrv }}" }
           - { name: stable, version: stable }
 
     name: Test / ${{ matrix.toolchain.name }}
@@ -30,7 +36,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Rust (${{ matrix.toolchain.name }})
-        uses: actions-rust-lang/setup-rust-toolchain@v1.8.0
+        uses: actions-rust-lang/setup-rust-toolchain@v1.9.0
         with:
           toolchain: ${{ matrix.toolchain.version }}
 

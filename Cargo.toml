@@ -1,7 +1,7 @@
 [package]
 name = "oas3"
 description = "Structures and tools to parse, navigate and validate OpenAPI v3 specifications."
-version = "0.4.0"
+version = "0.5.0"
 authors = [
     "softprops <d.tangren@gmail.com>",
     "Rob Ede <robjtede@icloud.com>",
@@ -11,6 +11,7 @@ categories = ["data-structures", "development-tools::testing", "parsing"]
 repository = "https://github.com/x52dev/oas3-rs"
 license = "MIT"
 edition = "2021"
+rust-version = "1.65"
 
 [features]
 default = ["validation"]
@@ -21,7 +22,7 @@ conformance = ["validation", "reqwest", "prettytable-rs", "colored"]
 bytes = "1.5"
 derive_more = "0.99"
 futures-util = "0.3"
-http = "0.2"
+http = "1"
 log = "0.4"
 once_cell = "1"
 regex = "1"
