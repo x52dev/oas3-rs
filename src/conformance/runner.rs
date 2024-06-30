@@ -1,6 +1,13 @@
 use std::{
-    collections::VecDeque, error::Error as StdError, future::Future, ops::Deref, string::ToString,
-    sync::atomic::AtomicUsize, sync::atomic::Ordering, sync::Arc,
+    collections::VecDeque,
+    error::Error as StdError,
+    future::Future,
+    ops::Deref,
+    string::ToString,
+    sync::{
+        atomic::{AtomicUsize, Ordering},
+        Arc,
+    },
 };
 
 use colored::{ColoredString, Colorize};

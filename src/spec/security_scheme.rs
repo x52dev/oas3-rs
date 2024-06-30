@@ -77,8 +77,9 @@ pub enum SecurityScheme {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use url::Url;
+
+    use super::*;
 
     #[test]
     fn test_http_basic_deser() {
