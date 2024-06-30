@@ -46,6 +46,7 @@ impl MediaTypeExamples {
                     description: None,
                     summary: None,
                     value: Some(example.clone()),
+                    extensions: BTreeMap::default(),
                 };
 
                 let mut map = BTreeMap::new();
