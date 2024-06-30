@@ -32,38 +32,39 @@ mod response;
 mod schema;
 mod security_scheme;
 mod server;
+mod spec_extensions;
 mod tag;
 
-pub use self::components::*;
-pub use self::contact::*;
-pub use self::encoding::*;
-pub use self::error::Error;
-pub use self::example::*;
-pub use self::external_doc::*;
-pub use self::flows::*;
-pub use self::header::*;
-pub use self::info::*;
-pub use self::license::*;
-pub use self::link::*;
-pub use self::media_type::*;
-pub use self::media_type_examples::*;
-pub use self::operation::*;
-pub use self::parameter::*;
-pub use self::path_item::*;
-pub use self::r#ref::*;
-pub use self::request_body::*;
-pub use self::response::*;
-pub use self::schema::{
-    Error as SchemaError, Schema, Type as SchemaType, TypeSet as SchemaTypeSet,
+pub use self::{
+    components::*,
+    contact::*,
+    encoding::*,
+    error::Error,
+    example::*,
+    external_doc::*,
+    flows::*,
+    header::*,
+    info::*,
+    license::*,
+    link::*,
+    media_type::*,
+    media_type_examples::*,
+    operation::*,
+    parameter::*,
+    path_item::*,
+    r#ref::*,
+    request_body::*,
+    response::*,
+    schema::{Error as SchemaError, Schema, Type as SchemaType, TypeSet as SchemaTypeSet},
+    security_scheme::*,
+    server::*,
+    tag::*,
 };
-pub use self::security_scheme::*;
-pub use self::server::*;
-pub use self::tag::*;
 
-const OPENAPI_SUPPORTED_VERSION_RANGE: &str = "~3";
+const OPENAPI_SUPPORTED_VERSION_RANGE: &str = "~3.1";
 
 /// A complete OpenAPI specification.
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Spec {
     /// This string MUST be the [semantic version number](https://semver.org/spec/v2.0.0.html)
     /// of the
@@ -86,8 +87,7 @@ pub struct Spec {
     /// [url](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#serverUrl)
     /// value of `/`.
     // FIXME: Provide a default value as specified in documentation instead of `None`.
-    #[serde(default)]
-    #[serde(skip_serializing_if = "Vec::is_empty")]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub servers: Vec<Server>,
 
     /// Holds the relative paths to the individual endpoints and their operations. The path is
@@ -95,6 +95,7 @@ pub struct Spec {
     /// [`Server Object`](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#serverObject)
     /// in order to construct the full URL. The Paths MAY be empty, due to
     /// [ACL constraints](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#securityFiltering).
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub paths: Option<BTreeMap<String, PathItem>>,
 
     /// An element to hold various schemas for the specification.
@@ -133,9 +134,15 @@ pub struct Spec {
     /// Additional external documentation.
     #[serde(skip_serializing_if = "Option::is_none", rename = "externalDocs")]
     pub external_docs: Option<ExternalDoc>,
-}
 
-// TODO: Add "Specification Extensions" https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specificationExtensions}
+    /// Specification extensions.
+    ///
+    /// Only "x-" prefixed keys are collected, and the prefix is stripped.
+    ///
+    /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specification-extensions>.
+    #[serde(flatten, with = "spec_extensions")]
+    pub extensions: BTreeMap<String, serde_json::Value>,
+}
 
 impl Spec {
     pub fn validate_version(&self) -> Result<semver::Version, Error> {
@@ -197,5 +204,48 @@ impl Spec {
 
     pub fn primary_server(&self) -> Option<&Server> {
         self.servers.first()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use pretty_assertions::assert_eq;
+
+    #[test]
+    fn spec_extensions_deserialize() {
+        let spec = indoc::indoc! {"
+            openapi: '3.1.0'
+            info:
+              title: test
+              version: v1
+            components: {}
+            x-bar: true
+            qux: true
+        "};
+
+        let spec = serde_yml::from_str::<Spec>(spec).unwrap();
+        assert!(spec.components.is_some());
+        assert!(!spec.extensions.contains_key("x-bar"));
+        assert!(!spec.extensions.contains_key("qux"));
+        assert_eq!(spec.extensions.get("bar").unwrap(), true);
+    }
+
+    #[test]
+    fn spec_extensions_serialize() {
+        let spec = indoc::indoc! {"
+            openapi: '3.1.0'
+            info:
+              title: test
+              version: v1
+            components: {}
+            x-bar: true
+        "};
+
+        let parsed_spec = serde_yml::from_str::<Spec>(spec).unwrap();
+        let round_trip_spec = serde_yml::to_string(&parsed_spec).unwrap();
+
+        assert_eq!(spec, round_trip_spec);
     }
 }

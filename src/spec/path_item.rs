@@ -1,7 +1,9 @@
+use std::collections::BTreeMap;
+
 use http::Method;
 use serde::{Deserialize, Serialize};
 
-use super::{ObjectOrReference, Operation, Parameter, Server};
+use super::{spec_extensions, ObjectOrReference, Operation, Parameter, Server};
 
 /// Describes the operations available on a single path.
 ///
@@ -82,8 +84,14 @@ pub struct PathItem {
     #[serde(default)]
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub parameters: Vec<ObjectOrReference<Parameter>>,
-    //
-    // TODO: Add "Specification Extensions" https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specificationExtensions}
+
+    /// Specification extensions.
+    ///
+    /// Only "x-" prefixed keys are collected, and the prefix is stripped.
+    ///
+    /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specification-extensions>.
+    #[serde(flatten, with = "spec_extensions")]
+    pub extensions: BTreeMap<String, serde_json::Value>,
 }
 
 impl PathItem {

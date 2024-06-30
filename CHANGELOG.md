@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Add `Spec::extensions` field.
+- Add `spec::{Components, Contact, Example, ExternalDoc, License, Link::{Id, Ref}, Parameter, PathItem, RequestBody, Response, Tag}::extensions` fields.
+- Add `spec::ParameterIn` enum.
+- Add `spec::ParameterStyle::{Matrix, Label, SpaceDelimited, PipeDelimited, DeepObject}` variants.
+- The `spec::Parameter::location` field is now of type `ParameterIn`.
+- Narrow version range allowed by `Spec::validate_version()` to `~3.1`.
+- Remove `Default` implementation for `Spec`.
+- Remove `Default` implementation for `spec::{Info, License, Parameter, Server, ServerVariable}`.
+
 ## 0.6.0
 
 - Add `from_str()` function.

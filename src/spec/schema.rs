@@ -123,8 +123,10 @@ pub struct Schema {
     /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#properties>.
     ///
     /// [Schema Object]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#schema-object
-    #[serde(rename = "additionalProperties")]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "additionalProperties",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub additional_properties: Option<Box<ObjectOrReference<Schema>>>,
 
     //
@@ -142,84 +144,64 @@ pub struct Schema {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub format: Option<String>,
 
-    #[serde(default)]
-    #[serde(rename = "enum")]
-    #[serde(skip_serializing_if = "Vec::is_empty")]
+    #[serde(rename = "enum", default, skip_serializing_if = "Vec::is_empty")]
     pub enum_values: Vec<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pattern: Option<String>,
 
-    #[serde(rename = "multipleOf")]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "multipleOf", skip_serializing_if = "Option::is_none")]
     pub multiple_of: Option<serde_json::Number>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub minimum: Option<serde_json::Number>,
 
-    #[serde(rename = "exclusiveMaximum")]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "exclusiveMaximum", skip_serializing_if = "Option::is_none")]
     pub exclusive_maximum: Option<serde_json::Number>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maximum: Option<serde_json::Number>,
 
-    #[serde(rename = "exclusiveMinimum")]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "exclusiveMinimum", skip_serializing_if = "Option::is_none")]
     pub exclusive_minimum: Option<serde_json::Number>,
 
-    #[serde(rename = "minLength")]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "minLength", skip_serializing_if = "Option::is_none")]
     pub min_length: Option<u64>,
 
-    #[serde(rename = "maxLength")]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "maxLength", skip_serializing_if = "Option::is_none")]
     pub max_length: Option<u64>,
 
-    #[serde(rename = "minItems")]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "minItems", skip_serializing_if = "Option::is_none")]
     pub min_items: Option<u64>,
 
-    #[serde(rename = "maxItems")]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "maxItems", skip_serializing_if = "Option::is_none")]
     pub max_items: Option<u64>,
 
-    #[serde(rename = "uniqueItems")]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "uniqueItems", skip_serializing_if = "Option::is_none")]
     pub unique_items: Option<bool>,
 
-    #[serde(rename = "maxProperties")]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "maxProperties", skip_serializing_if = "Option::is_none")]
     pub max_properties: Option<u64>,
 
-    #[serde(rename = "minProperties")]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "minProperties", skip_serializing_if = "Option::is_none")]
     pub min_properties: Option<u64>,
 
-    #[serde(rename = "readOnly")]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "readOnly", skip_serializing_if = "Option::is_none")]
     pub read_only: Option<bool>,
 
-    #[serde(rename = "writeOnly")]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "writeOnly", skip_serializing_if = "Option::is_none")]
     pub write_only: Option<bool>,
 
     //
     // composition
     //
-    #[serde(default)]
-    #[serde(rename = "allOf")]
-    #[serde(skip_serializing_if = "Vec::is_empty")]
+    #[serde(rename = "allOf", default, skip_serializing_if = "Vec::is_empty")]
     pub all_of: Vec<ObjectOrReference<Schema>>,
 
-    #[serde(default)]
-    #[serde(rename = "oneOf")]
-    #[serde(skip_serializing_if = "Vec::is_empty")]
+    #[serde(rename = "oneOf", default, skip_serializing_if = "Vec::is_empty")]
     pub one_of: Vec<ObjectOrReference<Schema>>,
 
-    #[serde(default)]
-    #[serde(rename = "anyOf")]
-    #[serde(skip_serializing_if = "Vec::is_empty")]
+    #[serde(rename = "anyOf", default, skip_serializing_if = "Vec::is_empty")]
     pub any_of: Vec<ObjectOrReference<Schema>>,
 }
 

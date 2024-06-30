@@ -2,10 +2,7 @@
 name = "oas3"
 description = "Structures and tools to parse, navigate, and validate OpenAPI v3.1 specifications"
 version = "0.6.0"
-authors = [
-    "softprops <d.tangren@gmail.com>",
-    "Rob Ede <robjtede@icloud.com>",
-]
+authors = ["softprops <d.tangren@gmail.com>", "Rob Ede <robjtede@icloud.com>"]
 keywords = ["oas3", "openapi", "swagger", "api", "validation"]
 categories = ["data-structures", "development-tools::testing", "parsing"]
 repository = "https://github.com/x52dev/oas3-rs"

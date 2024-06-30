@@ -2,7 +2,7 @@ use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
-use super::Server;
+use super::{spec_extensions, Server};
 
 /// The Link object represents a possible design-time link for a response.
 ///
@@ -59,7 +59,14 @@ pub enum Link {
         /// A server object to be used by the target operation.
         #[serde(skip_serializing_if = "Option::is_none")]
         server: Option<Server>,
-        // TODO: Add "Specification Extensions" https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specificationExtension
+
+        /// Specification extensions.
+        ///
+        /// Only "x-" prefixed keys are collected, and the prefix is stripped.
+        ///
+        /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specification-extensions>.
+        #[serde(flatten, with = "spec_extensions")]
+        extensions: BTreeMap<String, serde_json::Value>,
     },
     /// The name of an _existing_, resolvable OAS operation, as defined with a unique
     /// `operationId`. This field is mutually exclusive of the `operationRef` field.
@@ -94,6 +101,13 @@ pub enum Link {
         /// A server object to be used by the target operation.
         #[serde(skip_serializing_if = "Option::is_none")]
         server: Option<Server>,
-        // TODO: Add "Specification Extensions" https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specificationExtension
+
+        /// Specification extensions.
+        ///
+        /// Only "x-" prefixed keys are collected, and the prefix is stripped.
+        ///
+        /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specification-extensions>.
+        #[serde(flatten, with = "spec_extensions")]
+        extensions: BTreeMap<String, serde_json::Value>,
     },
 }

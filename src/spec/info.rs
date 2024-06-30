@@ -7,7 +7,7 @@ use super::{Contact, License};
 ///
 ///
 /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#infoObject>.
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 // #[serde(rename_all = "lowercase")]
 pub struct Info {
     /// The title of the application.

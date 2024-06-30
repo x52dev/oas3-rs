@@ -2,7 +2,10 @@ use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
-use super::{FromRef, Header, Link, MediaType, ObjectOrReference, Ref, RefError, RefType, Spec};
+use super::{
+    spec_extensions, FromRef, Header, Link, MediaType, ObjectOrReference, Ref, RefError, RefType,
+    Spec,
+};
 
 /// Describes a single response from an API Operation, including design-time, static `links`
 /// to operations based on the response.
@@ -36,7 +39,14 @@ pub struct Response {
     #[serde(default)]
     #[serde(skip_serializing_if = "BTreeMap::is_empty")]
     pub links: BTreeMap<String, ObjectOrReference<Link>>,
-    // TODO: Add "Specification Extensions" https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specificationExtensions}
+
+    /// Specification extensions.
+    ///
+    /// Only "x-" prefixed keys are collected, and the prefix is stripped.
+    ///
+    /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specification-extensions>.
+    #[serde(flatten, with = "spec_extensions")]
+    pub extensions: BTreeMap<String, serde_json::Value>,
 }
 
 impl FromRef for Response {

@@ -2,15 +2,14 @@ use bytes::Bytes;
 use http::HeaderMap;
 use log::{debug, trace};
 
-use crate::{
-    spec::{Error as SpecError, RefError},
-    validation::{Error as ValidationError, ValidationTree},
-    Error, Spec,
-};
-
 use super::{
     OperationSpec, ParamPosition, RequestSource, RequestSpec, ResponseSpec, ResponseSpecSource,
     TestAuthentication, TestOperation, TestParam, TestRequest, TestResponseSpec,
+};
+use crate::{
+    spec::{Error as SpecError, ParameterIn, RefError},
+    validation::{Error as ValidationError, ValidationTree},
+    Error, Spec,
 };
 
 #[derive(Debug, Clone)]
@@ -112,14 +111,11 @@ impl ConformanceTestSpec {
                 .ok_or(ValidationError::ParameterNotFound(param.name.clone()))?;
 
             // validate position
-            let pos = match parameter.location.as_ref() {
-                "query" => ParamPosition::Query,
-                "header" => ParamPosition::Header,
-                "path" => ParamPosition::Path,
-                "cookie" => ParamPosition::Cookie,
-                pos_str => Err(ValidationError::InvalidParameterLocation(
-                    pos_str.to_owned(),
-                ))?,
+            let pos = match parameter.location {
+                ParameterIn::Query => ParamPosition::Query,
+                ParameterIn::Header => ParamPosition::Header,
+                ParameterIn::Path => ParamPosition::Path,
+                ParameterIn::Cookie => ParamPosition::Cookie,
             };
 
             // TODO: validate type

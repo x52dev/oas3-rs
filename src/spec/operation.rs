@@ -15,8 +15,7 @@ use super::{
 pub struct Operation {
     /// A list of tags for API documentation control. Tags can be used for logical grouping of
     /// operations by resources or any other qualifier.
-    #[serde(default)]
-    #[serde(skip_serializing_if = "Vec::is_empty")]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub tags: Vec<String>,
 
     /// A short summary of what the operation does.

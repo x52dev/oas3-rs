@@ -1,13 +1,15 @@
+use std::collections::BTreeMap;
+
 use serde::{Deserialize, Serialize};
 
-use super::{FromRef, Ref, RefError, RefType, Spec};
+use super::{spec_extensions, FromRef, Ref, RefError, RefType, Spec};
 
 /// Multi-purpose example objects.
 ///
 /// Will be validated against schema when used in conformance testing.
 ///
 /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#exampleObject>.
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct Example {
     /// Short description for the example.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -24,14 +26,21 @@ pub struct Example {
     /// in JSON or YAML, use a string value to contain the example, escaping where necessary.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub value: Option<serde_json::Value>,
+    //
     // FIXME: Implement (merge with value as enum)
     // /// A URL that points to the literal example. This provides the capability to reference
     // /// examples that cannot easily be included in JSON or YAML documents. The `value` field
     // /// and `externalValue` field are mutually exclusive.
     // #[serde(skip_serializing_if = "Option::is_none")]
     // pub externalValue: Option<String>,
-
-    // TODO: Add "Specification Extensions" https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specificationExtensions}
+    //
+    /// Specification extensions.
+    ///
+    /// Only "x-" prefixed keys are collected, and the prefix is stripped.
+    ///
+    /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specification-extensions>.
+    #[serde(flatten, with = "spec_extensions")]
+    pub extensions: BTreeMap<String, serde_json::Value>,
 }
 
 impl Example {

@@ -1,11 +1,15 @@
+use std::collections::BTreeMap;
+
 use serde::{Deserialize, Serialize};
+
+use super::spec_extensions;
 
 /// Adds metadata to a single tag that is used by the
 /// [Operation Object](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#operationObject).
 /// It is not mandatory to have a Tag Object per tag defined in the Operation Object instances.
 ///
 /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#tagObject>.
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct Tag {
     /// The name of the tag.
     pub name: String,
@@ -18,6 +22,12 @@ pub struct Tag {
     // #[serde(default)]
     // #[serde(skip_serializing_if = "Vec::is_empty")]
     // pub external_docs: Vec<ExternalDoc>,
-
-    // TODO: Add "Specification Extensions" https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specificationExtensions}
+    //
+    /// Specification extensions.
+    ///
+    /// Only "x-" prefixed keys are collected, and the prefix is stripped.
+    ///
+    /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specification-extensions>.
+    #[serde(flatten, with = "spec_extensions")]
+    pub extensions: BTreeMap<String, serde_json::Value>,
 }

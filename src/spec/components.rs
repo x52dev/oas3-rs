@@ -3,8 +3,8 @@ use std::collections::BTreeMap;
 use serde::{Deserialize, Serialize};
 
 use super::{
-    schema::Schema, Callback, Example, Header, Link, ObjectOrReference, Parameter, PathItem,
-    RequestBody, Response, SecurityScheme,
+    schema::Schema, spec_extensions, Callback, Example, Header, Link, ObjectOrReference, Parameter,
+    PathItem, RequestBody, Response, SecurityScheme,
 };
 
 /// Holds a set of reusable objects for different aspects of the OAS.
@@ -12,8 +12,8 @@ use super::{
 /// All objects defined within the components object will have no effect on the API unless
 /// they are explicitly referenced from properties outside the components object.
 ///
-/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#componentsObject>.
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
+/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#components-object>.
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Components {
     /// An object to hold reusable [Schema Objects](Schema).
     #[serde(default)]
@@ -64,6 +64,12 @@ pub struct Components {
     #[serde(default)]
     #[serde(skip_serializing_if = "BTreeMap::is_empty")]
     pub callbacks: BTreeMap<String, ObjectOrReference<Callback>>,
-    //
-    // TODO: Add "Specification Extensions" https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specificationExtensions}
+
+    /// Specification extensions.
+    ///
+    /// Only "x-" prefixed keys are collected, and the prefix is stripped.
+    ///
+    /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specification-extensions>.
+    #[serde(flatten, with = "spec_extensions")]
+    pub extensions: BTreeMap<String, serde_json::Value>,
 }

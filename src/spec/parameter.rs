@@ -1,29 +1,154 @@
+use std::collections::BTreeMap;
+
 use serde::{Deserialize, Serialize};
 
-use super::{FromRef, Ref, RefError, RefType, Spec};
-use crate::Schema;
+use super::{spec_extensions, FromRef, Ref, RefError, RefType, Schema, Spec};
 
-// FIXME: Verify against OpenAPI 3.0.1
+#[derive(Debug, Clone, Copy, PartialEq, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub enum ParameterIn {
+    /// Used together with [path templating], where the parameter value is actually part of the
+    /// operation's URL.
+    ///
+    /// This does not include the host or base path of the API. For example, in `/items/{itemId}`,
+    /// the path parameter is `itemId`.
+    ///
+    /// [path templating]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#path-templating
+    Path,
+
+    /// Parameters that are appended to the URL. For example, in `/items?id=###`, the query
+    /// parameter is `id`.
+    Query,
+
+    /// Custom headers that are expected as part of the request.
+    ///
+    /// Note that [RFC 7230] states header names are case insensitive.
+    ///
+    /// RFC 7230: https://datatracker.ietf.org/doc/html/rfc7230#section-3.2
+    Header,
+
+    /// Used to pass a specific cookie value to the API.
+    Cookie,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub enum ParameterStyle {
+    /// Path-style parameters defined by RFC6570.
+    ///
+    /// Applies to: `primitive, array, object` in `path`.
+    Matrix,
+
+    /// Label style parameters defined by RFC6570.
+    ///
+    /// Applies to: `primitive, array, object` in `path`.
+    Label,
+
+    /// Form style parameters defined by RFC6570. This option replaces collectionFormat with a csv (when explode is false) or multi (when explode is true) value from OpenAPI 2.0..
+    ///
+    /// Applies to: `primitive, array, object` in `query, cookie`.
+    Form,
+
+    /// Simple style parameters defined by RFC6570. This option replaces collectionFormat with a csv value from OpenAPI 2.0..
+    ///
+    /// Applies to: `array` in `path, header `.
+    Simple,
+
+    /// Space separated array or object values. This option replaces collectionFormat equal to ssv from OpenAPI 2.0..
+    ///
+    /// Applies to: `array, object` in `query`.
+    SpaceDelimited,
+
+    /// Pipe separated array or object values. This option replaces collectionFormat equal to pipes from OpenAPI 2.0..
+    ///
+    /// Applies to: `array, object` in `query`.
+    PipeDelimited,
+
+    /// Provides a simple way of rendering nested objects using form parameters..
+    ///
+    /// Applies to: `object` in `query`.
+    DeepObject,
+}
+
 /// Describes a single operation parameter.
-/// A unique parameter is defined by a combination of a
-/// [name](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameterName)
-/// and [location](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameterIn).
 ///
-/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameterObject>.
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
+/// A unique parameter is defined by a combination of a `name` and location (`in`).
+///
+/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameter-object>.
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Parameter {
     /// The name of the parameter.
     pub name: String,
 
-    // TODO: enumify
     /// The location of the parameter.
-    /// Possible values are "query", "header", "path" or "cookie".
+    ///
+    /// Given by the `in` field.
     #[serde(rename = "in")]
-    pub location: String,
+    pub location: ParameterIn,
 
+    /// A brief description of the parameter.
+    ///
+    /// This could contain examples of use. CommonMark syntax MAY be used for rich text representation.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+
+    /// Determines whether this parameter is mandatory.
+    ///
+    /// If the parameter location is "path", this property is REQUIRED and its value MUST be true.
+    /// Otherwise, the property MAY be included and its default value is false.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub required: Option<bool>,
 
+    /// Specifies that a parameter is deprecated and SHOULD be transitioned out of usage.
+    ///
+    /// Default value is false.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub deprecated: Option<bool>,
+
+    /// Sets the ability to pass empty-valued parameters.
+    ///
+    /// This is valid only for query parameters and allows sending a parameter with an empty value.
+    /// Default value is false. If style is used, and if behavior is n/a (cannot be serialized), the
+    /// value of `allowEmptyValue` SHALL be ignored. Use of this property is NOT RECOMMENDED, as it
+    /// is likely to be removed in a later revision.
+    #[serde(
+        rename = "allowEmptyValue",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub allow_empty_value: Option<bool>,
+
+    /// Describes how the parameter value will be serialized depending on the type of the parameter
+    /// value.
+    ///
+    /// Default values (based on value of in): for `query` - `form`; for `path` - `simple`; for
+    /// `header` - `simple`; for cookie - `form`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub style: Option<ParameterStyle>,
+
+    /// True if array/object parameter values generate separate parameters for each value of the
+    /// array or key-value pair of the map.
+    ///
+    /// For other types of parameters this property has no effect. When `style` is `form`, the
+    /// default value is true. For all other styles, the default value is false.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub explode: Option<bool>,
+
+    /// Determines whether the parameter value SHOULD allow reserved characters to be included
+    /// without percent-encoding.
+    ///
+    /// Reserved characters as defined by [RFC 3986 §2.2]: `:/?#[]@!$&'()*+,;=`. This property only
+    /// applies to parameters with an `in` value of `query`. The default value is false.
+    ///
+    /// [RFC 3986 §2.2]: https://datatracker.ietf.org/doc/html/rfc3986#section-2.2
+    #[serde(
+        rename = "allowReserved",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub allow_reserved: Option<bool>,
+
+    /// The schema defining the type used for the parameter.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub schema: Option<Schema>,
 
@@ -31,7 +156,9 @@ pub struct Parameter {
     #[serde(rename = "uniqueItems")]
     pub unique_items: Option<bool>,
 
-    /// string, number, boolean, integer, array, file ( only for formData )
+    /// Parameter string, number, boolean, integer, array, file ( only for formData )
+    ///
+    /// Given by the `in` field.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "type")]
     pub param_type: Option<String>,
@@ -39,37 +166,13 @@ pub struct Parameter {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub format: Option<String>,
 
-    /// A brief description of the parameter. This could contain examples
-    /// of use.  GitHub Flavored Markdown is allowed.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub description: Option<String>,
-
-    // collectionFormat: ???
-    // default: ???
-    // maximum ?
-    // exclusiveMaximum ??
-    // minimum ??
-    // exclusiveMinimum ??
-    // maxLength ??
-    // minLength ??
-    // pattern ??
-    // maxItems ??
-    // minItems ??
-    // enum ??
-    // multipleOf ??
-    // allowEmptyValue ( for query / body params )
-    /// Describes how the parameter value will be serialized depending on the type of the parameter
-    /// value. Default values (based on value of in): for `query` - `form`; for `path` - `simple`; for
-    /// `header` - `simple`; for cookie - `form`.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    style: Option<ParameterStyle>,
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
-#[serde(rename_all = "camelCase")]
-enum ParameterStyle {
-    Form,
-    Simple,
+    /// Specification extensions.
+    ///
+    /// Only "x-" prefixed keys are collected, and the prefix is stripped.
+    ///
+    /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specification-extensions>.
+    #[serde(flatten, with = "spec_extensions")]
+    pub extensions: BTreeMap<String, serde_json::Value>,
 }
 
 impl FromRef for Parameter {

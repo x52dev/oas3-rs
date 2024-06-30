@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 /// An object representing a Server.
 ///
 /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#serverObject>.
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct Server {
     /// A URL to the target host. This URL supports Server Variables and MAY be relative, to
     /// indicate that the host location is relative to the location where the OpenAPI document
@@ -27,7 +27,7 @@ pub struct Server {
 /// An object representing a Server Variable for server URL template substitution.
 ///
 /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#serverVariableObject>.
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct ServerVariable {
     /// The default value to use for substitution, and to send, if an alternate value is not
     /// supplied. Unlike the Schema Object's default, this value MUST be provided by the consumer.
