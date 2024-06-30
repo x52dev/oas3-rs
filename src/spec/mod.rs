@@ -34,30 +34,31 @@ mod security_scheme;
 mod server;
 mod tag;
 
-pub use components::*;
-pub use contact::*;
-pub use encoding::*;
-pub use example::*;
-pub use external_doc::*;
-pub use flows::*;
-pub use header::*;
-pub use info::*;
-pub use license::*;
-pub use link::*;
-pub use media_type::*;
-pub use media_type_examples::*;
-pub use operation::*;
-pub use parameter::*;
-pub use path_item::*;
-pub use r#ref::*;
-pub use request_body::*;
-pub use response::*;
-pub use security_scheme::*;
-pub use server::*;
-pub use tag::*;
-
-pub use error::Error;
-pub use schema::{Error as SchemaError, Schema, Type as SchemaType};
+pub use self::components::*;
+pub use self::contact::*;
+pub use self::encoding::*;
+pub use self::error::Error;
+pub use self::example::*;
+pub use self::external_doc::*;
+pub use self::flows::*;
+pub use self::header::*;
+pub use self::info::*;
+pub use self::license::*;
+pub use self::link::*;
+pub use self::media_type::*;
+pub use self::media_type_examples::*;
+pub use self::operation::*;
+pub use self::parameter::*;
+pub use self::path_item::*;
+pub use self::r#ref::*;
+pub use self::request_body::*;
+pub use self::response::*;
+pub use self::schema::{
+    Error as SchemaError, Schema, Type as SchemaType, TypeSet as SchemaTypeSet,
+};
+pub use self::security_scheme::*;
+pub use self::server::*;
+pub use self::tag::*;
 
 const OPENAPI_SUPPORTED_VERSION_RANGE: &str = "~3";
 
@@ -94,7 +95,7 @@ pub struct Spec {
     /// [`Server Object`](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#serverObject)
     /// in order to construct the full URL. The Paths MAY be empty, due to
     /// [ACL constraints](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#securityFiltering).
-    pub paths: BTreeMap<String, PathItem>,
+    pub paths: Option<BTreeMap<String, PathItem>>,
 
     /// An element to hold various schemas for the specification.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -150,7 +151,7 @@ impl Spec {
     }
 
     pub fn operation(&self, method: &http::Method, path: &str) -> Option<&Operation> {
-        let resource = self.paths.get(path)?;
+        let resource = self.paths.as_ref()?.get(path)?;
 
         match *method {
             Method::GET => resource.get.as_ref(),
@@ -168,10 +169,14 @@ impl Spec {
     pub fn operations(&self) -> impl Iterator<Item = (String, Method, &Operation)> {
         let paths = &self.paths;
 
-        debug!("num paths: {}", paths.len());
+        debug!(
+            "num paths: {}",
+            paths.as_ref().map_or(0, |paths| paths.len())
+        );
 
         let ops = paths
             .iter()
+            .flatten()
             .flat_map(|(path, item)| {
                 debug!(
                     "path: {}, methods: {}",

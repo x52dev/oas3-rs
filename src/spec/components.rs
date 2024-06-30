@@ -64,5 +64,6 @@ pub struct Components {
     #[serde(default)]
     #[serde(skip_serializing_if = "BTreeMap::is_empty")]
     pub callbacks: BTreeMap<String, ObjectOrReference<Callback>>,
+    //
     // TODO: Add "Specification Extensions" https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specificationExtensions}
 }

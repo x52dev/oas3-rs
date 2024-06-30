@@ -11,11 +11,13 @@ use super::{ObjectOrReference, Operation, Parameter, Server};
 /// operations and parameters are available.
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
 pub struct PathItem {
-    /// Allows for an external definition of this path item. The referenced structure MUST be
-    /// in the format of a
-    /// [Path Item Object](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#pathItemObject).
-    /// If there are conflicts between the referenced definition and this Path Item's definition,
-    /// the behavior is undefined.
+    /// An external definition of this path item.
+    ///
+    /// The referenced structure MUST be in the format of a [Path Item Object]. If there are
+    /// conflicts between the referenced definition and this Path Item's definition, the behavior is
+    /// undefined.
+    ///
+    /// [Path Item Object]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#pathItemObject
     // FIXME: Should this ref be moved to an enum?
     #[serde(skip_serializing_if = "Option::is_none", rename = "$ref")]
     pub reference: Option<String>,
@@ -23,6 +25,7 @@ pub struct PathItem {
     /// An optional, string summary, intended to apply to all operations in this path.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub summary: Option<String>,
+
     /// An optional, string description, intended to apply to all operations in this path.
     /// [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -79,6 +82,7 @@ pub struct PathItem {
     #[serde(default)]
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub parameters: Vec<ObjectOrReference<Parameter>>,
+    //
     // TODO: Add "Specification Extensions" https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specificationExtensions}
 }
 
