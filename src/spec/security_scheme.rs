@@ -18,6 +18,12 @@ use super::Flows;
 pub enum SecurityScheme {
     #[serde(rename = "apiKey")]
     ApiKey {
+        /// A description for security scheme.
+        ///
+        /// CommonMark syntax MAY be used for rich text representation.
+        #[serde(skip_serializing_if = "Option::is_none")]
+        description: Option<String>,
+
         name: String,
         #[serde(rename = "in")]
         location: String,
@@ -25,18 +31,47 @@ pub enum SecurityScheme {
 
     #[serde(rename = "http")]
     Http {
+        /// A description for security scheme.
+        ///
+        /// CommonMark syntax MAY be used for rich text representation.
+        #[serde(skip_serializing_if = "Option::is_none")]
+        description: Option<String>,
+
         scheme: String,
         #[serde(rename = "bearerFormat")]
         bearer_format: Option<String>,
     },
 
     #[serde(rename = "oauth2")]
-    OAuth2 { flows: Flows },
+    OAuth2 {
+        /// A description for security scheme.
+        ///
+        /// CommonMark syntax MAY be used for rich text representation.
+        #[serde(skip_serializing_if = "Option::is_none")]
+        description: Option<String>,
+
+        flows: Flows,
+    },
 
     #[serde(rename = "openIdConnect")]
     OpenIdConnect {
+        /// A description for security scheme.
+        ///
+        /// CommonMark syntax MAY be used for rich text representation.
+        #[serde(skip_serializing_if = "Option::is_none")]
+        description: Option<String>,
+
         #[serde(rename = "openIdConnectUrl")]
         open_id_connect_url: String,
+    },
+
+    #[serde(rename = "mutualTLS")]
+    MutualTls {
+        /// A description for security scheme.
+        ///
+        /// CommonMark syntax MAY be used for rich text representation.
+        #[serde(skip_serializing_if = "Option::is_none")]
+        description: Option<String>,
     },
 }
 
@@ -53,6 +88,7 @@ mod tests {
         assert!(matches!(
             obj,
             SecurityScheme::Http {
+                description: None,
                 scheme,
                 bearer_format: None,
             } if scheme == "basic"
@@ -84,7 +120,10 @@ mod tests {
 
         let obj: SecurityScheme = serde_json::from_str(IMPLICIT_OAUTH2_SAMPLE).unwrap();
         match obj {
-            SecurityScheme::OAuth2 { flows } => {
+            SecurityScheme::OAuth2 {
+                description: _,
+                flows,
+            } => {
                 assert!(flows.implicit.is_some());
                 let implicit = flows.implicit.unwrap();
                 assert_eq!(

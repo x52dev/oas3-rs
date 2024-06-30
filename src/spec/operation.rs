@@ -50,12 +50,11 @@ pub struct Operation {
     /// [Reference Object](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#referenceObject)
     /// to link to parameters that are defined at the
     /// [OpenAPI Object's components/parameters](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#componentsParameters).
-    #[serde(default)]
-    #[serde(skip_serializing_if = "Vec::is_empty")]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub parameters: Vec<ObjectOrReference<Parameter>>,
 
     /// The request body applicable for this operation. The requestBody is only supported in HTTP methods where the HTTP 1.1 specification RFC7231 has explicitly defined semantics for request bodies. In other cases where the HTTP spec is vague, requestBody SHALL be ignored by consumers.
-    #[serde(skip_serializing_if = "Option::is_none", rename = "requestBody")]
+    #[serde(rename = "requestBody", skip_serializing_if = "Option::is_none")]
     pub request_body: Option<ObjectOrReference<RequestBody>>,
 
     /// The list of possible responses as they are returned from executing this operation.
@@ -74,7 +73,7 @@ pub struct Operation {
     /// response for a successful operation call.
     ///
     /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#responsesObject>.
-    pub responses: BTreeMap<String, ObjectOrReference<Response>>,
+    pub responses: Option<BTreeMap<String, ObjectOrReference<Response>>>,
 
     /// A map of possible out-of band callbacks related to the parent operation. The key is
     /// a unique identifier for the Callback Object. Each value in the map is a
@@ -120,6 +119,7 @@ impl Operation {
     pub fn responses(&self, spec: &Spec) -> BTreeMap<String, Response> {
         self.responses
             .iter()
+            .flatten()
             .filter_map(|(name, oor)| {
                 oor.resolve(spec)
                     .map(|obj| (name.clone(), obj))

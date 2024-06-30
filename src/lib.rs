@@ -48,12 +48,17 @@ pub fn from_reader<R>(read: R) -> Result<OpenApiV3Spec, Error>
 where
     R: Read,
 {
-    Ok(serde_yaml::from_reader::<R, OpenApiV3Spec>(read)?)
+    Ok(serde_yml::from_reader::<R, OpenApiV3Spec>(read)?)
+}
+
+/// Try deserializing an OpenAPI spec (YAML or JSON) from string.
+pub fn from_str(val: impl AsRef<str>) -> Result<OpenApiV3Spec, Error> {
+    Ok(serde_yml::from_str::<OpenApiV3Spec>(val.as_ref())?)
 }
 
 /// Try serializing to a YAML string.
 pub fn to_yaml(spec: &OpenApiV3Spec) -> Result<String, Error> {
-    Ok(serde_yaml::to_string(spec)?)
+    Ok(serde_yml::to_string(spec)?)
 }
 
 /// Try serializing to a JSON string.
@@ -87,8 +92,8 @@ mod tests {
 
     /// Convert a YAML `&str` to a JSON `String`.
     fn convert_yaml_str_to_json(yaml_str: &str) -> String {
-        let yaml: serde_yaml::Value = serde_yaml::from_str(yaml_str).unwrap();
-        let json: serde_json::Value = serde_yaml::from_value(yaml).unwrap();
+        let yaml: serde_yml::Value = serde_yml::from_str(yaml_str).unwrap();
+        let json: serde_json::Value = serde_yml::from_value(yaml).unwrap();
         serde_json::to_string_pretty(&json).unwrap()
     }
 
