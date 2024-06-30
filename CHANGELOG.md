@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.6.0
+
 - Add `from_str()` function.
 - Add `spec::SecurityScheme::MutualTls` enum variant.
 - Add `spec::SecurityScheme::{ApiKey, Http, OAuth2, OpenIdConnect}::description` fields.
@@ -19,7 +21,7 @@
 
 ## 0.4.0
 
-- The `bearer_format` field of `SecurityScheme::Http` is now optional.
+- The `SecurityScheme::Http::bearer_format` is now optional.
 
 ## 0.3.0
 
