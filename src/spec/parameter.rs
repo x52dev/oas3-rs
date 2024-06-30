@@ -173,8 +173,8 @@ pub struct Parameter {
     /// encoding. The `examples` field is mutually exclusive of the `example` field. Furthermore, if
     /// referencing a `schema` that contains an example, the `examples` value SHALL override the
     /// example provided by the schema.
-    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
-    pub examples: BTreeMap<String, ObjectOrReference<Example>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub examples: Option<BTreeMap<String, ObjectOrReference<Example>>>,
 
     /// A map containing the representations for the parameter.
     ///

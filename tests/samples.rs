@@ -10,6 +10,7 @@ fn validate_passing_samples() {
     oas3::from_str(include_str!("samples/pass/path_no_response.yaml")).unwrap();
     oas3::from_str(include_str!("samples/pass/path_var_empty_pathitem.yaml")).unwrap();
     oas3::from_str(include_str!("samples/pass/schema.yaml")).unwrap();
+    oas3::from_str(include_str!("samples/pass/parameters.yaml")).unwrap();
 }
 
 #[test]
