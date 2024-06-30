@@ -2,7 +2,10 @@ use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
-use super::{spec_extensions, FromRef, Ref, RefError, RefType, Schema, Spec};
+use super::{
+    spec_extensions, Example, FromRef, MediaType, ObjectOrReference, Ref, RefError, RefType,
+    Schema, Spec,
+};
 
 #[derive(Debug, Clone, Copy, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -24,7 +27,7 @@ pub enum ParameterIn {
     ///
     /// Note that [RFC 7230] states header names are case insensitive.
     ///
-    /// RFC 7230: https://datatracker.ietf.org/doc/html/rfc7230#section-3.2
+    /// [RFC 7230]: https://datatracker.ietf.org/doc/html/rfc7230#section-3.2
     Header,
 
     /// Used to pass a specific cookie value to the API.
@@ -149,22 +152,37 @@ pub struct Parameter {
     pub allow_reserved: Option<bool>,
 
     /// The schema defining the type used for the parameter.
+    ///
+    /// A parameter MUST contain either a schema property, or a content property, but not both.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub schema: Option<Schema>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "uniqueItems")]
-    pub unique_items: Option<bool>,
-
-    /// Parameter string, number, boolean, integer, array, file ( only for formData )
+    /// Example of the parameter's potential value.
     ///
-    /// Given by the `in` field.
+    /// The example SHOULD match the specified schema and encoding properties if present. The
+    /// `example` field is mutually exclusive of the `examples` field. Furthermore, if referencing a
+    /// `schema` that contains an example, the `example` value SHALL override the example provided
+    /// by the schema. To represent examples of media types that cannot naturally be represented in
+    /// JSON or YAML, a string value can contain the example with escaping where necessary.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "type")]
-    pub param_type: Option<String>,
+    pub example: Option<serde_json::Value>,
 
+    /// Examples of the parameter's potential value.
+    ///
+    /// Each example SHOULD contain a value in the correct format as specified in the parameter
+    /// encoding. The `examples` field is mutually exclusive of the `example` field. Furthermore, if
+    /// referencing a `schema` that contains an example, the `examples` value SHALL override the
+    /// example provided by the schema.
+    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+    pub examples: BTreeMap<String, ObjectOrReference<Example>>,
+
+    /// A map containing the representations for the parameter.
+    ///
+    /// A parameter MUST contain either a schema property, or a content property, but not both.
+    ///
+    /// The key is the media type and the value describes it. The map MUST only contain one entry.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub format: Option<String>,
+    pub content: Option<BTreeMap<String, MediaType>>,
 
     /// Specification extensions.
     ///

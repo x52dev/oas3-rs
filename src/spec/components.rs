@@ -16,53 +16,55 @@ use super::{
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Components {
     /// An object to hold reusable [Schema Objects](Schema).
-    #[serde(default)]
-    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub schemas: BTreeMap<String, ObjectOrReference<Schema>>,
 
     /// An object to hold reusable [Response Objects](Response).
-    #[serde(default)]
-    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub responses: BTreeMap<String, ObjectOrReference<Response>>,
 
     /// An object to hold reusable [Parameter Objects](Parameter).
-    #[serde(default)]
-    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub parameters: BTreeMap<String, ObjectOrReference<Parameter>>,
 
     /// An object to hold reusable [Example Objects](Example).
-    #[serde(default)]
-    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub examples: BTreeMap<String, ObjectOrReference<Example>>,
 
     /// An object to hold reusable [Request Body Objects](RequestBody).
-    #[serde(default)]
-    #[serde(rename = "requestBodies", skip_serializing_if = "BTreeMap::is_empty")]
+    #[serde(
+        rename = "requestBodies",
+        default,
+        skip_serializing_if = "BTreeMap::is_empty"
+    )]
     pub request_bodies: BTreeMap<String, ObjectOrReference<RequestBody>>,
 
     /// An object to hold reusable [Header Objects](Header).
-    #[serde(default)]
-    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub headers: BTreeMap<String, ObjectOrReference<Header>>,
 
     /// An object to hold reusable [Path Item Objects](PathItem).
-    #[serde(default)]
-    #[serde(rename = "pathItems", skip_serializing_if = "BTreeMap::is_empty")]
+    #[serde(
+        rename = "pathItems",
+        default,
+        skip_serializing_if = "BTreeMap::is_empty"
+    )]
     pub path_items: BTreeMap<String, ObjectOrReference<PathItem>>,
 
     /// An object to hold reusable [Security Scheme Objects](SecurityScheme).
-    #[serde(default)]
-    #[serde(rename = "securitySchemes", skip_serializing_if = "BTreeMap::is_empty")]
+    #[serde(
+        rename = "securitySchemes",
+        default,
+        skip_serializing_if = "BTreeMap::is_empty"
+    )]
     pub security_schemes: BTreeMap<String, ObjectOrReference<SecurityScheme>>,
 
     /// An object to hold reusable [Link Objects](crate::spec::Link).
-    #[serde(default)]
-    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub links: BTreeMap<String, ObjectOrReference<Link>>,
 
     /// An object to hold reusable [Callback Objects](crate::spec::Callback).
-    #[serde(default)]
-    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub callbacks: BTreeMap<String, ObjectOrReference<Callback>>,
 
     /// Specification extensions.
