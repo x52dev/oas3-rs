@@ -1,5 +1,8 @@
+# direnv
+.direnv
+
+# x52 toolchain
+.toolchain
+
+# Rust
 target
-Cargo.lock
-*.bk
-.env
-.DS_Store
