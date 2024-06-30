@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.8.1
+
 - Fix `spec::Parameter` deserialization when no `examples` are present.
 
 ## 0.8.0
