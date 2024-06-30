@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fix `spec::Parameter` deserialization when no `examples` are present.
+
 ## 0.8.0
 
 - Add `spec::Parameter::{example, examples, content}` fields.

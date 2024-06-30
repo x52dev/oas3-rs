@@ -173,7 +173,7 @@ pub struct Parameter {
     /// encoding. The `examples` field is mutually exclusive of the `example` field. Furthermore, if
     /// referencing a `schema` that contains an example, the `examples` value SHALL override the
     /// example provided by the schema.
-    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub examples: BTreeMap<String, ObjectOrReference<Example>>,
 
     /// A map containing the representations for the parameter.
@@ -210,5 +210,27 @@ impl FromRef for Parameter {
 
             typ => Err(RefError::MismatchedType(typ, RefType::Parameter)),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use indoc::indoc;
+
+    use super::*;
+
+    #[test]
+    fn deserialization() {
+        let spec = indoc! {"
+            name: foo
+            in: query
+            description: bar
+            required: false
+            schema:
+                type: string
+        "};
+
+        let parameter = serde_yml::from_str::<Parameter>(spec).unwrap();
+        assert_eq!(parameter.name, "foo");
     }
 }
