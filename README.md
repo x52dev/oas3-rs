@@ -1,8 +1,8 @@
 # OAS3
 
-> Structures and tools to parse, navigate and validate [OpenAPI v3 Spec][oas3-spec] files.
+> Structures and tools to parse, navigate and validate [OpenAPI v3.1 Spec][oas3-spec] files.
 
-Based on v3 parts of the [`openapi`](https://crates.io/crates/openapi) crate by [softprops](https://crates.io/users/softprops).
+Originally based on v3 parts of the [`openapi`](https://crates.io/crates/openapi) crate by [softprops](https://crates.io/users/softprops).
 
 Additional features:
 
@@ -10,20 +10,9 @@ Additional features:
 - Example request/response validation
 - Live API conformance testing
 
-## Install
-
-add the following to your `Cargo.toml` file
-
-```toml
-[dependencies]
-oas3 = "0.4"
-```
-
 ## Usage
 
 ```rust
-extern crate oas3;
-
 fn main() {
   match oas3::from_path("path/to/openapi.yaml") {
     Ok(spec) => println!("spec: {:?}", spec),

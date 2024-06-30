@@ -77,11 +77,13 @@ pub struct Schema {
     #[serde(skip_serializing_if = "BTreeMap::is_empty")]
     pub properties: BTreeMap<String, ObjectOrReference<Schema>>,
 
-    /// Value can be boolean or object. Inline or referenced schema MUST be of a
-    /// [Schema Object](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#schemaObject)
-    /// and not a standard JSON Schema.
+    /// Schema for additional object properties.
+    ///
+    /// Inline or referenced MUST be of a [Schema Object] and not a standard JSON Schema.
     ///
     /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#properties>.
+    ///
+    /// [Schema Object]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#schema-object
     #[serde(rename = "additionalProperties")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub additional_properties: Option<Box<ObjectOrReference<Schema>>>,
