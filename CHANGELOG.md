@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.8.0
+
 - Add `spec::Parameter::{example, examples, content}` fields.
 - Implement `FromRef` for `spec::Header`.
 - Remove `spec::Parameter::unique_items` field.
