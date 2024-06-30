@@ -7,7 +7,7 @@ use super::spec_extensions;
 
 /// Contact information for the exposed API.
 ///
-/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#contactObject>.
+/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#contact-object>.
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Contact {
     #[serde(skip_serializing_if = "Option::is_none")]

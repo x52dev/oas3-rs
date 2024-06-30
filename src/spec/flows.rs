@@ -86,7 +86,7 @@ pub struct AuthorizationCodeFlow {
 /// object is an expression, evaluated at runtime, that identifies a URL to use for the
 /// callback operation.
 ///
-/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#callbackObject>.
+/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#callback-object>.
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
 pub struct Callback(
     /// A Path Item Object used to define a callback request and expected responses.

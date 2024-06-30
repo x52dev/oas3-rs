@@ -78,7 +78,7 @@ pub struct PathItem {
     /// and
     /// [location](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameterIn).
     /// The list can use the
-    /// [Reference Object](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#referenceObject)
+    /// [Reference Object](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#reference-object)
     /// to link to parameters that are defined at the
     /// [OpenAPI Object's components/parameters](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#componentsParameters).
     #[serde(default)]

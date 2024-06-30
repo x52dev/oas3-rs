@@ -12,14 +12,13 @@ use super::{FromRef, Ref, RefError, RefType, Schema, Spec};
 /// 1. All traits that are affected by the location MUST be applicable to a location of
 ///    `header` (for example, [`style`]).
 ///
-/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#headerObject>.
+/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#header-object>.
 ///
 /// [Parameter Object]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameterObject
 /// [`style`]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameterStyle
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
 pub struct Header {
     // FIXME: Is the third change properly implemented?
-    // FIXME: Merge `ObjectOrReference<Header>::Reference` and `ParameterOrRef::Reference`
     #[serde(skip_serializing_if = "Option::is_none")]
     pub required: Option<bool>,
 

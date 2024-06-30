@@ -7,7 +7,7 @@ use super::Flows;
 /// (implicit, password, application and access code) as defined in [RFC6749], and
 /// [OpenID Connect Discovery].
 ///
-/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#securitySchemeObject>.
+/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#security-scheme-object>.
 ///
 /// [RFC6749]: https://tools.ietf.org/html/rfc6749
 /// [OpenID Connect Discovery]: https://tools.ietf.org/html/draft-ietf-oauth-discovery-06

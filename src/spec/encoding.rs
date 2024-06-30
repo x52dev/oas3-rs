@@ -25,7 +25,7 @@ pub struct Encoding {
     pub headers: BTreeMap<String, ObjectOrReference<Header>>,
 
     /// Describes how a specific property value will be serialized depending on its type.
-    /// See [Parameter Object](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameterObject)
+    /// See [Parameter Object](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameter-object)
     /// for details on the
     /// [`style`](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameterStyle)
     /// property. The behavior follows the same values as `query` parameters, including

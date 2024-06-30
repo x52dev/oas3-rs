@@ -7,7 +7,7 @@ use super::spec_extensions;
 
 /// Allows referencing an external resource for extended documentation.
 ///
-/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#externalDocumentationObject>.
+/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#external-documentation-object>.
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct ExternalDoc {
     /// The URL for the target documentation.

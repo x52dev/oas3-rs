@@ -9,7 +9,7 @@ use super::{
 
 /// Describes a single API operation on a path.
 ///
-/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#operationObject>.
+/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#operation-object>.
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
 // #[serde(rename_all = "lowercase")]
 pub struct Operation {
@@ -46,9 +46,9 @@ pub struct Operation {
     /// and
     /// [location](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameterIn).
     /// The list can use the
-    /// [Reference Object](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#referenceObject)
+    /// [Reference Object](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#reference-object)
     /// to link to parameters that are defined at the
-    /// [OpenAPI Object's components/parameters](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#componentsParameters).
+    /// [OpenAPI Object's components/parameters](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#components-parameters).
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub parameters: Vec<ObjectOrReference<Parameter>>,
 
@@ -71,12 +71,12 @@ pub struct Operation {
     /// The `Responses Object` MUST contain at least one response code, and it SHOULD be the
     /// response for a successful operation call.
     ///
-    /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#responsesObject>.
+    /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#responses-object>.
     pub responses: Option<BTreeMap<String, ObjectOrReference<Response>>>,
 
     /// A map of possible out-of band callbacks related to the parent operation. The key is
     /// a unique identifier for the Callback Object. Each value in the map is a
-    /// [Callback Object](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#callbackObject)
+    /// [Callback Object](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#callback-object)
     /// that describes a request that may be initiated by the API provider and the
     /// expected responses. The key value used to identify the callback object is
     /// an expression, evaluated at runtime, that identifies a URL to use for the

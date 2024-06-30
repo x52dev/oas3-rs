@@ -18,15 +18,15 @@ use super::{spec_extensions, Server};
 /// is used for accessing values in an operation and using them as parameters while invoking
 /// the linked operation.
 ///
-/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#linkObject>.
+/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#link-object>.
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[serde(untagged)]
 pub enum Link {
     /// A relative or absolute reference to an OAS operation. This field is mutually exclusive
     /// of the `operationId` field, and MUST point to an
-    /// [Operation Object](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#operationObject).
+    /// [Operation Object](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#operation-object).
     /// Relative `operationRef` values MAY be used to locate an existing
-    /// [Operation Object](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#operationObject)
+    /// [Operation Object](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#operation-object)
     /// in the OpenAPI definition.
     Ref {
         #[serde(rename = "operationRef")]

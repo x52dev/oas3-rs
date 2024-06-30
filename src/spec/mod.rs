@@ -82,7 +82,7 @@ pub struct Spec {
     /// An array of Server Objects, which provide connectivity information to a target server.
     /// If the `servers` property is not provided, or is an empty array, the default value would
     /// be a
-    /// [Server Object](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#serverObject)
+    /// [Server Object](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#server-object)
     /// with a
     /// [url](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#serverUrl)
     /// value of `/`.
@@ -92,7 +92,7 @@ pub struct Spec {
 
     /// Holds the relative paths to the individual endpoints and their operations. The path is
     /// appended to the URL from the
-    /// [`Server Object`](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#serverObject)
+    /// [`Server Object`](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#server-object)
     /// in order to construct the full URL. The Paths MAY be empty, due to
     /// [ACL constraints](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#securityFiltering).
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -112,7 +112,7 @@ pub struct Spec {
     /// A list of tags used by the specification with additional metadata.
     ///The order of the tags can be used to reflect on their order by the parsing tools.
     /// Not all tags that are used by the
-    /// [Operation Object](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#operationObject)
+    /// [Operation Object](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#operation-object)
     /// must be declared. The tags that are not declared MAY be organized randomly or
     /// based on the tools' logic. Each tag name in the list MUST be unique.
     #[serde(default)]

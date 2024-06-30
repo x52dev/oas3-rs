@@ -10,7 +10,7 @@ use super::{
 /// Describes a single response from an API Operation, including design-time, static `links`
 /// to operations based on the response.
 ///
-/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#responseObject>.
+/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#response-object>.
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
 pub struct Response {
     /// A short description of the response.
@@ -35,7 +35,7 @@ pub struct Response {
 
     /// A map of operations links that can be followed from the response. The key of the map
     /// is a short name for the link, following the naming constraints of the names for
-    /// [Component Objects](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#componentsObject).
+    /// [Component Objects](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#components-object).
     #[serde(default)]
     #[serde(skip_serializing_if = "BTreeMap::is_empty")]
     pub links: BTreeMap<String, ObjectOrReference<Link>>,

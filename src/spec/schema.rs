@@ -85,7 +85,7 @@ impl TypeSet {
 /// [JSON Schema Validation](https://tools.ietf.org/html/draft-wright-json-schema-validation-00).
 /// Unless stated otherwise, the property definitions follow the JSON Schema.
 ///
-/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#schemaObject>.
+/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#schema-object>.
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
 pub struct Schema {
     //
