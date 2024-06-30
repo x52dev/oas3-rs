@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.7.0
+
 - Add `Spec::extensions` field.
 - Add `spec::{Components, Contact, Example, ExternalDoc, License, Link::{Id, Ref}, Parameter, PathItem, RequestBody, Response, Tag}::extensions` fields.
 - Add `spec::ParameterIn` enum.
