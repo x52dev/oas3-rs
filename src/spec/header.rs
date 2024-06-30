@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::Schema;
+use super::{FromRef, Ref, RefError, RefType, Schema, Spec};
 
 // TODO: update to 3.1 spec including JSON Schema conformance.
 
@@ -56,4 +56,21 @@ pub struct Header {
     // enum ??
     // multipleOf ??
     // allowEmptyValue ( for query / body params )
+}
+
+impl FromRef for Header {
+    fn from_ref(spec: &Spec, path: &str) -> Result<Self, RefError> {
+        let refpath = path.parse::<Ref>()?;
+
+        match refpath.kind {
+            RefType::Header => spec
+                .components
+                .as_ref()
+                .and_then(|cs| cs.headers.get(&refpath.name))
+                .ok_or_else(|| RefError::Unresolvable(path.to_owned()))
+                .and_then(|oor| oor.resolve(spec)),
+
+            typ => Err(RefError::MismatchedType(typ, RefType::Example)),
+        }
+    }
 }

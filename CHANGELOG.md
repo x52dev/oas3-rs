@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Implement `FromRef` for `spec::Header`.
+
 ## 0.7.0
 
 - Add `Spec::extensions` field.
