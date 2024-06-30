@@ -16,6 +16,7 @@
         "reqwest",
         "rustfmt",
         "semver",
+        "serde",
         "spdx",
         "strs",
         "structs",
