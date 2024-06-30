@@ -20,7 +20,8 @@ pub enum Error {
     RequiredSpecifiedOnNonObject,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+/// Single schema type.
+#[derive(Debug, Clone, Copy, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Type {
     Boolean,
@@ -29,9 +30,50 @@ pub enum Type {
     String,
     Array,
     Object,
+    Null,
 }
 
-// FIXME: Verify against OpenAPI 3.0
+/// Set of schema types.
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[serde(untagged)]
+pub enum TypeSet {
+    Single(Type),
+    Multiple(Vec<Type>),
+}
+
+impl TypeSet {
+    /// Returns `true` if this type-set contains the given type.
+    pub fn contains(&self, type_: Type) -> bool {
+        match self {
+            TypeSet::Single(single_type) => *single_type == type_,
+            TypeSet::Multiple(type_set) => type_set.contains(&type_),
+        }
+    }
+
+    /// Returns `true` if this type-set is `object` or `[object, 'null']`.
+    pub(crate) fn is_object_or_nullable_object(&self) -> bool {
+        match self {
+            TypeSet::Single(Type::Object) => true,
+            TypeSet::Multiple(set) if set == &[Type::Object] => true,
+            TypeSet::Multiple(set) if set == &[Type::Object, Type::Null] => true,
+            TypeSet::Multiple(set) if set == &[Type::Null, Type::Object] => true,
+            _ => false,
+        }
+    }
+
+    /// Returns `true` if this type-set is `array` or `[array, 'null']`.
+    pub(crate) fn is_array_or_nullable_array(&self) -> bool {
+        match self {
+            TypeSet::Single(Type::Array) => true,
+            TypeSet::Multiple(set) if set == &[Type::Array] => true,
+            TypeSet::Multiple(set) if set == &[Type::Array, Type::Null] => true,
+            TypeSet::Multiple(set) if set == &[Type::Null, Type::Array] => true,
+            _ => false,
+        }
+    }
+}
+
+// FIXME: Verify against OpenAPI 3.1
 /// The Schema Object allows the definition of input and output data types.
 /// These types can be objects, but also primitives and arrays.
 /// This object is an extended subset of the
@@ -58,10 +100,7 @@ pub struct Schema {
     //
     #[serde(rename = "type")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub schema_type: Option<Type>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub nullable: Option<bool>,
+    pub schema_type: Option<TypeSet>,
 
     //
     // structure
@@ -120,14 +159,14 @@ pub struct Schema {
 
     #[serde(rename = "exclusiveMaximum")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub exclusive_maximum: Option<bool>,
+    pub exclusive_maximum: Option<serde_json::Number>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maximum: Option<serde_json::Number>,
 
     #[serde(rename = "exclusiveMinimum")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub exclusive_minimum: Option<bool>,
+    pub exclusive_minimum: Option<serde_json::Number>,
 
     #[serde(rename = "minLength")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -184,6 +223,16 @@ pub struct Schema {
     pub any_of: Vec<ObjectOrReference<Schema>>,
 }
 
+impl Schema {
+    /// Returns true if [`Null`](Type::Null) appears in set of schema types, or None if unspecified.
+    pub fn is_nullable(&self) -> Option<bool> {
+        Some(match self.schema_type.as_ref()? {
+            TypeSet::Single(type_) => *type_ == Type::Null,
+            TypeSet::Multiple(set) => set.contains(&Type::Null),
+        })
+    }
+}
+
 impl FromRef for Schema {
     fn from_ref(spec: &Spec, path: &str) -> Result<Self, RefError> {
         let refpath = path.parse::<Ref>()?;
@@ -198,5 +247,35 @@ impl FromRef for Schema {
 
             typ => Err(RefError::MismatchedType(typ, RefType::Schema)),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn type_set_contains() {
+        let spec = "type: integer";
+        let schema = serde_yml::from_str::<Schema>(spec).unwrap();
+        let schema_type = schema.schema_type.unwrap();
+        assert!(schema_type.contains(Type::Integer));
+
+        let spec = "type: [integer, 'null']";
+        let schema = serde_yml::from_str::<Schema>(spec).unwrap();
+        let schema_type = schema.schema_type.unwrap();
+        assert!(schema_type.contains(Type::Integer));
+
+        let spec = "type: [object, 'null']";
+        let schema = serde_yml::from_str::<Schema>(spec).unwrap();
+        let schema_type = schema.schema_type.unwrap();
+        assert!(schema_type.contains(Type::Object));
+        assert!(schema_type.is_object_or_nullable_object());
+
+        let spec = "type: [array]";
+        let schema = serde_yml::from_str::<Schema>(spec).unwrap();
+        let schema_type = schema.schema_type.unwrap();
+        assert!(schema_type.contains(Type::Array));
+        assert!(schema_type.is_array_or_nullable_array());
     }
 }

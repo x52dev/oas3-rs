@@ -4,6 +4,7 @@
         "deque",
         "deserializable",
         "dotenv",
+        "indoc",
         "ints",
         "maplit",
         "noncomposite",

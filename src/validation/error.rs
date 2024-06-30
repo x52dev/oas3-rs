@@ -5,7 +5,7 @@ use http::{Method, StatusCode};
 use serde_json::Value as JsonValue;
 
 use super::Path;
-use crate::spec::{Error as SchemaError, SchemaType};
+use crate::spec::{Error as SchemaError, SchemaTypeSet};
 
 #[derive(Debug)]
 pub struct AggregateError {
@@ -54,8 +54,8 @@ pub enum Error {
     #[display(fmt = "Not JSON")]
     NotJson,
 
-    #[display(fmt = "{} is not a {:?}", _0, _1)]
-    TypeMismatch(Path, SchemaType),
+    #[display(fmt = "{} is not one of {:?}", _0, _1)]
+    TypeMismatch(Path, SchemaTypeSet),
 
     #[display(fmt = "Array item type mismatch: {}", _0)]
     ArrayItemTypeMismatch(JsonValue, #[error(source)] Box<Error>),

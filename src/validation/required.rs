@@ -1,7 +1,7 @@
 use serde_json::Value as JsonValue;
 
 use super::{Error, Path, Validate};
-use crate::spec::SchemaType;
+use crate::spec::{SchemaType, SchemaTypeSet};
 
 #[derive(Debug, Clone)]
 pub struct RequiredFields {
@@ -16,9 +16,9 @@ impl RequiredFields {
 
 impl Validate for RequiredFields {
     fn validate(&self, val: &JsonValue, path: Path) -> Result<(), Error> {
-        let obj = val
-            .as_object()
-            .ok_or_else(|| Error::TypeMismatch(path.clone(), SchemaType::Object))?;
+        let obj = val.as_object().ok_or_else(|| {
+            Error::TypeMismatch(path.clone(), SchemaTypeSet::Single(SchemaType::Object))
+        })?;
 
         for field in &self.fields {
             let path = path.extend(field);

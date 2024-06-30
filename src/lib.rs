@@ -1,9 +1,12 @@
 //! Structures and tools to parse, navigate and validate [OpenAPI v3.1] specifications.
 //!
+//! Note that due to v3.1 being a breaking change from v3.0, you may have trouble correctly parsing
+//! specs in the older format.
+//!
 //! # Example
 //!
 //! ```no_run
-//! match oas3::from_path("path/to/openapi.yaml") {
+//! match oas3::from_path("path/to/openapi.yml") {
 //!   Ok(spec) => println!("spec: {:?}", spec),
 //!   Err(err) => println!("error: {}", err)
 //! }

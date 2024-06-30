@@ -1,39 +1,39 @@
 use serde_json::Value as JsonValue;
 
 use super::{Error, Path, Validate};
-use crate::spec::SchemaType;
+use crate::spec::{SchemaType, SchemaTypeSet};
 
 #[derive(Debug, Clone)]
 pub struct DataType {
-    r#type: SchemaType,
+    type_set: SchemaTypeSet,
     nullable: bool,
 }
 
 impl DataType {
-    pub fn new(type_: SchemaType) -> Self {
+    pub fn new(type_set: SchemaTypeSet) -> Self {
         Self {
-            r#type: type_,
+            type_set,
             nullable: false,
         }
     }
 
     pub fn boolean() -> Self {
-        Self::new(SchemaType::Boolean)
+        Self::new(SchemaTypeSet::Single(SchemaType::Boolean))
     }
     pub fn integer() -> Self {
-        Self::new(SchemaType::Integer)
+        Self::new(SchemaTypeSet::Single(SchemaType::Integer))
     }
     pub fn number() -> Self {
-        Self::new(SchemaType::Number)
+        Self::new(SchemaTypeSet::Single(SchemaType::Number))
     }
     pub fn string() -> Self {
-        Self::new(SchemaType::String)
+        Self::new(SchemaTypeSet::Single(SchemaType::String))
     }
     pub fn array() -> Self {
-        Self::new(SchemaType::Array)
+        Self::new(SchemaTypeSet::Single(SchemaType::Array))
     }
     pub fn object() -> Self {
-        Self::new(SchemaType::Object)
+        Self::new(SchemaTypeSet::Single(SchemaType::Object))
     }
 
     pub fn set_nullable(self, nullable: bool) -> Self {
@@ -73,13 +73,13 @@ impl Validate for DataType {
         };
 
         // check type equality
-        if self.r#type != data_type {
+        if !self.type_set.contains(data_type) {
             // integers also count as numbers
-            if val.is_i64() && self.r#type == SchemaType::Number {
+            if val.is_i64() && self.type_set.contains(SchemaType::Number) {
                 return Ok(());
             }
 
-            return Err(Error::TypeMismatch(path, self.r#type));
+            return Err(Error::TypeMismatch(path, self.type_set.clone()));
         }
 
         Ok(())
@@ -92,21 +92,21 @@ mod tests {
 
     #[test]
     fn bool_validation() {
-        let v = DataType::boolean();
+        let val = DataType::boolean();
 
         valid_vs_invalid!(
-            v,
-            &[&TRUE],
+            val,
+            &[&TRUE, &FALSE],
             &[&NULL, &INTEGER, &STRING, &ARRAY_INTS, &OBJ_EMPTY],
         );
     }
 
     #[test]
     fn integer_validation() {
-        let v = DataType::integer();
+        let val = DataType::integer();
 
         valid_vs_invalid!(
-            v,
+            val,
             &[&INTEGER],
             &[&FLOAT, &NULL, &TRUE, &STRING, &ARRAY_INTS, &OBJ_EMPTY],
         );
@@ -114,10 +114,10 @@ mod tests {
 
     #[test]
     fn number_validation() {
-        let v = DataType::number();
+        let val = DataType::number();
 
         valid_vs_invalid!(
-            v,
+            val,
             &[&INTEGER, &FLOAT],
             &[&NULL, &TRUE, &STRING, &ARRAY_INTS, &OBJ_EMPTY],
         );
@@ -125,10 +125,10 @@ mod tests {
 
     #[test]
     fn string_validation() {
-        let v = DataType::string();
+        let val = DataType::string();
 
         valid_vs_invalid!(
-            v,
+            val,
             &[&STRING],
             &[&NULL, &TRUE, &INTEGER, &FLOAT, &ARRAY_INTS, &OBJ_EMPTY],
         );
@@ -136,18 +136,18 @@ mod tests {
 
     #[test]
     fn nullable_validation() {
-        let v = DataType::boolean().nullable();
+        let val = DataType::boolean().nullable();
 
         valid_vs_invalid!(
-            v,
+            val,
             &[&TRUE, &NULL],
             &[&FLOAT, &STRING, &ARRAY_INTS, &OBJ_EMPTY],
         );
 
-        let v = DataType::string().nullable();
+        let val = DataType::string().nullable();
 
         valid_vs_invalid!(
-            v,
+            val,
             &[&STRING, &NULL],
             &[&FLOAT, &TRUE, &ARRAY_INTS, &OBJ_EMPTY],
         );
@@ -155,10 +155,10 @@ mod tests {
 
     #[test]
     fn array_validation() {
-        let v = DataType::array();
+        let val = DataType::array();
 
         valid_vs_invalid!(
-            v,
+            val,
             &[&ARRAY_INTS, &ARRAY_STRS],
             &[&TRUE, &NULL, &FLOAT, &STRING, &OBJ_EMPTY],
         );
@@ -166,10 +166,10 @@ mod tests {
 
     #[test]
     fn object_validation() {
-        let v = DataType::object();
+        let val = DataType::object();
 
         valid_vs_invalid!(
-            v,
+            val,
             &[&OBJ_NUMS, &OBJ_EMPTY, &OBJ_MIXED, &OBJ_MIXED2],
             &[&NULL, &INTEGER, &FLOAT, &STRING, &ARRAY_INTS],
         );

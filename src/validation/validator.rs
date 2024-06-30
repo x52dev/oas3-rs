@@ -2,7 +2,7 @@ use std::{collections::BTreeMap, fmt};
 
 use super::{AggregateError, DataType, Error, Path, RequiredFields, Validate};
 use crate::{
-    spec::{Error as SchemaError, SchemaType},
+    spec::{Error as SchemaError, SchemaType, SchemaTypeSet},
     Schema, Spec,
 };
 
@@ -36,20 +36,20 @@ impl ValidationTree {
             branch: ValidationBranch::Leaf,
         };
 
-        if let Some(type_) = schema.schema_type {
+        if let Some(type_) = &schema.schema_type {
             trace!("restricting data type: {:?}", type_);
 
-            let type_val = if let Some(nullable) = schema.nullable {
-                DataType::new(type_).set_nullable(nullable)
+            let type_val = if let Some(nullable) = schema.is_nullable() {
+                DataType::new(type_.clone()).set_nullable(nullable)
             } else {
-                DataType::new(type_)
+                DataType::new(type_.clone())
             };
 
             valtree.validators.push(Box::new(type_val));
         }
 
-        match schema.schema_type {
-            Some(SchemaType::Object) => {
+        match &schema.schema_type {
+            Some(type_set) if type_set.is_object_or_nullable_object() => {
                 trace!(
                     "adding object validators: props {}",
                     schema
@@ -80,7 +80,7 @@ impl ValidationTree {
                 }
             }
 
-            Some(SchemaType::Array) => {
+            Some(type_set) if type_set.is_array_or_nullable_array() => {
                 trace!("adding array validators");
 
                 if let Some(schema_ref) = schema.items.as_ref() {
@@ -237,7 +237,12 @@ impl ValidationTree {
                             v.validate_inner(item, child_path)?;
                         }
                     }
-                    _ => return Err(Error::TypeMismatch(path, SchemaType::Array)),
+                    _ => {
+                        return Err(Error::TypeMismatch(
+                            path,
+                            SchemaTypeSet::Single(SchemaType::Array),
+                        ))
+                    }
                 }
 
                 Ok(())
@@ -261,7 +266,12 @@ impl ValidationTree {
                             }
                         }
                     }
-                    _ => return Err(Error::TypeMismatch(path, SchemaType::Object)),
+                    _ => {
+                        return Err(Error::TypeMismatch(
+                            path,
+                            SchemaTypeSet::Single(SchemaType::Object),
+                        ))
+                    }
                 }
 
                 Ok(())
