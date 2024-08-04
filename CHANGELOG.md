@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Minimum supported Rust version (MSRV) is now 1.70.
+
 ## 0.8.1
 
 - Fix `spec::Parameter` deserialization when no `examples` are present.
