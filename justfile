@@ -8,11 +8,19 @@ msrv := ```
 ```
 msrv_rustup := "+" + msrv
 
+# Check project.
+check: && clippy
+    just --unstable --fmt --check
+    fd --hidden -e=toml --exec-batch taplo format --check
+    fd --hidden -e=toml --exec-batch taplo lint
+    fd --hidden --type=file -e=md -e=yml --exec-batch prettier --check
+    cargo +nightly fmt -- --check
+
 # Format project.
 fmt:
     just --unstable --fmt
-    fd --hidden --extension=toml --exec-batch taplo format
-    fd --hidden --type=file --extension=md --extension=yml --exec-batch prettier --write
+    fd --hidden -e=toml --exec-batch taplo format
+    fd --hidden --type=file -e=md -e=yml --exec-batch prettier --write
     cargo +nightly fmt
 
 # Lint workspace with Clippy.

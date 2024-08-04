@@ -93,7 +93,7 @@ impl TestRunner {
         // TODO: add other param types to request
 
         let res = client
-            .request(method, &url.to_string())
+            .request(method, url.to_string())
             .headers(req.headers.clone())
             .body(req.body.to_vec())
             .send()
