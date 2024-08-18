@@ -3,11 +3,10 @@ use std::collections::BTreeMap;
 use log::error;
 use serde::{Deserialize, Serialize};
 
-use crate::spec::spec_extensions;
-
 use super::{
     Callback, Error, ExternalDoc, ObjectOrReference, Parameter, RequestBody, Response, Server, Spec,
 };
+use crate::spec::spec_extensions;
 
 /// Describes a single API operation on a path.
 ///

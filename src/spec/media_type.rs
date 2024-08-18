@@ -3,7 +3,7 @@ use std::collections::BTreeMap;
 use serde::{Deserialize, Serialize};
 
 use super::{Encoding, Error, Example, MediaTypeExamples, ObjectOrReference, Spec};
-use crate::Schema;
+use crate::ObjectSchema;
 
 /// Each Media Type Object provides schema and examples for the media type identified by its key.
 ///
@@ -12,7 +12,7 @@ use crate::Schema;
 pub struct MediaType {
     /// The schema defining the type used for the request body.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub schema: Option<ObjectOrReference<Schema>>,
+    pub schema: Option<ObjectOrReference<ObjectSchema>>,
 
     /// Example of the media type.
     // TODO: figure out how to make this not an Option
@@ -30,7 +30,7 @@ pub struct MediaType {
 }
 
 impl MediaType {
-    pub fn schema(&self, spec: &Spec) -> Result<Schema, Error> {
+    pub fn schema(&self, spec: &Spec) -> Result<ObjectSchema, Error> {
         self.schema
             .as_ref()
             .unwrap()

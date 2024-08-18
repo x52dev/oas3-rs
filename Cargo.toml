@@ -35,6 +35,7 @@ prettytable-rs = { version = "0.10", optional = true }
 reqwest = { version = "0.12", optional = true, features = ["json"] }
 
 [dev-dependencies]
+assert_matches = "1"
 color-eyre = "0.6"
 dotenvy = "0.15"
 eyre = "0.6"
@@ -42,7 +43,7 @@ indoc = "2"
 maplit = "1"
 pretty_assertions = "1"
 pretty_env_logger = "0.5"
-tokio = { version = "1", features = ["full"] }
+tokio = { version = "1.24.2", features = ["full"] }
 
 [[example]]
 name = "conformance"

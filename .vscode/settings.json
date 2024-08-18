@@ -21,6 +21,7 @@
         "serde",
         "spdx",
         "strs",
+        "struct",
         "structs",
         "valtree",
         "valtrees"

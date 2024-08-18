@@ -6,7 +6,7 @@ use serde_json::Value as JsonValue;
 use super::{AggregateError, DataType, Error, Path, RequiredFields, Validate};
 use crate::{
     spec::{Error as SchemaError, SchemaType, SchemaTypeSet},
-    Schema, Spec,
+    ObjectSchema, Spec,
 };
 
 #[derive(Debug)]
@@ -25,7 +25,7 @@ pub struct ValidationTree {
 }
 
 impl ValidationTree {
-    pub fn from_schema(schema: &Schema, spec: &Spec) -> Result<ValidationTree, SchemaError> {
+    pub fn from_schema(schema: &ObjectSchema, spec: &Spec) -> Result<ValidationTree, SchemaError> {
         trace!(
             "creating validation tree from schema: {}",
             &schema.title.as_deref().unwrap_or("_unnamed_")
@@ -309,7 +309,7 @@ mod tests {
     use super::{super::tests::*, *};
     use crate::validation::RequiredFields;
 
-    fn get_schema(spec: &Spec, name: &str) -> Schema {
+    fn get_schema(spec: &Spec, name: &str) -> ObjectSchema {
         spec.components
             .as_ref()
             .unwrap()

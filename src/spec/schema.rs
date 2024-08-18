@@ -75,19 +75,21 @@ impl TypeSet {
     }
 }
 
-// FIXME: Verify against OpenAPI 3.1
-/// The Schema Object allows the definition of input and output data types.
-/// These types can be objects, but also primitives and arrays.
-/// This object is an extended subset of the
-/// [JSON Schema Specification Wright Draft 00](http://json-schema.org/).
-/// For more information about the properties, see
-/// [JSON Schema Core](https://tools.ietf.org/html/draft-wright-json-schema-00) and
-/// [JSON Schema Validation](https://tools.ietf.org/html/draft-wright-json-schema-validation-00).
-/// Unless stated otherwise, the property definitions follow the JSON Schema.
+/// A schema object allows the definition of input and output data types.
 ///
-/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#schema-object>.
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
-pub struct Schema {
+/// These types can be objects, but also primitives and arrays. This object is an extended subset of
+/// the [JSON Schema Specification Wright Draft 00]. For more information about the properties, see
+/// [JSON Schema Core] and [JSON Schema Validation]. Unless stated otherwise, the property
+/// definitions follow the JSON Schema.
+///
+/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#schema-object> and
+/// <https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-01#name-json-schema-documents>.
+///
+/// [JSON Schema Specification Wright Draft 00]: https://json-schema.org
+/// [JSON Schema Core]: https://tools.ietf.org/html/draft-wright-json-schema-00
+/// [JSON Schema Validation]: https://tools.ietf.org/html/draft-wright-json-schema-validation-00
+#[derive(Clone, Debug, PartialEq, Default, Deserialize, Serialize)]
+pub struct ObjectSchema {
     //
     // display metadata
     //
@@ -112,24 +114,26 @@ pub struct Schema {
     pub required: Vec<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub items: Option<Box<ObjectOrReference<Schema>>>,
+    pub items: Option<Box<ObjectOrReference<ObjectSchema>>>,
 
     #[serde(default)]
     #[serde(skip_serializing_if = "BTreeMap::is_empty")]
-    pub properties: BTreeMap<String, ObjectOrReference<Schema>>,
+    pub properties: BTreeMap<String, ObjectOrReference<ObjectSchema>>,
 
     /// Schema for additional object properties.
     ///
-    /// Inline or referenced MUST be of a [Schema Object] and not a standard JSON Schema.
+    /// Inline or referenced item MUST be of a [Schema Object] or a boolean.
     ///
-    /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#properties>.
+    /// See <https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-01#name-additionalproperties>,
+    /// <https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-01#name-json-schema-documents>,
+    /// and <https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-01#name-boolean-json-schemas>.
     ///
     /// [Schema Object]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#schema-object
     #[serde(
         rename = "additionalProperties",
         skip_serializing_if = "Option::is_none"
     )]
-    pub additional_properties: Option<Box<ObjectOrReference<Schema>>>,
+    pub additional_properties: Option<Schema>,
 
     //
     // additional metadata
@@ -198,16 +202,16 @@ pub struct Schema {
     // composition
     //
     #[serde(rename = "allOf", default, skip_serializing_if = "Vec::is_empty")]
-    pub all_of: Vec<ObjectOrReference<Schema>>,
+    pub all_of: Vec<ObjectOrReference<ObjectSchema>>,
 
     #[serde(rename = "oneOf", default, skip_serializing_if = "Vec::is_empty")]
-    pub one_of: Vec<ObjectOrReference<Schema>>,
+    pub one_of: Vec<ObjectOrReference<ObjectSchema>>,
 
     #[serde(rename = "anyOf", default, skip_serializing_if = "Vec::is_empty")]
-    pub any_of: Vec<ObjectOrReference<Schema>>,
+    pub any_of: Vec<ObjectOrReference<ObjectSchema>>,
 }
 
-impl Schema {
+impl ObjectSchema {
     /// Returns true if [`Null`](Type::Null) appears in set of schema types, or None if unspecified.
     pub fn is_nullable(&self) -> Option<bool> {
         Some(match self.schema_type.as_ref()? {
@@ -217,7 +221,7 @@ impl Schema {
     }
 }
 
-impl FromRef for Schema {
+impl FromRef for ObjectSchema {
     fn from_ref(spec: &Spec, path: &str) -> Result<Self, RefError> {
         let refpath = path.parse::<Ref>()?;
 
@@ -234,6 +238,26 @@ impl FromRef for Schema {
     }
 }
 
+/// A boolean JSON schema.
+///
+/// See <https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-01#name-boolean-json-schemas>.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(transparent)]
+pub struct BooleanSchema(pub bool);
+
+/// A JSON schema document.
+///
+/// See <https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-01#name-json-schema-documents>.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(untagged)]
+pub enum Schema {
+    /// A boolean JSON schema.
+    Boolean(BooleanSchema),
+
+    /// An object JSON schema.
+    Object(Box<ObjectOrReference<ObjectSchema>>),
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -241,23 +265,23 @@ mod tests {
     #[test]
     fn type_set_contains() {
         let spec = "type: integer";
-        let schema = serde_yml::from_str::<Schema>(spec).unwrap();
+        let schema = serde_yml::from_str::<ObjectSchema>(spec).unwrap();
         let schema_type = schema.schema_type.unwrap();
         assert!(schema_type.contains(Type::Integer));
 
         let spec = "type: [integer, 'null']";
-        let schema = serde_yml::from_str::<Schema>(spec).unwrap();
+        let schema = serde_yml::from_str::<ObjectSchema>(spec).unwrap();
         let schema_type = schema.schema_type.unwrap();
         assert!(schema_type.contains(Type::Integer));
 
         let spec = "type: [object, 'null']";
-        let schema = serde_yml::from_str::<Schema>(spec).unwrap();
+        let schema = serde_yml::from_str::<ObjectSchema>(spec).unwrap();
         let schema_type = schema.schema_type.unwrap();
         assert!(schema_type.contains(Type::Object));
         assert!(schema_type.is_object_or_nullable_object());
 
         let spec = "type: [array]";
-        let schema = serde_yml::from_str::<Schema>(spec).unwrap();
+        let schema = serde_yml::from_str::<ObjectSchema>(spec).unwrap();
         let schema_type = schema.schema_type.unwrap();
         assert!(schema_type.contains(Type::Array));
         assert!(schema_type.is_array_or_nullable_array());
