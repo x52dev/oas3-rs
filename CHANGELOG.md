@@ -10,7 +10,7 @@
 - The `spec::ObjectSchema::addition_properties` field is now of type `Option<Schema>`.
 - The `spec::Parameter::schema` field is now of type `ObjectOrReference<ObjectSchema>`.
 - Add `Operation::extensions` field.
-- Minimum supported Rust version (MSRV) is now 1.70.
+- Minimum supported Rust version (MSRV) is now 1.75.
 
 ## 0.8.1
 
