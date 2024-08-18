@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.9.0
+
 - Rename `spec::{Schema => ObjectSchema}` struct.
 - Add `spec::BooleanSchema` struct.
 - Add `spec::Schema` enum.
