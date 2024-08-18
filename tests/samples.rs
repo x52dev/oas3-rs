@@ -13,6 +13,26 @@ fn validate_passing_samples() {
 }
 
 #[test]
+fn issue_79() {
+    let spec = oas3::from_str(include_str!("samples/pass/issue-79.yaml")).unwrap();
+
+    let op = spec
+        .operations()
+        .find(|(_, _, op)| {
+            op.operation_id
+                .as_deref()
+                .map_or(false, |id| id == "listClientIdsWithSize")
+        })
+        .unwrap()
+        .2;
+
+    let param = op.parameter("sortBy", &spec).unwrap().unwrap();
+    let schema = param.schema.unwrap().resolve(&spec).unwrap();
+
+    assert_eq!(schema.title.as_deref(), Some("foo"));
+}
+
+#[test]
 fn validate_failing_samples() {
     // TODO: implement validation for one-of: [paths, components, webhooks]
     // see https://spec.openapis.org/oas/v3.1.0#openapi-document

@@ -155,7 +155,7 @@ pub struct Parameter {
     ///
     /// A parameter MUST contain either a schema property, or a content property, but not both.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub schema: Option<Schema>,
+    pub schema: Option<ObjectOrReference<Schema>>,
 
     /// Example of the parameter's potential value.
     ///

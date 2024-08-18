@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- The `spec::Parameter::schema` field is now of type `ObjectOrReference<Schema>`.
 - Minimum supported Rust version (MSRV) is now 1.70.
 
 ## 0.8.1
