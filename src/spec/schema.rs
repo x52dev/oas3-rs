@@ -2,7 +2,7 @@
 
 use std::collections::BTreeMap;
 
-use derive_more::{Display, Error};
+use derive_more::derive::{Display, Error};
 use serde::{Deserialize, Serialize};
 
 use crate::spec::{FromRef, ObjectOrReference, Ref, RefError, RefType, Spec};
@@ -10,13 +10,13 @@ use crate::spec::{FromRef, ObjectOrReference, Ref, RefError, RefType, Spec};
 /// Schema Errors
 #[derive(Debug, Clone, PartialEq, Display, Error)]
 pub enum Error {
-    #[display(fmt = "Missing type property")]
+    #[display("Missing type property")]
     NoType,
 
-    #[display(fmt = "Unknown type: {}", _0)]
+    #[display("Unknown type: {}", _0)]
     UnknownType(#[error(not(source))] String),
 
-    #[display(fmt = "Required fields specified on a non-object schema")]
+    #[display("Required fields specified on a non-object schema")]
     RequiredSpecifiedOnNonObject,
 }
 

@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use derive_more::{Display, Error};
+use derive_more::derive::{Display, Error};
 use log::trace;
 use once_cell::sync::Lazy;
 use regex::Regex;
@@ -36,14 +36,14 @@ where
 
 #[derive(Clone, Debug, PartialEq, Display, Error)]
 pub enum RefError {
-    #[display(fmt = "Invalid type: {}", _0)]
+    #[display("Invalid type: {}", _0)]
     InvalidType(#[error(not(source))] String),
 
-    #[display(fmt = "Mismatched type: cannot reference a {} as a {}", _0, _1)]
+    #[display("Mismatched type: cannot reference a {} as a {}", _0, _1)]
     MismatchedType(RefType, RefType),
 
     // TODO: use some kind of path structure
-    #[display(fmt = "Unresolvable path: {}", _0)]
+    #[display("Unresolvable path: {}", _0)]
     Unresolvable(#[error(not(source))] String),
 }
 

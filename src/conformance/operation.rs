@@ -1,4 +1,4 @@
-use derive_more::Display;
+use derive_more::derive::Display;
 use http::Method;
 use log::debug;
 
@@ -6,10 +6,10 @@ use crate::{spec::Operation, validation::Error as ValidationError, Spec};
 
 #[derive(Debug, Clone, Display)]
 pub enum OperationSpec {
-    #[display(fmt = "{} {}", method, path)]
+    #[display("{} {}", method, path)]
     Parts { method: Method, path: String },
 
-    #[display(fmt = "OpID: {}", _0)]
+    #[display("OpID: {}", _0)]
     OperationId(String),
 }
 

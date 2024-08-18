@@ -1,4 +1,4 @@
-use derive_more::{Display, Error, From};
+use derive_more::derive::{Display, Error, From};
 use semver::{Error as SemVerError, Version};
 
 use crate::spec::{r#ref::RefError, schema::Error as SchemaError};
@@ -6,15 +6,15 @@ use crate::spec::{r#ref::RefError, schema::Error as SchemaError};
 /// Spec Errors
 #[derive(Debug, Display, Error, From)]
 pub enum Error {
-    #[display(fmt = "Reference error")]
+    #[display("Reference error")]
     Ref(RefError),
 
-    #[display(fmt = "Schema error")]
+    #[display("Schema error")]
     Schema(SchemaError),
 
-    #[display(fmt = "Semver error")]
+    #[display("Semver error")]
     SemVerError(SemVerError),
 
-    #[display(fmt = "Unsupported spec file version ({})", _0)]
+    #[display("Unsupported spec file version ({})", _0)]
     UnsupportedSpecFileVersion(#[error(not(source))] Version),
 }
