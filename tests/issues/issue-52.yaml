@@ -1,0 +1,35 @@
+openapi: 3.1.0
+info:
+  title: API
+  version: 1.0.0
+paths:
+  "/any":
+    get:
+      operationId: any
+      summary: any response
+      responses:
+        200:
+          description: any
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Any"
+  "/none":
+    get:
+      operationId: none
+      summary: none response
+      responses:
+        200:
+          description: none
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/None"
+components:
+  schemas:
+    Any:
+      type: object
+      additionalProperties: true
+    None:
+      type: object
+      additionalProperties: false

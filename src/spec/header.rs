@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use super::{FromRef, Ref, RefError, RefType, Schema, Spec};
+use super::{FromRef, ObjectSchema, Ref, RefError, RefType, Spec};
 
 // TODO: update to 3.1 spec including JSON Schema conformance.
 
@@ -23,7 +23,7 @@ pub struct Header {
     pub required: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub schema: Option<Schema>,
+    pub schema: Option<ObjectSchema>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "uniqueItems")]

@@ -3,8 +3,8 @@ use std::collections::BTreeMap;
 use serde::{Deserialize, Serialize};
 
 use super::{
-    schema::Schema, spec_extensions, Callback, Example, Header, Link, ObjectOrReference, Parameter,
-    PathItem, RequestBody, Response, SecurityScheme,
+    schema::ObjectSchema, spec_extensions, Callback, Example, Header, Link, ObjectOrReference,
+    Parameter, PathItem, RequestBody, Response, SecurityScheme,
 };
 
 /// Holds a set of reusable objects for different aspects of the OAS.
@@ -15,9 +15,9 @@ use super::{
 /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#components-object>.
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Components {
-    /// An object to hold reusable [Schema Objects](Schema).
+    /// An object to hold reusable [Schema Objects](ObjectSchema).
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
-    pub schemas: BTreeMap<String, ObjectOrReference<Schema>>,
+    pub schemas: BTreeMap<String, ObjectOrReference<ObjectSchema>>,
 
     /// An object to hold reusable [Response Objects](Response).
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]

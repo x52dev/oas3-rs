@@ -3,8 +3,8 @@ use std::collections::BTreeMap;
 use serde::{Deserialize, Serialize};
 
 use super::{
-    spec_extensions, Example, FromRef, MediaType, ObjectOrReference, Ref, RefError, RefType,
-    Schema, Spec,
+    spec_extensions, Example, FromRef, MediaType, ObjectOrReference, ObjectSchema, Ref, RefError,
+    RefType, Spec,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Deserialize, Serialize)]
@@ -155,7 +155,7 @@ pub struct Parameter {
     ///
     /// A parameter MUST contain either a schema property, or a content property, but not both.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub schema: Option<Schema>,
+    pub schema: Option<ObjectOrReference<ObjectSchema>>,
 
     /// Example of the parameter's potential value.
     ///

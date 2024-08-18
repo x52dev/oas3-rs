@@ -23,7 +23,7 @@ mod error;
 pub mod spec;
 
 pub use error::Error;
-pub use spec::{Schema, Spec};
+pub use spec::{ObjectSchema, Spec};
 
 #[cfg(feature = "validation")]
 pub mod validation;

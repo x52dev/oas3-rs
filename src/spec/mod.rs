@@ -55,7 +55,10 @@ pub use self::{
     r#ref::*,
     request_body::*,
     response::*,
-    schema::{Error as SchemaError, Schema, Type as SchemaType, TypeSet as SchemaTypeSet},
+    schema::{
+        BooleanSchema, Error as SchemaError, ObjectSchema, Schema, Type as SchemaType,
+        TypeSet as SchemaTypeSet,
+    },
     security_scheme::*,
     server::*,
     tag::*,
@@ -155,6 +158,17 @@ impl Spec {
         } else {
             Err(Error::UnsupportedSpecFileVersion(sem_ver))
         }
+    }
+
+    /// Returns operation matching `operation_id`, if found.
+    pub fn operation_by_id(&self, operation_id: &str) -> Option<&Operation> {
+        self.operations()
+            .find(|(_, _, op)| {
+                op.operation_id
+                    .as_deref()
+                    .map_or(false, |id| id == operation_id)
+            })
+            .map(|(_, _, op)| op)
     }
 
     pub fn operation(&self, method: &http::Method, path: &str) -> Option<&Operation> {

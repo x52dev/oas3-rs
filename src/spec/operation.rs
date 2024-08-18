@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 use super::{
     Callback, Error, ExternalDoc, ObjectOrReference, Parameter, RequestBody, Response, Server, Spec,
 };
+use crate::spec::spec_extensions;
 
 /// Describes a single API operation on a path.
 ///
@@ -104,6 +105,14 @@ pub struct Operation {
     #[serde(default)]
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub servers: Vec<Server>,
+
+    /// Specification extensions.
+    ///
+    /// Only "x-" prefixed keys are collected, and the prefix is stripped.
+    ///
+    /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specification-extensions>.
+    #[serde(flatten, with = "spec_extensions")]
+    pub extensions: BTreeMap<String, serde_json::Value>,
 }
 
 impl Operation {
