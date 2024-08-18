@@ -1,6 +1,6 @@
 use std::fmt;
 
-use derive_more::{Display, Error};
+use derive_more::derive::{Display, Error};
 use http::{Method, StatusCode};
 use serde_json::Value as JsonValue;
 
@@ -45,45 +45,45 @@ pub enum Error {
     //
     // Wrapped Errors
     //
-    #[display(fmt = "Schema error")]
+    #[display("Schema error")]
     Schema(SchemaError),
 
     //
     // Leaf Errors
     //
-    #[display(fmt = "Not JSON")]
+    #[display("Not JSON")]
     NotJson,
 
-    #[display(fmt = "{} is not one of {:?}", _0, _1)]
+    #[display("{} is not one of {:?}", _0, _1)]
     TypeMismatch(Path, SchemaTypeSet),
 
-    #[display(fmt = "Array item type mismatch: {}", _0)]
+    #[display("Array item type mismatch: {}", _0)]
     ArrayItemTypeMismatch(JsonValue, #[error(source)] Box<Error>),
 
-    #[display(fmt = "Undocumented field: {}", _0)]
+    #[display("Undocumented field: {}", _0)]
     UndocumentedField(#[error(not(source))] String),
 
-    #[display(fmt = "Status mismatch: expected {}; got {}", _0, _1)]
+    #[display("Status mismatch: expected {}; got {}", _0, _1)]
     StatusMismatch(StatusCode, StatusCode),
 
-    #[display(fmt = "Required field missing: {}", _0)]
+    #[display("Required field missing: {}", _0)]
     RequiredFieldMissing(#[error(not(source))] Path),
 
-    #[display(fmt = "Type did not match any `anyOf` variant: {}\n{}", _0, _1)]
+    #[display("Type did not match any `anyOf` variant: {}\n{}", _0, _1)]
     OneOfNoMatch(Path, AggregateError),
 
-    #[display(fmt = "Non-nullable field was null: {}", _0)]
+    #[display("Non-nullable field was null: {}", _0)]
     InvalidNull(#[error(not(source))] Path),
 
-    #[display(fmt = "Operation not found: {} {}", _0, _1)]
+    #[display("Operation not found: {} {}", _0, _1)]
     OperationNotFound(Method, String),
 
-    #[display(fmt = "Operation ID not found: {}", _0)]
+    #[display("Operation ID not found: {}", _0)]
     OperationIdNotFound(#[error(not(source))] String),
 
-    #[display(fmt = "Parameter not found: {}", _0)]
+    #[display("Parameter not found: {}", _0)]
     ParameterNotFound(#[error(not(source))] String),
 
-    #[display(fmt = "Invalid parameter location: {}", _0)]
+    #[display("Invalid parameter location: {}", _0)]
     InvalidParameterLocation(#[error(not(source))] String),
 }

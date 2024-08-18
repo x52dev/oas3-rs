@@ -4,7 +4,7 @@
 
 use std::{collections::BTreeMap, iter::Iterator};
 
-use derive_more::Error;
+use derive_more::derive::Error;
 use http::Method;
 use log::debug;
 use serde::{Deserialize, Serialize};
