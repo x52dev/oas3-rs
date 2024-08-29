@@ -1,7 +1,8 @@
 use serde::{Deserialize, Serialize};
+use std::collections::BTreeMap;
 use url::Url;
 
-use super::{Contact, License};
+use super::{spec_extensions, Contact, License};
 
 /// General information about the API.
 ///
@@ -37,4 +38,12 @@ pub struct Info {
     /// The license information for the exposed API.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub license: Option<License>,
+
+    /// Specification extensions.
+    ///
+    /// Only "x-" prefixed keys are collected, and the prefix is stripped.
+    ///
+    /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specification-extensions>.
+    #[serde(flatten, with = "spec_extensions")]
+    pub extensions: BTreeMap<String, serde_json::Value>,
 }
