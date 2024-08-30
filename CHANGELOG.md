@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.10.0
+
 - Add `spec::Info::extensions` field.
 - Remove top-level `ObjectSchema` re-export.
 
