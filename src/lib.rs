@@ -14,16 +14,13 @@
 //!
 //! [OpenAPI v3.1]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md
 
-#![deny(rust_2018_idioms, nonstandard_style)]
-#![warn(missing_debug_implementations)]
-
 use std::{fs::File, io::Read, path::Path};
 
 mod error;
 pub mod spec;
 
 pub use error::Error;
-pub use spec::{ObjectSchema, Spec};
+pub use spec::Spec;
 
 #[cfg(feature = "validation")]
 pub mod validation;

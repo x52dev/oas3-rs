@@ -2,8 +2,7 @@ use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
-use super::{Encoding, Error, Example, MediaTypeExamples, ObjectOrReference, Spec};
-use crate::ObjectSchema;
+use super::{Encoding, Error, Example, MediaTypeExamples, ObjectOrReference, ObjectSchema, Spec};
 
 /// Each Media Type Object provides schema and examples for the media type identified by its key.
 ///

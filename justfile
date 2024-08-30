@@ -53,3 +53,7 @@ test toolchain="":
     cargo {{ toolchain }} nextest run --workspace --all-features
     cargo {{ toolchain }} test --doc --workspace --all-features
     RUSTDOCFLAGS="-D warnings" cargo {{ toolchain }} doc --workspace --no-deps --all-features
+
+# Document crates in workspace.
+doc *args:
+    RUSTDOCFLAGS="--cfg=docsrs -Dwarnings" cargo +nightly doc --workspace --all-features {{ args }}

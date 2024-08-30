@@ -5,8 +5,8 @@ use serde_json::Value as JsonValue;
 
 use super::{AggregateError, DataType, Error, Path, RequiredFields, Validate};
 use crate::{
-    spec::{Error as SchemaError, SchemaType, SchemaTypeSet},
-    ObjectSchema, Spec,
+    spec::{Error as SchemaError, ObjectSchema, SchemaType, SchemaTypeSet},
+    Spec,
 };
 
 #[derive(Debug)]
