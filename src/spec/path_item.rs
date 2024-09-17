@@ -7,11 +7,11 @@ use super::{spec_extensions, ObjectOrReference, Operation, Parameter, Server};
 
 /// Describes the operations available on a single path.
 ///
-/// A Path Item MAY be empty, due to [ACL
-/// constraints](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#securityFiltering).
-/// The path itself is still exposed to the documentation viewer but they will not know which
-/// operations and parameters are available.
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
+/// A Path Item MAY be empty, due to [ACL constraints]. The path itself is still exposed to the
+/// documentation viewer but they will not know which operations and parameters are available.
+///
+/// [ACL constraints]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#securityFiltering
+#[derive(Debug, Clone, Default, PartialEq, Deserialize, Serialize)]
 pub struct PathItem {
     /// An external definition of this path item.
     ///

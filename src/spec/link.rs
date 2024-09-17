@@ -41,6 +41,7 @@ pub enum Link {
         // /// `[{in}.]{name}` for operations that use the same parameter name in different
         // /// locations (e.g. path.id).
         // parameters: BTreeMap<String, Any | {expression}>,
+        //
         #[serde(default)]
         #[serde(skip_serializing_if = "BTreeMap::is_empty")]
         parameters: BTreeMap<String, String>,
@@ -51,6 +52,7 @@ pub enum Link {
         // /// to use as a request body when calling the target operation.
         // #[serde(rename = "requestBody")]
         // request_body: Any | {expression}
+        //
         /// A description of the link. [CommonMark syntax](http://spec.commonmark.org/) MAY be
         /// used for rich text representation.
         #[serde(skip_serializing_if = "Option::is_none")]
@@ -83,6 +85,7 @@ pub enum Link {
         // /// `[{in}.]{name}` for operations that use the same parameter name in different
         // /// locations (e.g. path.id).
         // parameters: BTreeMap<String, Any | {expression}>,
+        //
         #[serde(default)]
         #[serde(skip_serializing_if = "BTreeMap::is_empty")]
         parameters: BTreeMap<String, String>,

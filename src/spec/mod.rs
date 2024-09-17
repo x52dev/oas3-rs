@@ -112,6 +112,7 @@ pub struct Spec {
     // /// Individual operations can override this definition.
     // #[serde(skip_serializing_if = "Option::is_none")]
     // pub security: Option<SecurityRequirement>,
+    //
     /// A list of tags used by the specification with additional metadata.
     ///The order of the tags can be used to reflect on their order by the parsing tools.
     /// Not all tags that are used by the

@@ -99,6 +99,7 @@ pub struct Operation {
     // /// [`security`](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#oasSecurity).
     // /// To remove a top-level security declaration, an empty array can be used.
     // pub security: Option<SecurityRequirement>,
+    //
     /// An alternative `server` array to service this operation. If an alternative `server`
     /// object is specified at the Path Item Object or Root level, it will be overridden by
     /// this value.

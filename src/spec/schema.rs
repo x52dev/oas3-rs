@@ -150,8 +150,16 @@ pub struct ObjectSchema {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub format: Option<String>,
 
+    /// An instance validates successfully against this if its value is equal to one of the elements
+    /// in this array.
     #[serde(rename = "enum", default, skip_serializing_if = "Vec::is_empty")]
     pub enum_values: Vec<String>,
+
+    /// Functionally equivalent to an "enum" with a single value.
+    ///
+    /// See <https://json-schema.org/draft/2020-12/json-schema-validation#name-const>.
+    #[serde(rename = "const", skip_serializing_if = "Option::is_none")]
+    pub const_value: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pattern: Option<String>,
