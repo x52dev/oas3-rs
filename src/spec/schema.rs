@@ -5,7 +5,7 @@ use std::collections::BTreeMap;
 use derive_more::derive::{Display, Error};
 use serde::{Deserialize, Serialize};
 
-use crate::spec::{FromRef, ObjectOrReference, Ref, RefError, RefType, Spec};
+use super::{spec_extensions, FromRef, ObjectOrReference, Ref, RefError, RefType, Spec};
 
 /// Schema Errors
 #[derive(Debug, Clone, PartialEq, Display, Error)]
@@ -217,6 +217,14 @@ pub struct ObjectSchema {
 
     #[serde(rename = "anyOf", default, skip_serializing_if = "Vec::is_empty")]
     pub any_of: Vec<ObjectOrReference<ObjectSchema>>,
+
+    /// Specification extensions.
+    ///
+    /// Only "x-" prefixed keys are collected, and the prefix is stripped.
+    ///
+    /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specification-extensions>.
+    #[serde(flatten, with = "spec_extensions")]
+    pub extensions: BTreeMap<String, serde_json::Value>,
 }
 
 impl ObjectSchema {

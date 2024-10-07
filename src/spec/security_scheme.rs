@@ -2,16 +2,16 @@ use serde::{Deserialize, Serialize};
 
 use super::Flows;
 
-/// Defines a security scheme that can be used by the operations. Supported schemes are HTTP
-/// authentication, an API key (either as a header or as a query parameter), OAuth2's common flows
-/// (implicit, password, application and access code) as defined in [RFC6749], and
-/// [OpenID Connect Discovery].
+/// Defines a security scheme that can be used by the operations.
+///
+/// Supported schemes are HTTP authentication, an API key (either as a header or as a query
+/// parameter), OAuth2's common flows (implicit, password, application and access code) as defined
+/// in [RFC6749], and [OpenID Connect Discovery].
 ///
 /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#security-scheme-object>.
 ///
 /// [RFC6749]: https://tools.ietf.org/html/rfc6749
 /// [OpenID Connect Discovery]: https://tools.ietf.org/html/draft-ietf-oauth-discovery-06
-
 #[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[serde(tag = "type")]

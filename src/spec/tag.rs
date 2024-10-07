@@ -4,11 +4,13 @@ use serde::{Deserialize, Serialize};
 
 use super::spec_extensions;
 
-/// Adds metadata to a single tag that is used by the
-/// [Operation Object](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#operation-object).
+/// Adds metadata to a single tag that is used by the [Operation Object].
+///
 /// It is not mandatory to have a Tag Object per tag defined in the Operation Object instances.
 ///
 /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#tag-object>.
+///
+/// [Operation Object]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#operation-object
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct Tag {
     /// The name of the tag.

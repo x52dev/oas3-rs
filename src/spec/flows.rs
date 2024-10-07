@@ -80,10 +80,11 @@ pub struct AuthorizationCodeFlow {
 }
 
 // TODO: Implement
-/// A map of possible out-of band callbacks related to the parent operation. Each value in
-/// the map is a Path Item Object that describes a set of requests that may be initiated by
-/// the API provider and the expected responses. The key value used to identify the callback
-/// object is an expression, evaluated at runtime, that identifies a URL to use for the
+/// Map of possible out-of band callbacks related to the parent operation.
+///
+/// Each value in the map is a Path Item Object that describes a set of requests that may be
+/// initiated by the API provider and the expected responses. The key value used to identify the
+/// callback object is an expression, evaluated at runtime, that identifies a URL to use for the
 /// callback operation.
 ///
 /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#callback-object>.
