@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.11.0
+
 - Add `spec::Schema::const_value` field.
 - Add `spec::ObjectSchema::extensions` field.
 
