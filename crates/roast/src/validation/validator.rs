@@ -1,13 +1,13 @@
 use std::{collections::BTreeMap, fmt};
 
 use log::trace;
-use serde_json::Value as JsonValue;
-
-use super::{AggregateError, DataType, Error, Path, RequiredFields, Validate};
 use oas3::{
     spec::{Error as SchemaError, ObjectSchema, SchemaType, SchemaTypeSet},
     Spec,
 };
+use serde_json::Value as JsonValue;
+
+use super::{AggregateError, DataType, Error, Path, RequiredFields, Validate};
 
 #[derive(Debug)]
 pub enum ValidationBranch {

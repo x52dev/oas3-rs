@@ -12,16 +12,16 @@ rust-version = { workspace = true }
 
 [dependencies]
 bytes = { workspace = true }
-colored = { workspace = true, optional = true }
+colored = { workspace = true }
 derive_more = { workspace = true, features = ["display", "error", "from"] }
 futures-util = { workspace = true }
 http = { workspace = true }
 log = { workspace = true }
 oas3 = { workspace = true }
 once_cell = { workspace = true }
-prettytable-rs = { workspace = true, optional = true }
+prettytable-rs = { workspace = true }
 regex = { workspace = true }
-reqwest = { workspace = true, features = ["json"], optional = true }
+reqwest = { workspace = true, features = ["json"] }
 semver = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }

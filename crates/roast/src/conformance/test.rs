@@ -2,8 +2,7 @@ use bytes::Bytes;
 use http::HeaderMap;
 use log::{debug, trace};
 use oas3::{
-    spec::Error as SpecError,
-    spec::{ParameterIn, RefError},
+    spec::{Error as SpecError, ParameterIn, RefError},
     Spec,
 };
 

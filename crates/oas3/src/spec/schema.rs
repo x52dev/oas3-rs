@@ -1,7 +1,6 @@
 //! Schema specification for [OpenAPI 3.0.1](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md)
 
-use std::collections::BTreeMap;
-use std::fmt;
+use std::{collections::BTreeMap, fmt};
 
 use derive_more::derive::{Display, Error};
 use serde::{Deserialize, Deserializer, Serialize};

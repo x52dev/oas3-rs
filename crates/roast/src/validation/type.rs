@@ -1,7 +1,7 @@
+use oas3::spec::{SchemaType, SchemaTypeSet};
 use serde_json::Value as JsonValue;
 
 use super::{Error, Path, Validate};
-use oas3::spec::{SchemaType, SchemaTypeSet};
 
 #[derive(Debug, Clone)]
 pub struct DataType {
