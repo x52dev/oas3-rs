@@ -1,27 +1,27 @@
 [package]
-name = "oas3"
+name = "roast"
 description = "Structures and tools to parse, navigate, and validate OpenAPI v3.1 specifications"
-version = "0.11.0"
-authors = ["softprops <d.tangren@gmail.com>", "Rob Ede <robjtede@icloud.com>"]
-keywords = ["oas3", "openapi", "swagger", "api", "validation"]
-categories = ["data-structures", "development-tools::testing", "parsing"]
+version = "0.1.0"
+authors = ["Rob Ede <robjtede@icloud.com>"]
+keywords = ["oas3", "openapi", "swagger", "api", "conformance"]
+categories = ["development-tools::testing"]
 repository = { workspace = true }
 license = { workspace = true }
 edition = { workspace = true }
 rust-version = { workspace = true }
 
-[features]
-default = ["validation"]
-validation = []
-
 [dependencies]
 bytes = { workspace = true }
+colored = { workspace = true, optional = true }
 derive_more = { workspace = true, features = ["display", "error", "from"] }
 futures-util = { workspace = true }
 http = { workspace = true }
 log = { workspace = true }
+oas3 = { workspace = true }
 once_cell = { workspace = true }
+prettytable-rs = { workspace = true, optional = true }
 regex = { workspace = true }
+reqwest = { workspace = true, features = ["json"], optional = true }
 semver = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
@@ -38,6 +38,9 @@ maplit = { workspace = true }
 pretty_assertions = { workspace = true }
 pretty_env_logger = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
+
+[[example]]
+name = "conformance"
 
 [lints]
 workspace = true

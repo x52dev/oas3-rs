@@ -2,10 +2,10 @@ use std::fmt;
 
 use derive_more::derive::{Display, Error};
 use http::{Method, StatusCode};
+use oas3::{spec::SchemaTypeSet, Error as SchemaError};
 use serde_json::Value as JsonValue;
 
 use super::Path;
-use crate::spec::{Error as SchemaError, SchemaTypeSet};
 
 #[derive(Debug)]
 pub struct AggregateError {

@@ -1,8 +1,9 @@
 use derive_more::derive::Display;
 use http::Method;
 use log::debug;
+use oas3::{spec::Operation, Spec};
 
-use crate::{spec::Operation, validation::Error as ValidationError, Spec};
+use crate::validation::Error as ValidationError;
 
 #[derive(Debug, Clone, Display)]
 pub enum OperationSpec {

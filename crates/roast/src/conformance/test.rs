@@ -1,15 +1,19 @@
 use bytes::Bytes;
 use http::HeaderMap;
 use log::{debug, trace};
+use oas3::{
+    spec::Error as SpecError,
+    spec::{ParameterIn, RefError},
+    Spec,
+};
 
 use super::{
     OperationSpec, ParamPosition, RequestSource, RequestSpec, ResponseSpec, ResponseSpecSource,
     TestAuthentication, TestOperation, TestParam, TestRequest, TestResponseSpec,
 };
 use crate::{
-    spec::{Error as SpecError, ParameterIn, RefError},
     validation::{Error as ValidationError, ValidationTree},
-    Error, Spec,
+    Error,
 };
 
 #[derive(Debug, Clone)]

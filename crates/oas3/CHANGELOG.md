@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Remove feature guard on `spec::Typeset::{is_object_or_nullable_object, is_array_or_nullable_array}()` methods.
+- Remove `validation` feature. (Functionality migrated to `roast` crate).
+- Remove `conformance` feature. (Functionality migrated to `roast` crate).
+
 ## 0.11.0
 
 - Add `spec::Schema::const_value` field.

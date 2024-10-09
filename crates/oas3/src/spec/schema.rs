@@ -51,8 +51,7 @@ impl TypeSet {
     }
 
     /// Returns `true` if this type-set is `object` or `[object, 'null']`.
-    #[allow(unused)] // used when validation feature is enabled
-    pub(crate) fn is_object_or_nullable_object(&self) -> bool {
+    pub fn is_object_or_nullable_object(&self) -> bool {
         match self {
             TypeSet::Single(Type::Object) => true,
             TypeSet::Multiple(set) if set == &[Type::Object] => true,
@@ -63,8 +62,7 @@ impl TypeSet {
     }
 
     /// Returns `true` if this type-set is `array` or `[array, 'null']`.
-    #[allow(unused)] // used when validation feature is enabled
-    pub(crate) fn is_array_or_nullable_array(&self) -> bool {
+    pub fn is_array_or_nullable_array(&self) -> bool {
         match self {
             TypeSet::Single(Type::Array) => true,
             TypeSet::Multiple(set) if set == &[Type::Array] => true,

@@ -727,7 +727,6 @@ dependencies = [
  "assert_matches",
  "bytes",
  "color-eyre",
- "colored",
  "derive_more",
  "dotenvy",
  "eyre",
@@ -739,9 +738,7 @@ dependencies = [
  "once_cell",
  "pretty_assertions",
  "pretty_env_logger",
- "prettytable-rs",
  "regex",
- "reqwest",
  "semver",
  "serde",
  "serde_json",
@@ -1019,6 +1016,37 @@ dependencies = [
  "spin",
  "untrusted",
  "windows-sys 0.52.0",
+]
+
+[[package]]
+name = "roast"
+version = "0.1.0"
+dependencies = [
+ "assert_matches",
+ "bytes",
+ "color-eyre",
+ "colored",
+ "derive_more",
+ "dotenvy",
+ "eyre",
+ "futures-util",
+ "http",
+ "indoc",
+ "log",
+ "maplit",
+ "oas3",
+ "once_cell",
+ "pretty_assertions",
+ "pretty_env_logger",
+ "prettytable-rs",
+ "regex",
+ "reqwest",
+ "semver",
+ "serde",
+ "serde_json",
+ "serde_yml",
+ "tokio",
+ "url",
 ]
 
 [[package]]

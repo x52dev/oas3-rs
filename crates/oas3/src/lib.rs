@@ -22,12 +22,6 @@ pub mod spec;
 pub use error::Error;
 pub use spec::Spec;
 
-#[cfg(feature = "validation")]
-pub mod validation;
-
-#[cfg(feature = "conformance")]
-pub mod conformance;
-
 /// Version 3.1.0 of the OpenAPI specification.
 ///
 /// Refer to the official [specification] for more information.

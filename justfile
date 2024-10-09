@@ -33,9 +33,9 @@ update-readmes:
 # Lint workspace with Clippy.
 [group("lint")]
 clippy:
-    cargo clippy --workspace --no-default-features
-    cargo clippy --workspace --no-default-features --all-features
-    cargo hack --feature-powerset clippy --workspace
+    cargo clippy --workspace --all-targets --no-default-features
+    cargo clippy --workspace --all-targets --no-default-features --all-features
+    cargo hack --feature-powerset clippy --workspace --all-targets
 
 # Downgrade dev-dependencies necessary to run MSRV checks/tests.
 [private]

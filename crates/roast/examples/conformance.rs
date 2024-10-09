@@ -1,8 +1,6 @@
 #![allow(dead_code, unused_variables)]
 
-use oas3::conformance::{
-    ConformanceTestSpec, OperationSpec, RequestSpec, ResponseSpec, TestRunner,
-};
+use roast::{ConformanceTestSpec, OperationSpec, RequestSpec, ResponseSpec, TestRunner};
 
 #[tokio::main]
 async fn main() -> eyre::Result<()> {

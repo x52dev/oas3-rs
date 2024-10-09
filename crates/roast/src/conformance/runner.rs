@@ -13,6 +13,7 @@ use std::{
 use colored::{ColoredString, Colorize};
 use futures_util::{stream, FutureExt as _, StreamExt as _};
 use log::{debug, trace};
+use oas3::Spec;
 use prettytable::{row, Table};
 use serde_json::Value as JsonValue;
 use url::Url;
@@ -23,7 +24,7 @@ use crate::{
         TestRequest, TestResponse,
     },
     validation::Error as ValidationError,
-    Error, Spec,
+    Error,
 };
 
 type TestResult = (ConformanceTestSpec, Result<TestResponse, Error>);
