@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Allow explicit `null` schema examples to be deserialized as `Some(serde_json::Value::Null)`.
 - Remove feature guard on `spec::Typeset::{is_object_or_nullable_object, is_array_or_nullable_array}()` methods.
 - Remove `validation` feature. (Functionality migrated to `roast` crate).
 - Remove `conformance` feature. (Functionality migrated to `roast` crate).

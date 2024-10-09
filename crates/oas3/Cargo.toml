@@ -26,6 +26,7 @@ semver = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 serde_yml = { workspace = true }
+serde_with = { workspace = true }
 url = { workspace = true, features = ["serde"] }
 
 [dev-dependencies]

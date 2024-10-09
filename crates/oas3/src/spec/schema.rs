@@ -1,9 +1,10 @@
 //! Schema specification for [OpenAPI 3.0.1](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md)
 
 use std::collections::BTreeMap;
+use std::fmt;
 
 use derive_more::derive::{Display, Error};
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
 
 use super::{spec_extensions, FromRef, ObjectOrReference, Ref, RefError, RefType, Spec};
 
@@ -139,7 +140,11 @@ pub struct ObjectSchema {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub default: Option<serde_json::Value>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(
+        default,
+        deserialize_with = "distinguish_missing_and_null",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub example: Option<serde_json::Value>,
 
     //
@@ -272,6 +277,15 @@ pub enum Schema {
     Object(Box<ObjectOrReference<ObjectSchema>>),
 }
 
+/// Considers any value that is present as `Some`, including `null`.
+fn distinguish_missing_and_null<'de, T, D>(de: D) -> Result<Option<T>, D::Error>
+where
+    T: Deserialize<'de> + fmt::Debug,
+    D: Deserializer<'de>,
+{
+    T::deserialize(de).map(Some)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -299,5 +313,21 @@ mod tests {
         let schema_type = schema.schema_type.unwrap();
         assert!(schema_type.contains(Type::Array));
         assert!(schema_type.is_array_or_nullable_array());
+    }
+
+    #[test]
+    fn example_can_be_explicit_null() {
+        let spec = indoc::indoc! {"
+            type: [string, 'null']
+        "};
+        let schema = serde_yml::from_str::<ObjectSchema>(spec).unwrap();
+        assert_eq!(schema.example, None);
+
+        let spec = indoc::indoc! {"
+            type: [string, 'null']
+            example: null
+        "};
+        let schema = serde_yml::from_str::<ObjectSchema>(spec).unwrap();
+        assert_eq!(schema.example, Some(serde_json::Value::Null));
     }
 }
