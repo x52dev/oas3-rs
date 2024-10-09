@@ -37,24 +37,32 @@ pub enum ParameterIn {
 #[derive(Debug, Clone, Copy, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub enum ParameterStyle {
-    /// Path-style parameters defined by RFC6570.
+    /// Path-style parameters defined by [RFC 6570].
     ///
     /// Applies to: `primitive, array, object` in `path`.
+    ///
+    /// [RFC 6570]: https://datatracker.ietf.org/doc/html/rfc6570
     Matrix,
 
-    /// Label style parameters defined by RFC6570.
+    /// Label style parameters defined by [RFC 6570].
     ///
     /// Applies to: `primitive, array, object` in `path`.
+    ///
+    /// [RFC 6570]: https://datatracker.ietf.org/doc/html/rfc6570
     Label,
 
-    /// Form style parameters defined by RFC6570. This option replaces collectionFormat with a csv (when explode is false) or multi (when explode is true) value from OpenAPI 2.0..
+    /// Form style parameters defined by [RFC 6570]. This option replaces collectionFormat with a csv (when explode is false) or multi (when explode is true) value from OpenAPI 2.0..
     ///
     /// Applies to: `primitive, array, object` in `query, cookie`.
+    ///
+    /// [RFC 6570]: https://datatracker.ietf.org/doc/html/rfc6570
     Form,
 
-    /// Simple style parameters defined by RFC6570. This option replaces collectionFormat with a csv value from OpenAPI 2.0..
+    /// Simple style parameters defined by [RFC 6570]. This option replaces collectionFormat with a csv value from OpenAPI 2.0..
     ///
-    /// Applies to: `array` in `path, header `.
+    /// Applies to: `array` in `path, header`.
+    ///
+    /// [RFC 6570]: https://datatracker.ietf.org/doc/html/rfc6570
     Simple,
 
     /// Space separated array or object values. This option replaces collectionFormat equal to ssv from OpenAPI 2.0..

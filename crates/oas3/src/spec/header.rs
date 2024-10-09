@@ -1,8 +1,11 @@
+use std::collections::BTreeMap;
+
 use serde::{Deserialize, Serialize};
 
-use super::{FromRef, ObjectSchema, Ref, RefError, RefType, Spec};
-
-// TODO: update to 3.1 spec including JSON Schema conformance.
+use super::{
+    spec_extensions, Example, FromRef, MediaType, ObjectOrReference, ObjectSchema, ParameterStyle,
+    Ref, RefError, RefType, Spec,
+};
 
 /// The Header Object mostly follows the structure of the [Parameter Object].
 ///
@@ -14,47 +17,95 @@ use super::{FromRef, ObjectSchema, Ref, RefError, RefType, Spec};
 ///
 /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#header-object>.
 ///
-/// [Parameter Object]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameterObject
+/// [Parameter Object]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameter-object
 /// [`style`]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameterStyle
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
 pub struct Header {
-    // FIXME: Is the third change properly implemented?
+    /// A brief description of the header.
+    ///
+    /// This could contain examples of use. CommonMark syntax MAY be used for rich text
+    /// representation.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+
+    /// Determines whether this header is mandatory.
+    ///
+    /// Default value is false.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub required: Option<bool>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub schema: Option<ObjectSchema>,
+    /// Specifies that a header is deprecated and SHOULD be transitioned out of usage.
+    ///
+    /// Default value is false.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub deprecated: Option<bool>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "uniqueItems")]
-    pub unique_items: Option<bool>,
+    /// Sets the ability to pass empty-valued header.
+    ///
+    /// This is valid only for query header and allows sending a parameter with an empty value.
+    /// Default value is false. If style is used, and if behavior is n/a (cannot be serialized), the
+    /// value of `allowEmptyValue` SHALL be ignored. Use of this property is NOT RECOMMENDED, as it
+    /// is likely to be removed in a later revision.
+    #[serde(
+        rename = "allowEmptyValue",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub allow_empty_value: Option<bool>,
 
-    /// string, number, boolean, integer, array, file ( only for formData )
+    /// Describes how the header value will be serialized.
+    ///
+    /// Default value is `simple`.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "type")]
-    pub param_type: Option<String>,
+    pub style: Option<ParameterStyle>,
 
+    /// True if array/object header values generate separate headers for each value of the array or
+    /// key-value pair of the map.
+    ///
+    /// Default value is false.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub format: Option<String>,
+    pub explode: Option<bool>,
 
-    /// A brief description of the parameter. This could contain examples
-    /// of use.  GitHub Flavored Markdown is allowed.
+    /// The schema defining the type used for the header.
+    ///
+    /// A header MUST contain either a `schema` property, or a `content` property, but not both.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub description: Option<String>,
-    // collectionFormat: ???
-    // default: ???
-    // maximum ?
-    // exclusiveMaximum ??
-    // minimum ??
-    // exclusiveMinimum ??
-    // maxLength ??
-    // minLength ??
-    // pattern ??
-    // maxItems ??
-    // minItems ??
-    // enum ??
-    // multipleOf ??
-    // allowEmptyValue ( for query / body params )
+    pub schema: Option<ObjectOrReference<ObjectSchema>>,
+
+    /// Example of the header's potential value.
+    ///
+    /// The example SHOULD match the specified schema and encoding properties if present. The
+    /// `example` field is mutually exclusive of the `examples` field. Furthermore, if referencing a
+    /// `schema` that contains an example, the `example` value SHALL override the example provided
+    /// by the schema. To represent examples of media types that cannot naturally be represented in
+    /// JSON or YAML, a string value can contain the example with escaping where necessary.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub example: Option<serde_json::Value>,
+
+    /// Examples of the header's potential value.
+    ///
+    /// Each example SHOULD contain a value in the correct format as specified in the header
+    /// encoding. The `examples` field is mutually exclusive of the `example` field. Furthermore, if
+    /// referencing a `schema` that contains an example, the `examples` value SHALL override the
+    /// example provided by the schema.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub examples: BTreeMap<String, ObjectOrReference<Example>>,
+
+    /// A map containing the representations for the header.
+    ///
+    /// A header MUST contain either a `schema` property, or a `content` property, but not both.
+    ///
+    /// The key is the media type and the value describes it. The map MUST only contain one entry.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub content: Option<BTreeMap<String, MediaType>>,
+
+    /// Specification extensions.
+    ///
+    /// Only "x-" prefixed keys are collected, and the prefix is stripped.
+    ///
+    /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specification-extensions>.
+    #[serde(flatten, with = "spec_extensions")]
+    pub extensions: BTreeMap<String, serde_json::Value>,
 }
 
 impl FromRef for Header {

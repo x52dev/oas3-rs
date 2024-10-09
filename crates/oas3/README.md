@@ -1,4 +1,4 @@
-# OAS3
+# `oas3`
 
 <!-- prettier-ignore-start -->
 

@@ -20,22 +20,15 @@ log = { workspace = true }
 oas3 = { workspace = true }
 once_cell = { workspace = true }
 prettytable-rs = { workspace = true }
-regex = { workspace = true }
 reqwest = { workspace = true, features = ["json"] }
-semver = { workspace = true }
-serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
-serde_yml = { workspace = true }
 url = { workspace = true, features = ["serde"] }
 
 [dev-dependencies]
-assert_matches = { workspace = true }
 color-eyre = { workspace = true }
 dotenvy = { workspace = true }
 eyre = { workspace = true }
-indoc = { workspace = true }
 maplit = { workspace = true }
-pretty_assertions = { workspace = true }
 pretty_env_logger = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 

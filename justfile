@@ -28,7 +28,8 @@ fmt: update-readmes
 # Update READMEs from crate root documentation.
 [group("lint")]
 update-readmes:
-    cd crates/oas3 && cargo rdme --force
+    cargo rdme --workspace-project=oas3 --readme-path=crates/oas3/README.md --force
+    cargo rdme --workspace-project=roast --readme-path=crates/roast/README.md --force
 
 # Lint workspace with Clippy.
 [group("lint")]
