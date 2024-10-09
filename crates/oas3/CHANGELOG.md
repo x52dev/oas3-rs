@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.12.0
+
 - Completely re-work `spec::Header`, updating it to conform to the OpenAPI v3.1 spec.
 - Allow explicit `null` schema examples to be deserialized as `Some(serde_json::Value::Null)`.
 - Remove feature guard on `spec::Typeset::{is_object_or_nullable_object, is_array_or_nullable_array}()` methods.
