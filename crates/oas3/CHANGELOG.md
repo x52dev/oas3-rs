@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.12.1
+
+- No significant changes since `0.12.0`.
+
 ## 0.12.0
 
 - Completely re-work `spec::Header`, updating it to conform to the OpenAPI v3.1 spec.
