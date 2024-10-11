@@ -55,6 +55,14 @@ test toolchain="":
     cargo {{ toolchain }} test --doc --workspace --all-features
     RUSTDOCFLAGS="-D warnings" cargo {{ toolchain }} doc --workspace --no-deps --all-features
 
+# Test workspace and generate Codecov coverage file
+test-coverage-codecov toolchain="":
+    cargo {{ toolchain }} llvm-cov --workspace --all-features --codecov --output-path codecov.json
+
+# Test workspace and generate LCOV coverage file
+test-coverage-lcov toolchain="":
+    cargo {{ toolchain }} llvm-cov --workspace --all-features --lcov --output-path lcov.info
+
 # Document crates in workspace.
 doc *args:
     RUSTDOCFLAGS="--cfg=docsrs -Dwarnings" cargo +nightly doc --workspace --all-features {{ args }}
