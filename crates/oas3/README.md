@@ -7,7 +7,7 @@
 [![dependency status](https://deps.rs/crate/oas3/0.12.1/status.svg)](https://deps.rs/crate/oas3/0.12.1)
 ![MIT or Apache 2.0 licensed](https://img.shields.io/crates/l/oas3.svg)
 <br />
-[![CI](https://github.com/x52dev/oas3/actions/workflows/ci.yml/badge.svg)](https://github.com/x52dev/oas3/actions/workflows/ci.yml)
+[![CI](https://github.com/x52dev/oas3-rs/actions/workflows/ci.yml/badge.svg)](https://github.com/x52dev/oas3-rs/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/x52dev/oas3/branch/main/graph/badge.svg)](https://codecov.io/gh/x52dev/oas3)
 ![Version](https://img.shields.io/crates/msrv/oas3.svg)
 [![Download](https://img.shields.io/crates/d/oas3.svg)](https://crates.io/crates/oas3)
