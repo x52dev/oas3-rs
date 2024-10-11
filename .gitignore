@@ -8,3 +8,7 @@
 /target
 Cargo.lock
 !/Cargo.lock
+
+# code coverage
+/codecov.json
+/lcov.info
