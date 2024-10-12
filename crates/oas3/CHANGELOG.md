@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Expose the `spec::ClientCredentialsFlow::token_url` field.
+- Rename `Error::{SemVerError => Semver}` variant.
 
 ## 0.12.1
 
