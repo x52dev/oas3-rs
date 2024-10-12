@@ -13,6 +13,7 @@ rust_2018_idioms = "deny"
 nonstandard_style = "deny"
 future_incompatible = "deny"
 missing_debug_implementations = { level = "warn", priority = -1 }
+missing_docs = { level = "warn", priority = -1 }
 
 [workspace.dependencies]
 assert_matches = "1"

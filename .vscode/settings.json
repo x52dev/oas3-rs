@@ -3,6 +3,7 @@
         "btreemap",
         "deque",
         "deserializable",
+        "docsrs",
         "dotenv",
         "indoc",
         "ints",

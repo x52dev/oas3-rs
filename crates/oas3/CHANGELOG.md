@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Expose the `spec::ClientCredentialsFlow::token_url` field.
+
 ## 0.12.1
 
 - No significant changes since `0.12.0`.
