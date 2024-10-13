@@ -44,6 +44,7 @@ pub struct Example {
 }
 
 impl Example {
+    /// Returns JSON-encoded bytes of this example's value.
     pub fn as_bytes(&self) -> Vec<u8> {
         match self.value {
             Some(ref val) => serde_json::to_string(val).unwrap().as_bytes().to_owned(),

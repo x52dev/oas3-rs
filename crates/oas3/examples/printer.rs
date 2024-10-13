@@ -1,3 +1,5 @@
+//! Demonstrates reading an OpenAPI spec file and printing back to stdout.
+
 use std::env;
 
 fn main() -> eyre::Result<()> {

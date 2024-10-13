@@ -162,7 +162,7 @@ impl Spec {
         }
     }
 
-    /// Returns operation matching `operation_id`, if found.
+    /// Returns a reference to the operation with given `operation_id`, or `None` if not found.
     pub fn operation_by_id(&self, operation_id: &str) -> Option<&Operation> {
         self.operations()
             .find(|(_, _, op)| {
@@ -173,6 +173,7 @@ impl Spec {
             .map(|(_, _, op)| op)
     }
 
+    /// Returns a reference to the operation with given `method` and `path`, or `None` if not found.
     pub fn operation(&self, method: &http::Method, path: &str) -> Option<&Operation> {
         let resource = self.paths.as_ref()?.get(path)?;
 
@@ -189,6 +190,7 @@ impl Spec {
         }
     }
 
+    /// Returns an iterator over all the operations defined in this spec.
     pub fn operations(&self) -> impl Iterator<Item = (String, Method, &Operation)> {
         let paths = &self.paths;
 
@@ -218,6 +220,7 @@ impl Spec {
         ops.into_iter()
     }
 
+    /// Returns a reference to the primary (first) server definition.
     pub fn primary_server(&self) -> Option<&Server> {
         self.servers.first()
     }
