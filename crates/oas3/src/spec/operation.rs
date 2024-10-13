@@ -11,11 +11,11 @@ use crate::spec::spec_extensions;
 /// Describes a single API operation on a path.
 ///
 /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#operation-object>.
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
-// #[serde(rename_all = "lowercase")]
+#[derive(Debug, Clone, Default, PartialEq, Deserialize, Serialize)]
 pub struct Operation {
-    /// A list of tags for API documentation control. Tags can be used for logical grouping of
-    /// operations by resources or any other qualifier.
+    /// A list of tags for API documentation control.
+    ///
+    /// Tags can be used for logical grouping of operations by resources or any other qualifier.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub tags: Vec<String>,
 
@@ -24,43 +24,51 @@ pub struct Operation {
     pub summary: Option<String>,
 
     /// A verbose explanation of the operation behavior.
-    /// [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
+    ///
+    /// [CommonMark syntax](https://spec.commonmark.org) MAY be used for rich text representation.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
 
     /// Additional external documentation for this operation.
-    #[serde(skip_serializing_if = "Option::is_none", rename = "externalDocs")]
+    #[serde(rename = "externalDocs", skip_serializing_if = "Option::is_none")]
     pub external_docs: Option<ExternalDoc>,
 
-    /// Unique string used to identify the operation. The id MUST be unique among all operations
-    /// described in the API. Tools and libraries MAY use the operationId to uniquely identify an
-    /// operation, therefore, it is RECOMMENDED to follow common programming naming conventions.
-    #[serde(skip_serializing_if = "Option::is_none", rename = "operationId")]
+    /// String used to uniquely identify the operation within this spec.
+    ///
+    /// The ID MUST be unique among all operations described in the API. Tools and libraries MAY use
+    /// the operation ID to uniquely identify an operation, therefore, it is RECOMMENDED to follow
+    /// common programming naming conventions.
+    #[serde(rename = "operationId", skip_serializing_if = "Option::is_none")]
     pub operation_id: Option<String>,
 
-    /// A list of parameters that are applicable for this operation. If a parameter is already
-    /// defined at the
-    /// [Path Item](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#pathItemParameters),
-    /// the new definition will override it but can never remove it. The list MUST NOT
-    /// include duplicated parameters. A unique parameter is defined by a combination of a
-    /// [name](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameterName)
-    /// and
-    /// [location](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameterIn).
-    /// The list can use the
-    /// [Reference Object](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#reference-object)
-    /// to link to parameters that are defined at the
-    /// [OpenAPI Object's components/parameters](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#components-parameters).
+    /// A list of parameters that are applicable for this operation.
+    ///
+    /// If a parameter is already defined at the [Path Item], the new definition will override it
+    /// but can never remove it. The list MUST NOT include duplicated parameters. A unique parameter
+    /// is defined by a combination of a [name] and [location] The list can use the
+    /// [Reference Object] to link to parameters that are defined at the
+    /// [OpenAPI Object's components/parameters].
+    ///
+    /// [Path Item]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#pathItemParameters
+    /// [name]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameterName
+    /// [location]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameterIn
+    /// [Reference Object]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#reference-object
+    /// [OpenAPI Object's components/parameters]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#components-parameters
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub parameters: Vec<ObjectOrReference<Parameter>>,
 
-    /// The request body applicable for this operation. The requestBody is only supported in HTTP methods where the HTTP 1.1 specification RFC7231 has explicitly defined semantics for request bodies. In other cases where the HTTP spec is vague, requestBody SHALL be ignored by consumers.
+    /// The request body applicable for this operation.
+    ///
+    /// The `requestBody` is only supported in HTTP methods where the HTTP/1.1 specification RFC
+    /// 7231 has explicitly defined semantics for request bodies. In other cases where the HTTP spec
+    /// is vague, `requestBody` SHALL be ignored by consumers.
     #[serde(rename = "requestBody", skip_serializing_if = "Option::is_none")]
     pub request_body: Option<ObjectOrReference<RequestBody>>,
 
     /// The list of possible responses as they are returned from executing this operation.
     ///
-    /// A container for the expected responses of an operation. The container maps a HTTP
-    /// response code to the expected response.
+    /// A container for the expected responses of an operation. The container maps a HTTP response
+    /// code to the expected response.
     ///
     /// The documentation is not necessarily expected to cover all possible HTTP response codes
     /// because they may not be known in advance. However, documentation is expected to cover
@@ -75,19 +83,20 @@ pub struct Operation {
     /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#responses-object>.
     pub responses: Option<BTreeMap<String, ObjectOrReference<Response>>>,
 
-    /// A map of possible out-of band callbacks related to the parent operation. The key is
-    /// a unique identifier for the Callback Object. Each value in the map is a
-    /// [Callback Object](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#callback-object)
-    /// that describes a request that may be initiated by the API provider and the
-    /// expected responses. The key value used to identify the callback object is
-    /// an expression, evaluated at runtime, that identifies a URL to use for the
-    /// callback operation.
-    #[serde(default)]
-    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+    /// A map of possible out-of band callbacks related to the parent operation.
+    ///
+    /// The key is a unique identifier for the Callback Object. Each value in the map is a
+    /// [Callback Object] that describes a request that may be initiated by the API provider and the
+    /// expected responses. The key value used to identify the callback object is an expression,
+    /// evaluated at runtime, that identifies a URL to use for the callback operation.
+    ///
+    /// [Callback Object]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#callback-object
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub callbacks: BTreeMap<String, Callback>,
 
-    /// Declares this operation to be deprecated. Consumers SHOULD refrain from usage
-    /// of the declared operation. Default value is `false`.
+    /// Declares this operation to be deprecated.
+    ///
+    /// Consumers SHOULD refrain from usage of the declared operation. Default value is `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub deprecated: Option<bool>,
 
@@ -100,11 +109,11 @@ pub struct Operation {
     // /// To remove a top-level security declaration, an empty array can be used.
     // pub security: Option<SecurityRequirement>,
     //
-    /// An alternative `server` array to service this operation. If an alternative `server`
-    /// object is specified at the Path Item Object or Root level, it will be overridden by
-    /// this value.
-    #[serde(default)]
-    #[serde(skip_serializing_if = "Vec::is_empty")]
+    /// An alternative `server` array to service this operation.
+    ///
+    /// If an alternative `server` object is specified at the Path Item Object or Root level, it
+    /// will be overridden by this value.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub servers: Vec<Server>,
 
     /// Specification extensions.
@@ -117,6 +126,7 @@ pub struct Operation {
 }
 
 impl Operation {
+    /// Resolves and returns this operation's request body.
     pub fn request_body(&self, spec: &Spec) -> Result<RequestBody, Error> {
         self.request_body
             .as_ref()
@@ -125,6 +135,7 @@ impl Operation {
             .map_err(Error::Ref)
     }
 
+    /// Resolves and returns map of this operation's responses, keyed by status code.
     pub fn responses(&self, spec: &Spec) -> BTreeMap<String, Response> {
         self.responses
             .iter()
@@ -139,6 +150,7 @@ impl Operation {
             .collect()
     }
 
+    /// Resolves and returns list of this operation's parameters.
     pub fn parameters(&self, spec: &Spec) -> Result<Vec<Parameter>, Error> {
         let params = self
             .parameters
@@ -150,6 +162,7 @@ impl Operation {
         Ok(params)
     }
 
+    /// Finds, resolves, and returns one of this operation's parameters by name.
     pub fn parameter(&self, search: &str, spec: &Spec) -> Result<Option<Parameter>, Error> {
         let param = self
             .parameters(spec)?

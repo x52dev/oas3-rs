@@ -53,8 +53,9 @@ pub enum Link {
         // #[serde(rename = "requestBody")]
         // request_body: Any | {expression}
         //
-        /// A description of the link. [CommonMark syntax](http://spec.commonmark.org/) MAY be
-        /// used for rich text representation.
+        /// A description of the link.
+        /// [CommonMark syntax](https://spec.commonmark.org) MAY be used for rich text
+        /// representation.
         #[serde(skip_serializing_if = "Option::is_none")]
         description: Option<String>,
 

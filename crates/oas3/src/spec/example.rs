@@ -16,7 +16,7 @@ pub struct Example {
     pub summary: Option<String>,
 
     /// Long description for the example.
-    /// [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
+    /// [CommonMark syntax](https://spec.commonmark.org) MAY be used for rich text representation.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
 

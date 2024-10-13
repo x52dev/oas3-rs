@@ -14,7 +14,7 @@ pub struct ExternalDoc {
     pub url: Url,
 
     /// A short description of the target documentation.
-    /// [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
+    /// [CommonMark syntax](https://spec.commonmark.org) MAY be used for rich text representation.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
 

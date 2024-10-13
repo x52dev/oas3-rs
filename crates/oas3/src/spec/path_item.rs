@@ -29,7 +29,8 @@ pub struct PathItem {
     pub summary: Option<String>,
 
     /// An optional, string description, intended to apply to all operations in this path.
-    /// [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
+    ///
+    /// [CommonMark syntax](https://spec.commonmark.org) MAY be used for rich text representation.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
 

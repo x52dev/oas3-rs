@@ -10,7 +10,8 @@ use super::{FromRef, MediaType, Ref, RefError, RefType, Spec};
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
 pub struct RequestBody {
     /// A brief description of the request body. This could contain examples of use.
-    /// [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
+    ///
+    /// [CommonMark syntax](https://spec.commonmark.org) MAY be used for rich text representation.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
 

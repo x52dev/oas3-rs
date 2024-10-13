@@ -14,7 +14,8 @@ use super::{
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
 pub struct Response {
     /// A short description of the response.
-    /// [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
+    ///
+    /// [CommonMark syntax](https://spec.commonmark.org) MAY be used for rich text representation.
     pub description: Option<String>,
 
     /// Maps a header name to its definition.
