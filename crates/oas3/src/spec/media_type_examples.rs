@@ -8,17 +8,25 @@ use super::{Example, ObjectOrReference, Spec};
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[serde(untagged)]
 pub enum MediaTypeExamples {
-    /// Example of the media type. The example object SHOULD be in the correct format as
-    /// specified by the media type. The `example` field is mutually exclusive of the
-    /// `examples` field. Furthermore, if referencing a `schema` which contains an example,
-    /// the `example` value SHALL override the example provided by the schema.
-    Example { example: serde_json::Value },
+    /// Example of the media type.
+    ///
+    /// The example object SHOULD be in the correct format as specified by the media type. The
+    /// `example` field is mutually exclusive of the `examples` field. Furthermore, if referencing a
+    /// `schema` which contains an example, the `example` value SHALL override the example provided
+    /// by the schema.
+    Example {
+        /// Example of the media type.
+        example: serde_json::Value,
+    },
 
-    /// Examples of the media type. Each example object SHOULD match the media type and
-    /// specified schema if present. The `examples` field is mutually exclusive of
-    /// the `example` field. Furthermore, if referencing a `schema` which contains an
-    /// example, the `examples` value SHALL override the example provided by the schema.
+    /// Examples of the media type.
+    ///
+    /// Each example object SHOULD match the media type and specified schema if present. The
+    /// `examples` field is mutually exclusive of the `example` field. Furthermore, if referencing a
+    /// `schema` which contains an example, the `examples` value SHALL override the example provided
+    /// by the schema.
     Examples {
+        /// Examples of the media type.
         examples: BTreeMap<String, ObjectOrReference<Example>>,
     },
 }
@@ -32,6 +40,7 @@ impl Default for MediaTypeExamples {
 }
 
 impl MediaTypeExamples {
+    /// Returns true if no examples are provided.
     pub fn is_empty(&self) -> bool {
         match self {
             MediaTypeExamples::Example { .. } => false,
@@ -39,6 +48,9 @@ impl MediaTypeExamples {
         }
     }
 
+    /// Resolves references and returns a map of provided examples keyed by name.
+    ///
+    /// If the `example` field is provided, then the map contains one item, keyed as "default".
     pub fn resolve_all(&self, spec: &Spec) -> BTreeMap<String, Example> {
         match self {
             Self::Example { example } => {

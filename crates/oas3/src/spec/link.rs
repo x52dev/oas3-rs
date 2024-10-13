@@ -19,15 +19,16 @@ use super::{spec_extensions, Server};
 /// the linked operation.
 ///
 /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#link-object>.
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(untagged)]
 pub enum Link {
-    /// A relative or absolute reference to an OAS operation. This field is mutually exclusive
-    /// of the `operationId` field, and MUST point to an
-    /// [Operation Object](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#operation-object).
-    /// Relative `operationRef` values MAY be used to locate an existing
-    /// [Operation Object](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#operation-object)
-    /// in the OpenAPI definition.
+    /// A relative or absolute reference to an OAS operation.
+    ///
+    /// This field is mutually exclusive of the `operationId` field, and MUST point to an
+    /// [Operation Object]. Relative `operationRef` values MAY be used to locate an existing
+    /// [Operation Object] in the OpenAPI definition.
+    ///
+    /// [Operation Object]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#operation-object
     Ref {
         #[serde(rename = "operationRef")]
         operation_ref: String,
@@ -42,8 +43,7 @@ pub enum Link {
         // /// locations (e.g. path.id).
         // parameters: BTreeMap<String, Any | {expression}>,
         //
-        #[serde(default)]
-        #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+        #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
         parameters: BTreeMap<String, String>,
 
         // FIXME: Implement
@@ -70,8 +70,11 @@ pub enum Link {
         #[serde(flatten, with = "spec_extensions")]
         extensions: BTreeMap<String, serde_json::Value>,
     },
+
     /// The name of an _existing_, resolvable OAS operation, as defined with a unique
-    /// `operationId`. This field is mutually exclusive of the `operationRef` field.
+    /// `operationId`.
+    ///
+    /// This field is mutually exclusive of the `operationRef` field.
     Id {
         #[serde(rename = "operationId")]
         operation_id: String,
@@ -86,8 +89,7 @@ pub enum Link {
         // /// locations (e.g. path.id).
         // parameters: BTreeMap<String, Any | {expression}>,
         //
-        #[serde(default)]
-        #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+        #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
         parameters: BTreeMap<String, String>,
 
         // FIXME: Implement
@@ -96,8 +98,11 @@ pub enum Link {
         // /// to use as a request body when calling the target operation.
         // #[serde(rename = "requestBody")]
         // request_body: Any | {expression}
-        /// A description of the link. [CommonMark syntax](http://spec.commonmark.org/) MAY be
-        /// used for rich text representation.
+        //
+        /// A description of the link.
+        ///
+        /// [CommonMark syntax](https://spec.commonmark.org) MAY be used for rich text
+        /// representation.
         #[serde(skip_serializing_if = "Option::is_none")]
         description: Option<String>,
 
