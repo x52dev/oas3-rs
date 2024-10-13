@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Add `spec::Contact::validate_email()` method.
 - Expose the `spec::ClientCredentialsFlow::token_url` field.
 - Rename `Error::{SemVerError => Semver}` variant.
 

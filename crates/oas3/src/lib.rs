@@ -21,8 +21,8 @@ use std::{fs::File, io::Read, path::Path};
 mod error;
 pub mod spec;
 
-pub use error::Error;
-pub use spec::Spec;
+pub use self::error::Error;
+pub use self::spec::Spec;
 
 /// Version 3.1.0 of the OpenAPI specification.
 ///

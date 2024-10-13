@@ -149,6 +149,7 @@ pub struct Spec {
 }
 
 impl Spec {
+    /// Validates spec version field.
     pub fn validate_version(&self) -> Result<semver::Version, Error> {
         let spec_version = &self.openapi;
         let sem_ver = semver::Version::parse(spec_version)?;
