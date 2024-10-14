@@ -24,6 +24,8 @@
         "strs",
         "struct",
         "structs",
+        "subschema",
+        "subschemas",
         "valtree",
         "valtrees"
     ],

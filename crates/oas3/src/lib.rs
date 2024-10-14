@@ -14,6 +14,7 @@
 //!
 //! [OpenAPI v3.1]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md
 
+#![warn(missing_docs)]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
 use std::{fs::File, io::Read, path::Path};

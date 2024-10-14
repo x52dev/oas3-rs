@@ -1,4 +1,4 @@
-//! Schema specification for [OpenAPI 3.0.1](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md)
+//! Schema specification for [OpenAPI 3.1](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md)
 
 use std::{collections::BTreeMap, fmt};
 
@@ -7,16 +7,19 @@ use serde::{Deserialize, Deserializer, Serialize};
 
 use super::{spec_extensions, FromRef, ObjectOrReference, Ref, RefError, RefType, Spec};
 
-/// Schema Errors
+/// Schema errors.
 #[derive(Debug, Clone, PartialEq, Display, Error)]
 pub enum Error {
-    #[display("Missing type property")]
+    /// Missing type field.
+    #[display("Missing type field")]
     NoType,
 
+    /// Unknown type.
     #[display("Unknown type: {}", _0)]
     UnknownType(#[error(not(source))] String),
 
-    #[display("Required fields specified on a non-object schema")]
+    /// Required property list specified for a non-object schema.
+    #[display("Required property list specified for a non-object schema")]
     RequiredSpecifiedOnNonObject,
 }
 
@@ -24,12 +27,25 @@ pub enum Error {
 #[derive(Debug, Clone, Copy, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Type {
+    /// Boolean schema type.
     Boolean,
+
+    /// Integer schema type.
     Integer,
+
+    /// Number schema type.
     Number,
+
+    /// String schema type.
     String,
+
+    /// Array schema type.
     Array,
+
+    /// Object schema type.
     Object,
+
+    /// Null schema type.
     Null,
 }
 
@@ -37,7 +53,10 @@ pub enum Type {
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(untagged)]
 pub enum TypeSet {
+    /// Single schema type specified.
     Single(Type),
+
+    /// Multiple possible schema types specified.
     Multiple(Vec<Type>),
 }
 
@@ -88,43 +107,92 @@ impl TypeSet {
 /// [JSON Schema Validation]: https://tools.ietf.org/html/draft-wright-json-schema-validation-00
 #[derive(Clone, Debug, PartialEq, Default, Deserialize, Serialize)]
 pub struct ObjectSchema {
-    //
-    // display metadata
-    //
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub title: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub description: Option<String>,
+    // #########################################################################
+    // Keywords for Applying Subschemas With Logic
+    // https://json-schema.org/draft/2020-12/json-schema-core#name-keywords-for-applying-subsch
+    // #########################################################################
 
     //
-    // type
-    //
-    #[serde(rename = "type")]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub schema_type: Option<TypeSet>,
+    /// An instance validates successfully against this keyword if it validates successfully against
+    /// all schemas defined by this keyword's value.
+    ///
+    /// This keyword's value MUST be a non-empty array. Each item of the array MUST be a valid JSON
+    /// Schema.
+    ///
+    /// See <https://json-schema.org/draft/2020-12/json-schema-core#name-allof>.
+    #[serde(rename = "allOf", default, skip_serializing_if = "Vec::is_empty")]
+    pub all_of: Vec<ObjectOrReference<ObjectSchema>>,
+
+    /// An instance validates successfully against this keyword if it validates successfully against
+    /// at least one schema defined by this keyword's value.
+    ///
+    /// This keyword's value MUST be a non-empty array. Each item of the array MUST be a valid JSON
+    /// Schema.
+    ///
+    /// See <https://json-schema.org/draft/2020-12/json-schema-core#name-anyof>.
+    #[serde(rename = "anyOf", default, skip_serializing_if = "Vec::is_empty")]
+    pub any_of: Vec<ObjectOrReference<ObjectSchema>>,
+
+    /// An instance validates successfully against this keyword if it validates successfully against
+    /// exactly one schema defined by this keyword's value.
+    ///
+    /// This keyword's value MUST be a non-empty array. Each item of the array MUST be a valid JSON
+    /// Schema.
+    ///
+    /// See <https://json-schema.org/draft/2020-12/json-schema-core#name-oneof>.
+    #[serde(rename = "oneOf", default, skip_serializing_if = "Vec::is_empty")]
+    pub one_of: Vec<ObjectOrReference<ObjectSchema>>,
+
+    // TODO: missing fields
+    // - not
+
+    // #########################################################################
+    // TODO: missing concept
+    // Keywords for Applying Subschemas Conditionally
+    // https://json-schema.org/draft/2020-12/json-schema-core#name-keywords-for-applying-subsche
+    // #########################################################################
+
+    // #########################################################################
+    // Keywords for Applying Subschemas to Arrays
+    // https://json-schema.org/draft/2020-12/json-schema-core#name-keywords-for-applying-subschema
+    // #########################################################################
 
     //
-    // structure
-    //
-    #[serde(default)]
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    pub required: Vec<String>,
-
+    /// This keyword applies its subschema to all instance array elements.
+    ///
+    /// Omitting this keyword has the same assertion behavior as an empty schema.
+    ///
+    /// See <https://json-schema.org/draft/2020-12/json-schema-core#name-items>.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub items: Option<Box<ObjectOrReference<ObjectSchema>>>,
 
-    #[serde(default)]
-    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+    // TODO: missing fields
+    // - prefixItems
+    // - contains
+
+    // #########################################################################
+    // Keywords for Applying Subschemas to Objects
+    // https://json-schema.org/draft/2020-12/json-schema-core#name-keywords-for-applying-subschemas
+    // #########################################################################
+
+    //
+    /// Validation succeeds if, for each name that appears in both the instance and as a name within
+    /// this keyword's value, the child instance for that name successfully validates against the
+    /// corresponding schema.
+    ///
+    /// Omitting this keyword has the same assertion behavior as an empty object.
+    ///
+    /// See <https://json-schema.org/draft/2020-12/json-schema-core#name-properties>.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub properties: BTreeMap<String, ObjectOrReference<ObjectSchema>>,
 
     /// Schema for additional object properties.
     ///
     /// Inline or referenced item MUST be of a [Schema Object] or a boolean.
     ///
-    /// See <https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-01#name-additionalproperties>,
-    /// <https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-01#name-json-schema-documents>,
-    /// and <https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-01#name-boolean-json-schemas>.
+    /// See <https://json-schema.org/draft/2020-12/json-schema-core#name-additionalproperties>,
+    /// <https://json-schema.org/draft/2020-12/json-schema-core#name-json-schema-documents>, and
+    /// <https://json-schema.org/draft/2020-12/json-schema-core#name-boolean-json-schemas>.
     ///
     /// [Schema Object]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#schema-object
     #[serde(
@@ -133,12 +201,312 @@ pub struct ObjectSchema {
     )]
     pub additional_properties: Option<Schema>,
 
+    // TODO: missing fields
+    // - patternProperties
+    // - propertyNames
+
+    // #########################################################################
+    // TODO: missing concept
+    // A Vocabulary for Unevaluated Locations
+    // https://json-schema.org/draft/2020-12/json-schema-core#name-a-vocabulary-for-unevaluate
+    // #########################################################################
+
+    // #########################################################################
+    // Validation Keywords for Any Instance Type
+    // https://json-schema.org/draft/2020-12/json-schema-validation#name-validation-keywords-for-any
+    // #########################################################################
+
     //
-    // additional metadata
+    /// Schema type.
+    ///
+    /// String values MUST be one of the six primitive types ("null", "boolean", "object", "array",
+    /// "number", or "string"), or "integer" which matches any number with a zero fractional part.
+    ///
+    /// If the value of "type" is a string, then an instance validates successfully if its type
+    /// matches the type represented by the value of the string. If the value of "type" is an array,
+    /// then an instance validates successfully if its type matches any of the types indicated by
+    /// the strings in the array.
+    ///
+    /// See <https://json-schema.org/draft/2020-12/json-schema-validation#name-type>.
+    #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
+    pub schema_type: Option<TypeSet>,
+
+    /// An instance validates successfully against this if its value is equal to one of the elements
+    /// in this array.
+    ///
+    /// Elements in the array might be of any type, including null.
+    ///
+    /// See <https://json-schema.org/draft/2020-12/json-schema-validation#name-enum>.
+    #[serde(rename = "enum", default, skip_serializing_if = "Vec::is_empty")]
+    pub enum_values: Vec<serde_json::Value>,
+
+    /// Functionally equivalent to an "enum" with a single value.
+    ///
+    /// The value of this keyword MAY be of any type, including null.
+    ///
+    /// See <https://json-schema.org/draft/2020-12/json-schema-validation#name-const>.
+    #[serde(rename = "const", skip_serializing_if = "Option::is_none")]
+    pub const_value: Option<serde_json::Value>,
+
+    // #########################################################################
+    // Validation Keywords for Numeric Instances (number and integer)
+    // https://json-schema.org/draft/2020-12/json-schema-validation#name-validation-keywords-for-num
+    // #########################################################################
+
     //
+    /// A numeric instance is valid only if division by this keyword's value results in an integer.
+    ///
+    /// The value of "multipleOf" MUST be a number, strictly greater than 0.
+    ///
+    /// See <https://json-schema.org/draft/2020-12/json-schema-validation#name-multipleof>.
+    #[serde(rename = "multipleOf", skip_serializing_if = "Option::is_none")]
+    pub multiple_of: Option<serde_json::Number>,
+
+    /// If the instance is a number, then this keyword validates only if the instance is less than
+    /// or exactly equal to "maximum".
+    ///
+    /// The value of "maximum" MUST be a number, representing an inclusive upper limit for a numeric
+    /// instance.
+    ///
+    /// See <https://json-schema.org/draft/2020-12/json-schema-validation#name-maximum>.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub maximum: Option<serde_json::Number>,
+
+    /// If the instance is a number, then the instance is valid only if it has a value strictly less
+    /// than (not equal to) "exclusiveMaximum".
+    ///
+    /// The value of "exclusiveMaximum" MUST be a number, representing an exclusive upper limit for
+    /// a numeric instance.
+    ///
+    /// See <https://json-schema.org/draft/2020-12/json-schema-validation#name-exclusivemaximum>.
+    #[serde(rename = "exclusiveMaximum", skip_serializing_if = "Option::is_none")]
+    pub exclusive_maximum: Option<serde_json::Number>,
+
+    /// If the instance is a number, then this keyword validates only if the instance is greater
+    /// than or exactly equal to "minimum".
+    ///
+    /// The value of "minimum" MUST be a number, representing an inclusive lower limit for a numeric
+    /// instance.
+    ///
+    /// See <https://json-schema.org/draft/2020-12/json-schema-validation#name-minimum>.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub minimum: Option<serde_json::Number>,
+
+    /// If the instance is a number, then the instance is valid only if it has a value strictly
+    /// greater than (not equal to) "exclusiveMinimum".
+    ///
+    /// The value of "exclusiveMinimum" MUST be a number, representing an exclusive lower limit for
+    /// a numeric instance.
+    ///
+    /// See <https://json-schema.org/draft/2020-12/json-schema-validation#name-exclusiveminimum>.
+    #[serde(rename = "exclusiveMinimum", skip_serializing_if = "Option::is_none")]
+    pub exclusive_minimum: Option<serde_json::Number>,
+
+    // #########################################################################
+    // Validation Keywords for Strings
+    // https://json-schema.org/draft/2020-12/json-schema-validation#name-validation-keywords-for-str
+    // #########################################################################
+
+    //
+    /// A string instance is valid against this keyword if its length is less than, or equal to, the
+    /// value of this keyword.
+    ///
+    /// See <https://json-schema.org/draft/2020-12/json-schema-validation#name-maxlength>.
+    #[serde(rename = "maxLength", skip_serializing_if = "Option::is_none")]
+    pub max_length: Option<u64>,
+
+    /// A string instance is valid against this keyword if its length is greater than, or equal to,
+    /// the value of this keyword.
+    ///
+    /// Omitting this keyword has the same behavior as a value of 0.
+    ///
+    /// See <https://json-schema.org/draft/2020-12/json-schema-validation#name-minlength>.
+    #[serde(rename = "minLength", skip_serializing_if = "Option::is_none")]
+    pub min_length: Option<u64>,
+
+    /// A string instance is considered valid if the regular expression matches the instance
+    /// successfully.
+    ///
+    /// Recall: regular expressions are not implicitly anchored.
+    ///
+    /// This string SHOULD be a valid regular expression, according to the ECMA-262 regular
+    /// expression dialect.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pattern: Option<String>,
+
+    // #########################################################################
+    // Validation Keywords for Arrays
+    // https://json-schema.org/draft/2020-12/json-schema-validation#name-validation-keywords-for-arr
+    // #########################################################################
+
+    //
+    /// An array instance is valid against "maxItems" if its size is less than, or equal to, the
+    /// value of this keyword.
+    ///
+    /// See <https://json-schema.org/draft/2020-12/json-schema-validation#name-maxitems>.
+    #[serde(rename = "maxItems", skip_serializing_if = "Option::is_none")]
+    pub max_items: Option<u64>,
+
+    /// An array instance is valid against "minItems" if its size is greater than, or equal to, the
+    /// value of this keyword.
+    ///
+    /// Omitting this keyword has the same behavior as a value of 0.
+    ///
+    /// See <https://json-schema.org/draft/2020-12/json-schema-validation#name-minitems>.
+    #[serde(rename = "minItems", skip_serializing_if = "Option::is_none")]
+    pub min_items: Option<u64>,
+
+    /// True if elements of the array instance must be unique.
+    ///
+    /// If this keyword has boolean value false, the instance validates successfully. If it has
+    /// boolean value true, the instance validates successfully if all of its elements are unique.
+    ///
+    /// Omitting this keyword has the same behavior as a value of false.
+    ///
+    /// See <https://json-schema.org/draft/2020-12/json-schema-validation#name-uniqueitems>.
+    #[serde(rename = "uniqueItems", skip_serializing_if = "Option::is_none")]
+    pub unique_items: Option<bool>,
+
+    // TODO: missing fields
+    // - maxContains
+    // - minContains
+
+    // #########################################################################
+    // Validation Keywords for Objects
+    // https://json-schema.org/draft/2020-12/json-schema-validation#name-validation-keywords-for-obj
+    // #########################################################################
+
+    //
+    /// An object instance is valid against "maxProperties" if its number of properties is less
+    /// than, or equal to, the value of this keyword.
+    ///
+    /// See <https://json-schema.org/draft/2020-12/json-schema-validation#name-maxproperties>.
+    #[serde(rename = "maxProperties", skip_serializing_if = "Option::is_none")]
+    pub max_properties: Option<u64>,
+
+    /// An object instance is valid against "minProperties" if its number of properties is greater
+    /// than, or equal to, the value of this keyword.
+    ///
+    /// Omitting this keyword has the same behavior as a value of 0.
+    ///
+    /// See <https://json-schema.org/draft/2020-12/json-schema-validation#name-minproperties>.
+    #[serde(rename = "minProperties", skip_serializing_if = "Option::is_none")]
+    pub min_properties: Option<u64>,
+
+    /// An object instance is valid against this keyword if every item in the array is the name of a
+    /// property in the instance.
+    ///
+    /// Omitting this keyword has the same behavior as an empty array.
+    ///
+    /// See <https://json-schema.org/draft/2020-12/json-schema-validation#name-required>.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub required: Vec<String>,
+
+    // TODO: missing fields
+    // - dependentRequired
+
+    // #########################################################################
+    // Vocabularies for Semantic Content With "format"
+    // https://json-schema.org/draft/2020-12/json-schema-validation#name-vocabularies-for-semantic-c
+    // #########################################################################
+
+    //
+    /// The "format" annotation keyword is defined to allow schema authors to convey semantic
+    /// information for a fixed subset of values which are accurately described by authoritative
+    /// resources, be they RFCs or other external specifications.
+    ///
+    /// See <https://json-schema.org/draft/2020-12/json-schema-validation#name-vocabularies-for-semantic-c>.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub format: Option<String>,
+
+    // #########################################################################
+    // A Vocabulary for Basic Meta-Data Annotations
+    // https://json-schema.org/draft/2020-12/json-schema-validation#name-a-vocabulary-for-basic-meta
+    // #########################################################################
+
+    //
+    /// Schema title.
+    ///
+    /// See <https://json-schema.org/draft/2020-12/json-schema-validation#name-title-and-description>.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub title: Option<String>,
+
+    /// Explains the purpose of the instance described by this schema.
+    ///
+    /// See <https://json-schema.org/draft/2020-12/json-schema-validation#name-title-and-description>.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+
+    /// Default value associated with a particular schema.
+    ///
+    /// It is RECOMMENDED that a default value be valid against the associated schema.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub default: Option<serde_json::Value>,
 
+    /// If true, indicates that applications SHOULD refrain from usage of the declared property.
+    ///
+    /// It MAY mean the property is going to be removed in the future. A root schema containing
+    /// "deprecated" with a value of true indicates that the entire resource being described MAY be
+    /// removed in the future.
+    ///
+    /// The "deprecated" keyword applies to each instance location to which the schema object
+    /// containing the keyword successfully applies. This can result in scenarios where every array
+    /// item or object property is deprecated even though the containing array or object is not.
+    ///
+    /// Omitting this keyword has the same behavior as a value of false.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub deprecated: Option<bool>,
+
+    /// If "readOnly" has a value of boolean true, it indicates that the value of the instance is
+    /// managed exclusively by the owning authority, and attempts by an application to modify the
+    /// value of this property are expected to be ignored or rejected by that owning authority.
+    ///
+    /// An instance document that is marked as "readOnly" for the entire document MAY be ignored if
+    /// sent to the owning authority, or MAY result in an error, at the authority's discretion.
+    ///
+    /// See <https://json-schema.org/draft/2020-12/json-schema-validation#name-readonly-and-writeonly>.
+    #[serde(rename = "readOnly", skip_serializing_if = "Option::is_none")]
+    pub read_only: Option<bool>,
+
+    /// If "writeOnly" has a value of boolean true, it indicates that the value is never present
+    /// when the instance is retrieved from the owning authority.
+    ///
+    /// It can be present when sent to the owning authority to update or create the document (or the
+    /// resource it represents), but it will not be included in any updated or newly created version
+    /// of the instance.
+    ///
+    /// An instance document that is marked as "writeOnly" for the entire document MAY be returned
+    /// as a blank document of some sort, or MAY produce an error upon retrieval, or have the
+    /// retrieval request ignored, at the authority's discretion.
+    ///
+    /// See <https://json-schema.org/draft/2020-12/json-schema-validation#name-readonly-and-writeonly>.
+    #[serde(rename = "writeOnly", skip_serializing_if = "Option::is_none")]
+    pub write_only: Option<bool>,
+
+    /// This keyword can be used to provide sample JSON values associated with a particular schema,
+    /// for the purpose of illustrating usage.
+    ///
+    /// It is RECOMMENDED that these values be valid against the associated schema.
+    ///
+    /// See <https://json-schema.org/draft/2020-12/json-schema-validation#name-examples>.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub examples: Vec<serde_json::Value>,
+
+    // #########################################################################
+    // OpenAPI Fixed Fields
+    // https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#fixed-fields-20
+    // #########################################################################
+
+    //
+    /// A free-form property to include an example of an instance for this schema.
+    ///
+    /// To represent examples that cannot be naturally represented in JSON or YAML, a string value
+    /// can be used to contain the example with escaping where necessary.
+    ///
+    /// # Deprecated
+    ///
+    /// The `example` property has been deprecated in favor of the JSON Schema `examples` keyword.
+    /// Use of `example` is discouraged, and later versions of this specification may remove it.
     #[serde(
         default,
         deserialize_with = "distinguish_missing_and_null",
@@ -146,80 +514,11 @@ pub struct ObjectSchema {
     )]
     pub example: Option<serde_json::Value>,
 
-    //
-    // validation requirements
-    //
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub format: Option<String>,
-
-    /// An instance validates successfully against this if its value is equal to one of the elements
-    /// in this array.
-    #[serde(rename = "enum", default, skip_serializing_if = "Vec::is_empty")]
-    pub enum_values: Vec<String>,
-
-    /// Functionally equivalent to an "enum" with a single value.
-    ///
-    /// See <https://json-schema.org/draft/2020-12/json-schema-validation#name-const>.
-    #[serde(rename = "const", skip_serializing_if = "Option::is_none")]
-    pub const_value: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub pattern: Option<String>,
-
-    #[serde(rename = "multipleOf", skip_serializing_if = "Option::is_none")]
-    pub multiple_of: Option<serde_json::Number>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub minimum: Option<serde_json::Number>,
-
-    #[serde(rename = "exclusiveMaximum", skip_serializing_if = "Option::is_none")]
-    pub exclusive_maximum: Option<serde_json::Number>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub maximum: Option<serde_json::Number>,
-
-    #[serde(rename = "exclusiveMinimum", skip_serializing_if = "Option::is_none")]
-    pub exclusive_minimum: Option<serde_json::Number>,
-
-    #[serde(rename = "minLength", skip_serializing_if = "Option::is_none")]
-    pub min_length: Option<u64>,
-
-    #[serde(rename = "maxLength", skip_serializing_if = "Option::is_none")]
-    pub max_length: Option<u64>,
-
-    #[serde(rename = "minItems", skip_serializing_if = "Option::is_none")]
-    pub min_items: Option<u64>,
-
-    #[serde(rename = "maxItems", skip_serializing_if = "Option::is_none")]
-    pub max_items: Option<u64>,
-
-    #[serde(rename = "uniqueItems", skip_serializing_if = "Option::is_none")]
-    pub unique_items: Option<bool>,
-
-    #[serde(rename = "maxProperties", skip_serializing_if = "Option::is_none")]
-    pub max_properties: Option<u64>,
-
-    #[serde(rename = "minProperties", skip_serializing_if = "Option::is_none")]
-    pub min_properties: Option<u64>,
-
-    #[serde(rename = "readOnly", skip_serializing_if = "Option::is_none")]
-    pub read_only: Option<bool>,
-
-    #[serde(rename = "writeOnly", skip_serializing_if = "Option::is_none")]
-    pub write_only: Option<bool>,
+    // #########################################################################
+    // OpenAPI Other
+    // #########################################################################
 
     //
-    // composition
-    //
-    #[serde(rename = "allOf", default, skip_serializing_if = "Vec::is_empty")]
-    pub all_of: Vec<ObjectOrReference<ObjectSchema>>,
-
-    #[serde(rename = "oneOf", default, skip_serializing_if = "Vec::is_empty")]
-    pub one_of: Vec<ObjectOrReference<ObjectSchema>>,
-
-    #[serde(rename = "anyOf", default, skip_serializing_if = "Vec::is_empty")]
-    pub any_of: Vec<ObjectOrReference<ObjectSchema>>,
-
     /// Specification extensions.
     ///
     /// Only "x-" prefixed keys are collected, and the prefix is stripped.

@@ -2,8 +2,12 @@
 
 ## Unreleased
 
+- Add `spec::ObjectSchema::deprecated` field.
+- Add `spec::ObjectSchema::examples` field.
 - Add `spec::Contact::validate_email()` method.
 - Expose the `spec::ClientCredentialsFlow::token_url` field.
+- The type of the `spec::ObjectSchema::enum` field is now `Vec<serde_json::Value>`.
+- The type of the `spec::ObjectSchema::const` field is now `Option<serde_json::Value>`.
 - Rename `Error::{SemVerError => Semver}` enum variant.
 - Rename `spec::RefError::{InvalidType => UnknownType}` enum variant.
 
