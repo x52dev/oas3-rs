@@ -7,20 +7,28 @@ use super::{FromRef, MediaType, Ref, RefError, RefType, Spec};
 /// Describes a single request body.
 ///
 /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#request-body-object>.
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
+#[derive(Debug, Clone, Default, PartialEq, Deserialize, Serialize)]
 pub struct RequestBody {
-    /// A brief description of the request body. This could contain examples of use.
+    /// A brief description of the request body.
+    ///
+    /// This could contain examples of use.
     ///
     /// [CommonMark syntax](https://spec.commonmark.org) MAY be used for rich text representation.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
 
-    /// The content of the request body. The key is a media type or
-    /// [media type range](https://tools.ietf.org/html/rfc7231#appendix-D) and the
-    /// value describes it. For requests that match multiple keys, only the most specific key
-    /// is applicable. e.g. text/plain overrides text/*
+    /// The content of the request body.
+    ///
+    /// The key is a media type or [media type range] and the value describes it. For requests that
+    /// match multiple keys, only the most specific key is applicable. E.g., `text/plain` overrides
+    /// `text/*`.
+    ///
+    /// [media type range]: https://tools.ietf.org/html/rfc7231#appendix-D
     pub content: BTreeMap<String, MediaType>,
 
+    /// Determines if the request body is required in the request.
+    ///
+    /// Defaults to false.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub required: Option<bool>,
 }

@@ -94,6 +94,7 @@ pub struct PathItem {
 }
 
 impl PathItem {
+    /// Returns iterator over this path's provided operations, keyed by method.
     pub fn methods(&self) -> impl IntoIterator<Item = (Method, &Operation)> {
         let mut methods = vec![];
 
