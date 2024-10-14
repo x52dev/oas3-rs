@@ -20,6 +20,8 @@ pub struct Tag {
     /// [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
+
+    //
     // /// Additional external documentation for this tag.
     // #[serde(default)]
     // #[serde(skip_serializing_if = "Vec::is_empty")]

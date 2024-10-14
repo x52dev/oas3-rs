@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use super::{Example, ObjectOrReference, Spec};
 
 /// Examples for a media type.
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(untagged)]
 pub enum MediaTypeExamples {
     /// Example of the media type.
@@ -78,5 +78,135 @@ impl MediaTypeExamples {
                 })
                 .collect(),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use serde_json::json;
+
+    use super::*;
+
+    #[test]
+    fn is_empty() {
+        assert!(MediaTypeExamples::default().is_empty());
+
+        assert!(!MediaTypeExamples::Example {
+            example: serde_json::Value::Null
+        }
+        .is_empty());
+    }
+
+    #[test]
+    fn deserialize() {
+        assert_eq!(
+            serde_yml::from_str::<MediaTypeExamples>(indoc::indoc! {"
+                    examples: {}
+                "})
+            .unwrap(),
+            MediaTypeExamples::default(),
+        );
+
+        assert_eq!(
+            serde_yml::from_str::<MediaTypeExamples>(indoc::indoc! {"
+                    example: null
+                "})
+            .unwrap(),
+            MediaTypeExamples::Example {
+                example: json!(null)
+            },
+        );
+    }
+
+    #[test]
+    fn serialize() {
+        let mt_examples = MediaTypeExamples::default();
+        assert_eq!(
+            serde_yml::to_string(&mt_examples).unwrap(),
+            indoc::indoc! {"
+                examples: {}
+            "},
+        );
+
+        let mt_examples = MediaTypeExamples::Example {
+            example: json!(null),
+        };
+        assert_eq!(
+            serde_yml::to_string(&mt_examples).unwrap(),
+            indoc::indoc! {"
+                example: null
+            "},
+        );
+    }
+
+    #[test]
+    fn single_example() {
+        let spec = serde_yml::from_str::<Spec>(indoc::indoc! {"
+openapi: 3.1.0
+info:
+  title: Mascots
+  version: 0.0.0
+paths: {}
+        "})
+        .unwrap();
+
+        let mt_examples = MediaTypeExamples::Example {
+            example: json!("ferris"),
+        };
+
+        let examples = mt_examples.resolve_all(&spec);
+
+        // no example with this name defined
+        assert_eq!(examples.get("Go"), None);
+
+        // single examples are put in "default" key of returned map
+        assert_eq!(
+            examples.get("default").unwrap().value.as_ref().unwrap(),
+            &json!("ferris"),
+        );
+    }
+
+    #[test]
+    fn resolve_references() {
+        let spec = serde_yml::from_str::<Spec>(indoc::indoc! {"
+openapi: 3.1.0
+info:
+  title: Mascots
+  version: 0.0.0
+paths: {}
+components:
+    examples:
+        RustMascot:
+            value: ferris
+        "})
+        .unwrap();
+
+        let mt_examples = MediaTypeExamples::Examples {
+            examples: BTreeMap::from([
+                (
+                    "Rust".to_owned(),
+                    ObjectOrReference::Ref {
+                        ref_path: "#/components/examples/RustMascot".to_owned(),
+                    },
+                ),
+                (
+                    "Go".to_owned(),
+                    ObjectOrReference::Ref {
+                        ref_path: "#/components/examples/GoMascot".to_owned(),
+                    },
+                ),
+            ]),
+        };
+
+        let examples = mt_examples.resolve_all(&spec);
+
+        // reference points to non-existent component
+        assert_eq!(examples.get("Go"), None);
+
+        // reference points to valid example component
+        assert_eq!(
+            examples.get("Rust").unwrap().value.as_ref().unwrap(),
+            &json!("ferris"),
+        );
     }
 }
