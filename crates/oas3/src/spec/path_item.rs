@@ -67,23 +67,21 @@ pub struct PathItem {
     pub trace: Option<Operation>,
 
     /// An alternative `server` array to service all operations in this path.
-    #[serde(default)]
-    #[serde(skip_serializing_if = "Vec::is_empty")]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub servers: Vec<Server>,
 
-    /// A list of parameters that are applicable for all the operations described under this
-    /// path. These parameters can be overridden at the operation level, but cannot be removed
-    /// there. The list MUST NOT include duplicated parameters. A unique parameter is defined by
-    /// a combination of a
-    /// [name](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameterName)
-    /// and
-    /// [location](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameterIn).
-    /// The list can use the
-    /// [Reference Object](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#reference-object)
-    /// to link to parameters that are defined at the
-    /// [OpenAPI Object's components/parameters](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#componentsParameters).
-    #[serde(default)]
-    #[serde(skip_serializing_if = "Vec::is_empty")]
+    /// A list of parameters that are applicable for all the operations described under this path.
+    ///
+    /// These parameters can be overridden at the operation level, but cannot be removed there. The
+    /// list MUST NOT include duplicated parameters. A unique parameter is defined by a combination
+    /// of a [name] and [location] The list can use the [Reference Object] to link to parameters
+    /// that are defined at the [OpenAPI Object's components/parameters].
+    ///
+    /// [name]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameterName
+    /// [location]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameterIn
+    /// [Reference Object]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#reference-object
+    /// [OpenAPI Object's components/parameters]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#componentsParameters
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub parameters: Vec<ObjectOrReference<Parameter>>,
 
     /// Specification extensions.

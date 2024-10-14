@@ -25,6 +25,7 @@ pub enum SecurityScheme {
         description: Option<String>,
 
         name: String,
+
         #[serde(rename = "in")]
         location: String,
     },
