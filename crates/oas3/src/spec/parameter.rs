@@ -7,6 +7,7 @@ use super::{
     RefType, Spec,
 };
 
+/// Parameter location.
 #[derive(Debug, Clone, Copy, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub enum ParameterIn {
@@ -34,6 +35,7 @@ pub enum ParameterIn {
     Cookie,
 }
 
+/// Parameter style.
 #[derive(Debug, Clone, Copy, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub enum ParameterStyle {

@@ -6,41 +6,47 @@ use super::{spec_extensions, Server};
 
 /// The Link object represents a possible design-time link for a response.
 ///
-/// The presence of a link does not guarantee the caller's ability to successfully invoke it,
-/// rather it provides a known relationship and traversal mechanism between responses and
-/// other operations.
+/// The presence of a link does not guarantee the caller's ability to successfully invoke it, rather
+/// it provides a known relationship and traversal mechanism between responses and other operations.
 ///
 /// Unlike _dynamic_ links (i.e. links provided *in* the response payload), the OAS linking
 /// mechanism does not require link information in the runtime response.
 ///
-/// For computing links, and providing instructions to execute them, a
-/// [runtime expression](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#runtimeExpression)
-/// is used for accessing values in an operation and using them as parameters while invoking
-/// the linked operation.
+/// For computing links, and providing instructions to execute them, a [runtime expression] is used
+/// for accessing values in an operation and using them as parameters while invoking the linked
+/// operation.
+///
+/// The `operationRef` and `operationId` fields are mutually exclusive and so this structure is
+/// modelled as an enum.
 ///
 /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#link-object>.
+///
+/// [runtime expression]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#runtime-expressions
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(untagged)]
 pub enum Link {
     /// A relative or absolute reference to an OAS operation.
-    ///
-    /// This field is mutually exclusive of the `operationId` field, and MUST point to an
-    /// [Operation Object]. Relative `operationRef` values MAY be used to locate an existing
-    /// [Operation Object] in the OpenAPI definition.
-    ///
-    /// [Operation Object]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#operation-object
     Ref {
+        /// A relative or absolute reference to an OAS operation.
+        ///
+        /// This field is mutually exclusive of the `operationId` field, and MUST point to an
+        /// [Operation Object]. Relative `operationRef` values MAY be used to locate an existing
+        /// [Operation Object] in the OpenAPI definition.
+        ///
+        /// [Operation Object]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#operation-object
         #[serde(rename = "operationRef")]
         operation_ref: String,
 
+        /// A map representing parameters to pass to an operation.
+        ///
+        /// The key is the parameter name to be used, whereas the value can be a constant or an
+        /// expression to be evaluated and passed to the linked operation. The parameter name can be
+        /// qualified using the [parameter location] `[{in}.]{name}` for operations that use the
+        /// same parameter name in different locations (e.g. path.id).
+        ///
+        /// [parameter location]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameterIn
+        //
         // FIXME: Implement
-        // /// A map representing parameters to pass to an operation as specified with `operationId`
-        // /// or identified via `operationRef`. The key is the parameter name to be used, whereas
-        // /// the value can be a constant or an expression to be evaluated and passed to the
-        // /// linked operation. The parameter name can be qualified using the
-        // /// [parameter location](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameterIn)
-        // /// `[{in}.]{name}` for operations that use the same parameter name in different
-        // /// locations (e.g. path.id).
         // parameters: BTreeMap<String, Any | {expression}>,
         //
         #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
@@ -54,6 +60,7 @@ pub enum Link {
         // request_body: Any | {expression}
         //
         /// A description of the link.
+        ///
         /// [CommonMark syntax](https://spec.commonmark.org) MAY be used for rich text
         /// representation.
         #[serde(skip_serializing_if = "Option::is_none")]
@@ -72,22 +79,23 @@ pub enum Link {
         extensions: BTreeMap<String, serde_json::Value>,
     },
 
-    /// The name of an _existing_, resolvable OAS operation, as defined with a unique
-    /// `operationId`.
-    ///
-    /// This field is mutually exclusive of the `operationRef` field.
+    /// The name of an _existing_, resolvable OAS operation, as defined with a unique `operationId`.
     Id {
+        /// The name of an _existing_, resolvable OAS operation, as defined with a unique
+        /// `operationId`.
         #[serde(rename = "operationId")]
         operation_id: String,
 
+        /// A map representing parameters to pass to an operation.
+        ///
+        /// The key is the parameter name to be used, whereas the value can be a constant or an
+        /// expression to be evaluated and passed to the linked operation. The parameter name can be
+        /// qualified using the [parameter location] `[{in}.]{name}` for operations that use the
+        /// same parameter name in different locations (e.g. path.id).
+        ///
+        /// [parameter location]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameterIn
+        //
         // FIXME: Implement
-        // /// A map representing parameters to pass to an operation as specified with `operationId`
-        // /// or identified via `operationRef`. The key is the parameter name to be used, whereas
-        // /// the value can be a constant or an expression to be evaluated and passed to the
-        // /// linked operation. The parameter name can be qualified using the
-        // /// [parameter location](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameterIn)
-        // /// `[{in}.]{name}` for operations that use the same parameter name in different
-        // /// locations (e.g. path.id).
         // parameters: BTreeMap<String, Any | {expression}>,
         //
         #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]

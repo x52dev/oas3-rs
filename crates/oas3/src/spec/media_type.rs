@@ -29,6 +29,7 @@ pub struct MediaType {
 }
 
 impl MediaType {
+    /// Resolves and returns the JSON schema definition for this media type.
     pub fn schema(&self, spec: &Spec) -> Result<ObjectSchema, Error> {
         self.schema
             .as_ref()
@@ -37,6 +38,9 @@ impl MediaType {
             .map_err(Error::Ref)
     }
 
+    /// Resolves and returns the provided examples for this media type.
+    ///
+    /// Also see [`MediaTypeExamples::resolve_all()`].
     pub fn examples(&self, spec: &Spec) -> BTreeMap<String, Example> {
         self.examples
             .as_ref()

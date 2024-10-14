@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use super::{Example, ObjectOrReference, Spec};
 
+/// Examples for a media type.
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[serde(untagged)]
 pub enum MediaTypeExamples {
