@@ -16,7 +16,7 @@ missing_debug_implementations = { level = "warn", priority = -1 }
 
 [workspace.dependencies]
 assert_matches = "1"
-bytes = "1.8"
+bytes = "1.9"
 color-eyre = "0.6"
 colored = "2"
 derive_more = "1"
