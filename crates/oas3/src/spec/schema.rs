@@ -5,7 +5,10 @@ use std::{collections::BTreeMap, fmt};
 use derive_more::derive::{Display, Error};
 use serde::{Deserialize, Deserializer, Serialize};
 
-use super::{spec_extensions, FromRef, ObjectOrReference, Ref, RefError, RefType, Spec};
+use super::{
+    discriminator::Discriminator, spec_extensions, FromRef, ObjectOrReference, Ref, RefError,
+    RefType, Spec,
+};
 
 /// Schema errors.
 #[derive(Debug, Clone, PartialEq, Display, Error)]
@@ -526,6 +529,9 @@ pub struct ObjectSchema {
     /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specification-extensions>.
     #[serde(flatten, with = "spec_extensions")]
     pub extensions: BTreeMap<String, serde_json::Value>,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub discriminator: Option<Discriminator>,
 }
 
 impl ObjectSchema {
@@ -627,5 +633,23 @@ mod tests {
         "};
         let schema = serde_yml::from_str::<ObjectSchema>(spec).unwrap();
         assert_eq!(schema.example, Some(serde_json::Value::Null));
+    }
+
+    #[test]
+    fn discriminator_example_is_parsed_correctly() {
+        let spec = indoc::indoc! {"
+          oneOf:
+            - $ref: '#/components/schemas/Cat'
+            - $ref: '#/components/schemas/Dog'
+            - $ref: '#/components/schemas/Lizard'
+            - $ref: 'https://gigantic-server.com/schemas/Monster/schema.json'
+          discriminator:
+            propertyName: petType
+            mapping:
+            dog: '#/components/schemas/Dog'
+            monster: 'https://gigantic-server.com/schemas/Monster/schema.json'
+        "};
+        let schema = serde_yml::from_str::<ObjectSchema>(spec).unwrap();
+        assert!(schema.discriminator.is_some());
     }
 }

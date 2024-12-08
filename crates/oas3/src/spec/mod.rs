@@ -13,6 +13,7 @@ mod components;
 mod contact;
 mod encoding;
 
+mod discriminator;
 mod error;
 mod example;
 mod external_doc;
