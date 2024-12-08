@@ -530,6 +530,9 @@ pub struct ObjectSchema {
     #[serde(flatten, with = "spec_extensions")]
     pub extensions: BTreeMap<String, serde_json::Value>,
 
+    /// Discriminator for object selection based on propertyName
+    ///
+    /// See <https://spec.openapis.org/oas/v3.1.0#discriminator-object>
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub discriminator: Option<Discriminator>,
 }
