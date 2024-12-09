@@ -39,7 +39,7 @@ serde = "1"
 serde_json = "1"
 serde_with = "3"
 serde_yml = "0.0.12"
-tokio = "1.41.1"
+tokio = "1.42.0"
 url = "2"
 
 [patch.crates-io]
