@@ -13,6 +13,7 @@ mod components;
 mod contact;
 mod encoding;
 
+mod discriminator;
 mod error;
 mod example;
 mod external_doc;
@@ -38,6 +39,7 @@ mod tag;
 pub use self::{
     components::*,
     contact::*,
+    discriminator::*,
     encoding::*,
     error::Error,
     example::*,
