@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.13.0
+
 - Add `spec::ObjectSchema::deprecated` field.
 - Add `spec::ObjectSchema::examples` field.
 - Add `spec::Contact::validate_email()` method.
