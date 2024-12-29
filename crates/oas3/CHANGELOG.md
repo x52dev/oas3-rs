@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.13.1
+
+- OpenAPI specification links in docs now reference the authoritative HTML version.
+
 ## 0.13.0
 
 - Add `spec::ObjectSchema::deprecated` field.
