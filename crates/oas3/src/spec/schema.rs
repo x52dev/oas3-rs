@@ -501,6 +501,12 @@ pub struct ObjectSchema {
     // #########################################################################
 
     //
+    /// Discriminator for object selection based on propertyName
+    ///
+    /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#discriminator-object>
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub discriminator: Option<Discriminator>,
+
     /// A free-form property to include an example of an instance for this schema.
     ///
     /// To represent examples that cannot be naturally represented in JSON or YAML, a string value
@@ -529,12 +535,6 @@ pub struct ObjectSchema {
     /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specification-extensions>.
     #[serde(flatten, with = "spec_extensions")]
     pub extensions: BTreeMap<String, serde_json::Value>,
-
-    /// Discriminator for object selection based on propertyName
-    ///
-    /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#discriminator-object>
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub discriminator: Option<Discriminator>,
 }
 
 impl ObjectSchema {
