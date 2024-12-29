@@ -649,8 +649,8 @@ mod tests {
           discriminator:
             propertyName: petType
             mapping:
-                dog: '#/components/schemas/Dog'
-                monster: 'https://gigantic-server.com/schemas/Monster/schema.json'
+              dog: '#/components/schemas/Dog'
+              monster: 'https://gigantic-server.com/schemas/Monster/schema.json'
         "};
         let schema = serde_yml::from_str::<ObjectSchema>(spec).unwrap();
 
