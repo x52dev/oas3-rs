@@ -5,6 +5,8 @@
 - Add `spec::ObjectSchema::deprecated` field.
 - Add `spec::ObjectSchema::examples` field.
 - Add `spec::Contact::validate_email()` method.
+- Add `spec::Discriminator` type.
+- Add `spec::ObjectSchema::discriminator` field.
 - Expose the `spec::ClientCredentialsFlow::token_url` field.
 - The type of the `spec::ObjectSchema::enum` field is now `Vec<serde_json::Value>`.
 - The type of the `spec::ObjectSchema::const` field is now `Option<serde_json::Value>`.

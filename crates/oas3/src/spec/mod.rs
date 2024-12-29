@@ -39,6 +39,7 @@ mod tag;
 pub use self::{
     components::*,
     contact::*,
+    discriminator::*,
     encoding::*,
     error::Error,
     example::*,

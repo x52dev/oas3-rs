@@ -4,10 +4,13 @@ use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
+/// A discriminator object can be used to aid in serialization, deserialization, and validation when
+/// payloads may be one of a number of different schemas.
+///
 /// The discriminator is a specific object in a schema which is used to inform the consumer of the
 /// document of an alternative schema based on the value associated with it.
 ///
-/// See <https://spec.openapis.org/oas/v3.1.0#discriminator-object>.
+/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#discriminator-object>.
 #[derive(Debug, Clone, PartialEq, Default, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Discriminator {

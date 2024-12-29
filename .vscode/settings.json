@@ -18,6 +18,7 @@
         "refpath",
         "reqwest",
         "rustfmt",
+        "rustup",
         "semver",
         "serde",
         "spdx",
