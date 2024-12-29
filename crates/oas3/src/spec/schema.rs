@@ -649,10 +649,12 @@ mod tests {
           discriminator:
             propertyName: petType
             mapping:
-            dog: '#/components/schemas/Dog'
-            monster: 'https://gigantic-server.com/schemas/Monster/schema.json'
+                dog: '#/components/schemas/Dog'
+                monster: 'https://gigantic-server.com/schemas/Monster/schema.json'
         "};
         let schema = serde_yml::from_str::<ObjectSchema>(spec).unwrap();
+
         assert!(schema.discriminator.is_some());
+        assert_eq!(2, schema.discriminator.unwrap().mapping.unwrap().len());
     }
 }

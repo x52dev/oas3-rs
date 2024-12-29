@@ -4,19 +4,19 @@ use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
-/// The discriminator is a specific object in a schema which is used to inform the consumer of
-/// the document of an alternative schema based on the value associated with it.
+/// The discriminator is a specific object in a schema which is used to inform the consumer of the
+/// document of an alternative schema based on the value associated with it.
 ///
-/// See <https://spec.openapis.org/oas/v3.1.0#discriminator-object>
-#[derive(Clone, Debug, PartialEq, Default, Deserialize, Serialize)]
+/// See <https://spec.openapis.org/oas/v3.1.0#discriminator-object>.
+#[derive(Debug, Clone, PartialEq, Default, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Discriminator {
-    /// The name of the property in the payload that will hold the discriminator value.
-    #[serde(rename = "propertyName")]
+    /// Name of the property in the payload that will hold the discriminator value.
     pub property_name: String,
 
-    /// An object to hold mappings between payload values and schema names or references
+    /// Object to hold mappings between payload values and schema names or references.
     ///
-    /// When using the discriminator, inline schemas will not be considered
+    /// When using the discriminator, inline schemas will not be considered.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub mapping: Option<BTreeMap<String, String>>,
 }
@@ -37,7 +37,7 @@ mod tests {
     fn discriminator_mapping_parsed_correctly() {
         let spec = indoc::indoc! {"
             propertyName: petType
-            mapping: 
+            mapping:
               dog: '#/components/schemas/Dog'
               cat: '#/components/schemas/Cat'
               monster: 'https://gigantic-server.com/schemas/Monster/schema.json'
