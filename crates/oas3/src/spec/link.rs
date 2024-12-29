@@ -19,9 +19,9 @@ use super::{spec_extensions, Server};
 /// The `operationRef` and `operationId` fields are mutually exclusive and so this structure is
 /// modelled as an enum.
 ///
-/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#link-object>.
+/// See <https://spec.openapis.org/oas/v3.1.0#link-object>.
 ///
-/// [runtime expression]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#runtime-expressions
+/// [runtime expression]: https://spec.openapis.org/oas/v3.1.0#runtime-expressions
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(untagged)]
 pub enum Link {
@@ -33,7 +33,7 @@ pub enum Link {
         /// [Operation Object]. Relative `operationRef` values MAY be used to locate an existing
         /// [Operation Object] in the OpenAPI definition.
         ///
-        /// [Operation Object]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#operation-object
+        /// [Operation Object]: https://spec.openapis.org/oas/v3.1.0#operation-object
         #[serde(rename = "operationRef")]
         operation_ref: String,
 
@@ -44,7 +44,7 @@ pub enum Link {
         /// qualified using the [parameter location] `[{in}.]{name}` for operations that use the
         /// same parameter name in different locations (e.g. path.id).
         ///
-        /// [parameter location]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameterIn
+        /// [parameter location]: https://spec.openapis.org/oas/v3.1.0#parameterIn
         //
         // FIXME: Implement
         // parameters: BTreeMap<String, Any | {expression}>,
@@ -54,7 +54,7 @@ pub enum Link {
 
         // FIXME: Implement
         // /// A literal value or
-        // /// [{expression}](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#runtimeExpression)
+        // /// [{expression}](https://spec.openapis.org/oas/v3.1.0#runtimeExpression)
         // /// to use as a request body when calling the target operation.
         // #[serde(rename = "requestBody")]
         // request_body: Any | {expression}
@@ -74,7 +74,7 @@ pub enum Link {
         ///
         /// Only "x-" prefixed keys are collected, and the prefix is stripped.
         ///
-        /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specification-extensions>.
+        /// See <https://spec.openapis.org/oas/v3.1.0#specification-extensions>.
         #[serde(flatten, with = "spec_extensions")]
         extensions: BTreeMap<String, serde_json::Value>,
     },
@@ -93,7 +93,7 @@ pub enum Link {
         /// qualified using the [parameter location] `[{in}.]{name}` for operations that use the
         /// same parameter name in different locations (e.g. path.id).
         ///
-        /// [parameter location]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameterIn
+        /// [parameter location]: https://spec.openapis.org/oas/v3.1.0#parameterIn
         //
         // FIXME: Implement
         // parameters: BTreeMap<String, Any | {expression}>,
@@ -103,7 +103,7 @@ pub enum Link {
 
         // FIXME: Implement
         // /// A literal value or
-        // /// [{expression}](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#runtimeExpression)
+        // /// [{expression}](https://spec.openapis.org/oas/v3.1.0#runtimeExpression)
         // /// to use as a request body when calling the target operation.
         // #[serde(rename = "requestBody")]
         // request_body: Any | {expression}
@@ -123,7 +123,7 @@ pub enum Link {
         ///
         /// Only "x-" prefixed keys are collected, and the prefix is stripped.
         ///
-        /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specification-extensions>.
+        /// See <https://spec.openapis.org/oas/v3.1.0#specification-extensions>.
         #[serde(flatten, with = "spec_extensions")]
         extensions: BTreeMap<String, serde_json::Value>,
     },

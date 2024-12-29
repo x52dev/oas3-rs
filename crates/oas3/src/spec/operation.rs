@@ -10,7 +10,7 @@ use crate::spec::spec_extensions;
 
 /// Describes a single API operation on a path.
 ///
-/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#operation-object>.
+/// See <https://spec.openapis.org/oas/v3.1.0#operation-object>.
 #[derive(Debug, Clone, Default, PartialEq, Deserialize, Serialize)]
 pub struct Operation {
     /// A list of tags for API documentation control.
@@ -49,11 +49,11 @@ pub struct Operation {
     /// [Reference Object] to link to parameters that are defined at the
     /// [OpenAPI Object's components/parameters].
     ///
-    /// [Path Item]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#pathItemParameters
-    /// [name]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameterName
-    /// [location]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameterIn
-    /// [Reference Object]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#reference-object
-    /// [OpenAPI Object's components/parameters]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#components-parameters
+    /// [Path Item]: https://spec.openapis.org/oas/v3.1.0#pathItemParameters
+    /// [name]: https://spec.openapis.org/oas/v3.1.0#parameterName
+    /// [location]: https://spec.openapis.org/oas/v3.1.0#parameterIn
+    /// [Reference Object]: https://spec.openapis.org/oas/v3.1.0#reference-object
+    /// [OpenAPI Object's components/parameters]: https://spec.openapis.org/oas/v3.1.0#components-parameters
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub parameters: Vec<ObjectOrReference<Parameter>>,
 
@@ -80,7 +80,7 @@ pub struct Operation {
     /// The `Responses Object` MUST contain at least one response code, and it SHOULD be the
     /// response for a successful operation call.
     ///
-    /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#responses-object>.
+    /// See <https://spec.openapis.org/oas/v3.1.0#responses-object>.
     pub responses: Option<BTreeMap<String, ObjectOrReference<Response>>>,
 
     /// A map of possible out-of band callbacks related to the parent operation.
@@ -90,7 +90,7 @@ pub struct Operation {
     /// expected responses. The key value used to identify the callback object is an expression,
     /// evaluated at runtime, that identifies a URL to use for the callback operation.
     ///
-    /// [Callback Object]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#callback-object
+    /// [Callback Object]: https://spec.openapis.org/oas/v3.1.0#callback-object
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub callbacks: BTreeMap<String, Callback>,
 
@@ -105,7 +105,7 @@ pub struct Operation {
     // /// values includes alternative security requirement objects that can be used. Only one
     // /// of the security requirement objects need to be satisfied to authorize a request.
     // /// This definition overrides any declared top-level
-    // /// [`security`](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#oasSecurity).
+    // /// [`security`](https://spec.openapis.org/oas/v3.1.0#oasSecurity).
     // /// To remove a top-level security declaration, an empty array can be used.
     // pub security: Option<SecurityRequirement>,
     //
@@ -120,7 +120,7 @@ pub struct Operation {
     ///
     /// Only "x-" prefixed keys are collected, and the prefix is stripped.
     ///
-    /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specification-extensions>.
+    /// See <https://spec.openapis.org/oas/v3.1.0#specification-extensions>.
     #[serde(flatten, with = "spec_extensions")]
     pub extensions: BTreeMap<String, serde_json::Value>,
 }

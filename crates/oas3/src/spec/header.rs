@@ -15,10 +15,10 @@ use super::{
 /// 1. All traits that are affected by the location MUST be applicable to a location of
 ///    `header` (for example, [`style`]).
 ///
-/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#header-object>.
+/// See <https://spec.openapis.org/oas/v3.1.0#header-object>.
 ///
-/// [Parameter Object]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameter-object
-/// [`style`]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameterStyle
+/// [Parameter Object]: https://spec.openapis.org/oas/v3.1.0#parameter-object
+/// [`style`]: https://spec.openapis.org/oas/v3.1.0#parameterStyle
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
 pub struct Header {
     /// A brief description of the header.
@@ -103,7 +103,7 @@ pub struct Header {
     ///
     /// Only "x-" prefixed keys are collected, and the prefix is stripped.
     ///
-    /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specification-extensions>.
+    /// See <https://spec.openapis.org/oas/v3.1.0#specification-extensions>.
     #[serde(flatten, with = "spec_extensions")]
     pub extensions: BTreeMap<String, serde_json::Value>,
 }

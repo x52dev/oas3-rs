@@ -10,7 +10,7 @@ use super::{spec_extensions, ObjectOrReference, Operation, Parameter, Server};
 /// A Path Item MAY be empty, due to [ACL constraints]. The path itself is still exposed to the
 /// documentation viewer but they will not know which operations and parameters are available.
 ///
-/// [ACL constraints]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#securityFiltering
+/// [ACL constraints]: https://spec.openapis.org/oas/v3.1.0#securityFiltering
 #[derive(Debug, Clone, Default, PartialEq, Deserialize, Serialize)]
 pub struct PathItem {
     /// An external definition of this path item.
@@ -19,7 +19,7 @@ pub struct PathItem {
     /// conflicts between the referenced definition and this Path Item's definition, the behavior is
     /// undefined.
     ///
-    /// [Path Item Object]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#pathItemObject
+    /// [Path Item Object]: https://spec.openapis.org/oas/v3.1.0#pathItemObject
     // FIXME: Should this ref be moved to an enum?
     #[serde(skip_serializing_if = "Option::is_none", rename = "$ref")]
     pub reference: Option<String>,
@@ -77,10 +77,10 @@ pub struct PathItem {
     /// of a [name] and [location] The list can use the [Reference Object] to link to parameters
     /// that are defined at the [OpenAPI Object's components/parameters].
     ///
-    /// [name]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameterName
-    /// [location]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameterIn
-    /// [Reference Object]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#reference-object
-    /// [OpenAPI Object's components/parameters]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#componentsParameters
+    /// [name]: https://spec.openapis.org/oas/v3.1.0#parameterName
+    /// [location]: https://spec.openapis.org/oas/v3.1.0#parameterIn
+    /// [Reference Object]: https://spec.openapis.org/oas/v3.1.0#reference-object
+    /// [OpenAPI Object's components/parameters]: https://spec.openapis.org/oas/v3.1.0#componentsParameters
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub parameters: Vec<ObjectOrReference<Parameter>>,
 
@@ -88,7 +88,7 @@ pub struct PathItem {
     ///
     /// Only "x-" prefixed keys are collected, and the prefix is stripped.
     ///
-    /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specification-extensions>.
+    /// See <https://spec.openapis.org/oas/v3.1.0#specification-extensions>.
     #[serde(flatten, with = "spec_extensions")]
     pub extensions: BTreeMap<String, serde_json::Value>,
 }

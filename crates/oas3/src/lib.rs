@@ -12,7 +12,7 @@
 //! }
 //! ```
 //!
-//! [OpenAPI v3.1]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md
+//! [OpenAPI v3.1]: https://spec.openapis.org/oas/v3.1.0
 
 #![warn(missing_docs)]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
@@ -28,7 +28,7 @@ pub use self::{error::Error, spec::Spec};
 ///
 /// Refer to the official [specification] for more information.
 ///
-/// [specification]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md
+/// [specification]: https://spec.openapis.org/oas/v3.1.0
 pub type OpenApiV3Spec = spec::Spec;
 
 /// Try deserializing an OpenAPI spec (YAML or JSON) from a file, giving the path.

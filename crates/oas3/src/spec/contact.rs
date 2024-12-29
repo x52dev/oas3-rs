@@ -14,7 +14,7 @@ pub struct InvalidEmail;
 
 /// Contact information for the exposed API.
 ///
-/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#contact-object>.
+/// See <https://spec.openapis.org/oas/v3.1.0#contact-object>.
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Contact {
     /// Identifying name of the contact person/organization.
@@ -36,7 +36,7 @@ pub struct Contact {
     ///
     /// Only "x-" prefixed keys are collected, and the prefix is stripped.
     ///
-    /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specification-extensions>.
+    /// See <https://spec.openapis.org/oas/v3.1.0#specification-extensions>.
     #[serde(flatten, with = "spec_extensions")]
     pub extensions: BTreeMap<String, serde_json::Value>,
 }

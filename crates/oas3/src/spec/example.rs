@@ -8,7 +8,7 @@ use super::{spec_extensions, FromRef, Ref, RefError, RefType, Spec};
 ///
 /// Will be validated against schema when used in conformance testing.
 ///
-/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#example-object>.
+/// See <https://spec.openapis.org/oas/v3.1.0#example-object>.
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct Example {
     /// Short description for the example.
@@ -38,7 +38,7 @@ pub struct Example {
     ///
     /// Only "x-" prefixed keys are collected, and the prefix is stripped.
     ///
-    /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specification-extensions>.
+    /// See <https://spec.openapis.org/oas/v3.1.0#specification-extensions>.
     #[serde(flatten, with = "spec_extensions")]
     pub extensions: BTreeMap<String, serde_json::Value>,
 }

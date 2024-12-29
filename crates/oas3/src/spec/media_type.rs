@@ -6,7 +6,7 @@ use super::{Encoding, Error, Example, MediaTypeExamples, ObjectOrReference, Obje
 
 /// Each Media Type Object provides schema and examples for the media type identified by its key.
 ///
-/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#media-type-object>.
+/// See <https://spec.openapis.org/oas/v3.1.0#media-type-object>.
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
 pub struct MediaType {
     /// The schema defining the type used for the request body.

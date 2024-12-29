@@ -1,4 +1,4 @@
-//! Schema specification for [OpenAPI 3.1](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md)
+//! Schema specification for [OpenAPI 3.1](https://spec.openapis.org/oas/v3.1.0)
 
 use std::collections::BTreeMap;
 
@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 /// The discriminator is a specific object in a schema which is used to inform the consumer of the
 /// document of an alternative schema based on the value associated with it.
 ///
-/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#discriminator-object>.
+/// See <https://spec.openapis.org/oas/v3.1.0#discriminator-object>.
 #[derive(Debug, Clone, PartialEq, Default, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Discriminator {

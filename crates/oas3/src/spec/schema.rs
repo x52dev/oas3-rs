@@ -1,4 +1,4 @@
-//! Schema specification for [OpenAPI 3.1](https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md)
+//! Schema specification for [OpenAPI 3.1](https://spec.openapis.org/oas/v3.1.0)
 
 use std::{collections::BTreeMap, fmt};
 
@@ -102,7 +102,7 @@ impl TypeSet {
 /// [JSON Schema Core] and [JSON Schema Validation]. Unless stated otherwise, the property
 /// definitions follow the JSON Schema.
 ///
-/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#schema-object> and
+/// See <https://spec.openapis.org/oas/v3.1.0#schema-object> and
 /// <https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-01#name-json-schema-documents>.
 ///
 /// [JSON Schema Specification Wright Draft 00]: https://json-schema.org
@@ -197,7 +197,7 @@ pub struct ObjectSchema {
     /// <https://json-schema.org/draft/2020-12/json-schema-core#name-json-schema-documents>, and
     /// <https://json-schema.org/draft/2020-12/json-schema-core#name-boolean-json-schemas>.
     ///
-    /// [Schema Object]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#schema-object
+    /// [Schema Object]: https://spec.openapis.org/oas/v3.1.0#schema-object
     #[serde(
         rename = "additionalProperties",
         skip_serializing_if = "Option::is_none"
@@ -497,13 +497,13 @@ pub struct ObjectSchema {
 
     // #########################################################################
     // OpenAPI Fixed Fields
-    // https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#fixed-fields-20
+    // https://spec.openapis.org/oas/v3.1.0#fixed-fields-20
     // #########################################################################
 
     //
     /// Discriminator for object selection based on propertyName
     ///
-    /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#discriminator-object>
+    /// See <https://spec.openapis.org/oas/v3.1.0#discriminator-object>
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub discriminator: Option<Discriminator>,
 
@@ -532,7 +532,7 @@ pub struct ObjectSchema {
     ///
     /// Only "x-" prefixed keys are collected, and the prefix is stripped.
     ///
-    /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specification-extensions>.
+    /// See <https://spec.openapis.org/oas/v3.1.0#specification-extensions>.
     #[serde(flatten, with = "spec_extensions")]
     pub extensions: BTreeMap<String, serde_json::Value>,
 }

@@ -30,6 +30,6 @@ match oas3::from_path("path/to/openapi.yml") {
 }
 ```
 
-[OpenAPI v3.1]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md
+[OpenAPI v3.1]: https://spec.openapis.org/oas/v3.1.0
 
 <!-- cargo-rdme end -->

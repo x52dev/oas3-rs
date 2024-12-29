@@ -17,7 +17,7 @@ pub enum ParameterIn {
     /// This does not include the host or base path of the API. For example, in `/items/{itemId}`,
     /// the path parameter is `itemId`.
     ///
-    /// [path templating]: https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#path-templating
+    /// [path templating]: https://spec.openapis.org/oas/v3.1.0#path-templating
     Path,
 
     /// Parameters that are appended to the URL. For example, in `/items?id=###`, the query
@@ -87,7 +87,7 @@ pub enum ParameterStyle {
 ///
 /// A unique parameter is defined by a combination of a `name` and location (`in`).
 ///
-/// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#parameter-object>.
+/// See <https://spec.openapis.org/oas/v3.1.0#parameter-object>.
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Parameter {
     /// The name of the parameter.
@@ -198,7 +198,7 @@ pub struct Parameter {
     ///
     /// Only "x-" prefixed keys are collected, and the prefix is stripped.
     ///
-    /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#specification-extensions>.
+    /// See <https://spec.openapis.org/oas/v3.1.0#specification-extensions>.
     #[serde(flatten, with = "spec_extensions")]
     pub extensions: BTreeMap<String, serde_json::Value>,
 }
