@@ -15,7 +15,7 @@ pub struct InvalidEmail;
 /// Contact information for the exposed API.
 ///
 /// See <https://spec.openapis.org/oas/v3.1.0#contact-object>.
-#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[derive(Debug, Clone, Default, PartialEq, Deserialize, Serialize)]
 pub struct Contact {
     /// Identifying name of the contact person/organization.
     #[serde(skip_serializing_if = "Option::is_none")]

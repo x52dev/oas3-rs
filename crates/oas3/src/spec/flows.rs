@@ -8,7 +8,7 @@ use super::spec_extensions;
 /// Allows configuration of the supported OAuth Flows.
 ///
 /// See <https://spec.openapis.org/oas/v3.1.0#oauth-flows-object>.
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct Flows {
     /// Configuration for the OAuth Implicit flow.
