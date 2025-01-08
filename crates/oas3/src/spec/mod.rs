@@ -170,7 +170,7 @@ impl Spec {
             .find(|(_, _, op)| {
                 op.operation_id
                     .as_deref()
-                    .map_or(false, |id| id == operation_id)
+                    .is_some_and(|id| id == operation_id)
             })
             .map(|(_, _, op)| op)
     }
