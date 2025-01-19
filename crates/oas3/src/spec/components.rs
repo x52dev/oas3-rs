@@ -13,7 +13,7 @@ use super::{
 /// they are explicitly referenced from properties outside the components object.
 ///
 /// See <https://spec.openapis.org/oas/v3.1.0#components-object>.
-#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[derive(Debug, Clone, Default, PartialEq, Deserialize, Serialize)]
 pub struct Components {
     /// An object to hold reusable [Schema Objects](ObjectSchema).
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]

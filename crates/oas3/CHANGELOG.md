@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Implement `Default` for `spec::{Components, Contact, Example, Flows}`.
+
 ## 0.13.1
 
 - OpenAPI specification links in docs now reference the authoritative HTML version.
