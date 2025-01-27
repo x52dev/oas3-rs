@@ -3,8 +3,8 @@
 <!-- prettier-ignore-start -->
 
 [![crates.io](https://img.shields.io/crates/v/oas3?label=latest)](https://crates.io/crates/oas3)
-[![Documentation](https://docs.rs/oas3/badge.svg?version=0.13.1)](https://docs.rs/oas3/0.13.1)
-[![dependency status](https://deps.rs/crate/oas3/0.13.1/status.svg)](https://deps.rs/crate/oas3/0.13.1)
+[![Documentation](https://docs.rs/oas3/badge.svg?version=0.14.0)](https://docs.rs/oas3/0.14.0)
+[![dependency status](https://deps.rs/crate/oas3/0.14.0/status.svg)](https://deps.rs/crate/oas3/0.14.0)
 ![MIT or Apache 2.0 licensed](https://img.shields.io/crates/l/oas3.svg)
 <br />
 [![CI](https://github.com/x52dev/oas3-rs/actions/workflows/ci.yml/badge.svg)](https://github.com/x52dev/oas3-rs/actions/workflows/ci.yml)

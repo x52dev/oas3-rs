@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.14.0
+
 - Implement `Default` for `spec::{Components, Contact, Example, Flows}`.
 - Migrate YAML parsing to `serde_yaml`. Exposed error type(s) have been altered.
 
