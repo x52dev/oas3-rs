@@ -25,7 +25,7 @@ where
         where
             M: de::MapAccess<'de>,
         {
-            let mut map = HashMap::<serde_yml::Value, serde_json::Value>::new();
+            let mut map = HashMap::<serde_yaml::Value, serde_json::Value>::new();
 
             while let Some((key, value)) = access.next_entry()? {
                 map.insert(key, value);

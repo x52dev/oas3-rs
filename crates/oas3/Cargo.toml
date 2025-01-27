@@ -23,7 +23,7 @@ regex = { workspace = true }
 semver = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
-serde_yml = { workspace = true }
+serde_yaml = { workspace = true }
 url = { workspace = true, features = ["serde"] }
 
 [dev-dependencies]

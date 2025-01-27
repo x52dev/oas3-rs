@@ -15,7 +15,7 @@ pub enum Error {
 
     /// YAML error.
     #[display("YAML error")]
-    Yaml(serde_yml::Error),
+    Yaml(serde_yaml::Error),
 
     /// JSON error.
     #[display("JSON error")]

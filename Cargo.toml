@@ -38,7 +38,7 @@ semver = "1"
 serde = "1"
 serde_json = "1"
 serde_with = "3"
-serde_yml = "0.0.12"
+serde_yaml = "0.9.34-deprecated"
 tokio = "1.43.0"
 url = "2"
 

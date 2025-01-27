@@ -246,7 +246,7 @@ mod tests {
             qux: true
         "};
 
-        let spec = serde_yml::from_str::<Spec>(spec).unwrap();
+        let spec = serde_yaml::from_str::<Spec>(spec).unwrap();
         assert!(spec.components.is_some());
         assert!(!spec.extensions.contains_key("x-bar"));
         assert!(!spec.extensions.contains_key("qux"));
@@ -264,8 +264,8 @@ mod tests {
             x-bar: true
         "};
 
-        let parsed_spec = serde_yml::from_str::<Spec>(spec).unwrap();
-        let round_trip_spec = serde_yml::to_string(&parsed_spec).unwrap();
+        let parsed_spec = serde_yaml::from_str::<Spec>(spec).unwrap();
+        let round_trip_spec = serde_yaml::to_string(&parsed_spec).unwrap();
 
         assert_eq!(spec, round_trip_spec);
     }

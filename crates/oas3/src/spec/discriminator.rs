@@ -31,7 +31,7 @@ mod tests {
     #[test]
     fn discriminator_property_name_parsed_correctly() {
         let spec = "propertyName: testName";
-        let discriminator = serde_yml::from_str::<Discriminator>(spec).unwrap();
+        let discriminator = serde_yaml::from_str::<Discriminator>(spec).unwrap();
         assert_eq!("testName", discriminator.property_name);
         assert!(discriminator.mapping.is_none());
     }
@@ -45,7 +45,7 @@ mod tests {
               cat: '#/components/schemas/Cat'
               monster: 'https://gigantic-server.com/schemas/Monster/schema.json'
         "};
-        let discriminator = serde_yml::from_str::<Discriminator>(spec).unwrap();
+        let discriminator = serde_yaml::from_str::<Discriminator>(spec).unwrap();
 
         assert_eq!("petType", discriminator.property_name);
         let mapping = discriminator.mapping.unwrap();

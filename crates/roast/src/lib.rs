@@ -16,7 +16,7 @@ pub enum Error {
     // Io(io::Error),
 
     // #[display("YAML error")]
-    // Yaml(serde_yml::Error),
+    // Yaml(serde_yaml::Error),
 
     // #[display("JSON error")]
     // Serialize(serde_json::Error),
