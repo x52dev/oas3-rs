@@ -256,7 +256,7 @@ mod tests {
     #[test]
     fn spec_extensions_serialize() {
         let spec = indoc::indoc! {"
-            openapi: '3.1.0'
+            openapi: 3.1.0
             info:
               title: test
               version: v1
