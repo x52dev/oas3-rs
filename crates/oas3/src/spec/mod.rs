@@ -228,7 +228,7 @@ impl Spec {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "yaml_spec"))]
 mod tests {
     use pretty_assertions::assert_eq;
 

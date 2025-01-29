@@ -32,6 +32,8 @@ pub use self::{error::Error, spec::Spec};
 pub type OpenApiV3Spec = spec::Spec;
 
 /// Try deserializing an OpenAPI spec (YAML or JSON) from a file, giving the path.
+///
+/// If the `yaml` feature flag is disabled only `JSON` specs are supported
 pub fn from_path<P>(path: P) -> Result<OpenApiV3Spec, Error>
 where
     P: AsRef<Path>,
@@ -40,19 +42,38 @@ where
 }
 
 /// Try deserializing an OpenAPI spec (YAML or JSON) from a [`Read`] type.
+///
+/// If the `yaml` feature flag is disabled only `JSON` specs are supported
 pub fn from_reader<R>(read: R) -> Result<OpenApiV3Spec, Error>
 where
     R: Read,
 {
-    Ok(serde_yaml::from_reader::<R, OpenApiV3Spec>(read)?)
+    #[cfg(feature = "yaml_spec")]
+    {
+        Ok(serde_yaml::from_reader::<R, OpenApiV3Spec>(read)?)
+    }
+    #[cfg(not(feature = "yaml_spec"))]
+    {
+        Ok(serde_json::from_reader::<R, OpenApiV3Spec>(read)?)
+    }
 }
 
 /// Try deserializing an OpenAPI spec (YAML or JSON) from string.
+///
+/// If the `yaml` feature flag is disabled only `JSON` specs are supported
 pub fn from_str(val: impl AsRef<str>) -> Result<OpenApiV3Spec, Error> {
-    Ok(serde_yaml::from_str::<OpenApiV3Spec>(val.as_ref())?)
+    #[cfg(feature = "yaml_spec")]
+    {
+        Ok(serde_yaml::from_str::<OpenApiV3Spec>(val.as_ref())?)
+    }
+    #[cfg(not(feature = "yaml_spec"))]
+    {
+        Ok(serde_json::from_str::<OpenApiV3Spec>(val.as_ref())?)
+    }
 }
 
 /// Try serializing to a YAML string.
+#[cfg(feature = "yaml_spec")]
 pub fn to_yaml(spec: &OpenApiV3Spec) -> Result<String, Error> {
     Ok(serde_yaml::to_string(spec)?)
 }
@@ -62,7 +83,7 @@ pub fn to_json(spec: &OpenApiV3Spec) -> Result<String, Error> {
     Ok(serde_json::to_string_pretty(spec)?)
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "yaml_spec"))]
 mod tests {
     use std::{
         fs::{self, read_to_string, File},

@@ -15,6 +15,7 @@ pub enum Error {
 
     /// YAML error.
     #[display("YAML error")]
+    #[cfg(feature = "yaml_spec")]
     Yaml(serde_yaml::Error),
 
     /// JSON error.
