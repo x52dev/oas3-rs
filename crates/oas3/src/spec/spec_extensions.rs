@@ -5,6 +5,11 @@ use std::{
 
 use serde::{de, Deserializer, Serializer};
 
+#[cfg(feature = "yaml_spec")]
+type KeyType = serde_yaml::Value;
+#[cfg(not(feature = "yaml_spec"))]
+type KeyType = serde_json::Value;
+
 /// Deserializes fields of a map beginning with `x-`.
 pub(crate) fn deserialize<'de, D>(
     deserializer: D,
@@ -25,7 +30,7 @@ where
         where
             M: de::MapAccess<'de>,
         {
-            let mut map = HashMap::<serde_yaml::Value, serde_json::Value>::new();
+            let mut map = HashMap::<KeyType, serde_json::Value>::new();
 
             while let Some((key, value)) = access.next_entry()? {
                 map.insert(key, value);

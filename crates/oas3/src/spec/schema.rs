@@ -593,7 +593,7 @@ where
     T::deserialize(de).map(Some)
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "yaml_spec"))]
 mod tests {
     use super::*;
 

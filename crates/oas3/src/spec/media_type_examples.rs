@@ -83,6 +83,7 @@ impl MediaTypeExamples {
 
 #[cfg(test)]
 mod tests {
+    #[cfg(feature = "yaml_spec")]
     use serde_json::json;
 
     use super::*;
@@ -98,6 +99,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "yaml_spec")]
     fn deserialize() {
         assert_eq!(
             serde_yaml::from_str::<MediaTypeExamples>(indoc::indoc! {"
@@ -119,6 +121,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "yaml_spec")]
     fn serialize() {
         let mt_examples = MediaTypeExamples::default();
         assert_eq!(
@@ -140,6 +143,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "yaml_spec")]
     fn single_example() {
         let spec = serde_yaml::from_str::<Spec>(indoc::indoc! {"
 openapi: 3.1.0
@@ -167,6 +171,7 @@ paths: {}
     }
 
     #[test]
+    #[cfg(feature = "yaml_spec")]
     fn resolve_references() {
         let spec = serde_yaml::from_str::<Spec>(indoc::indoc! {"
 openapi: 3.1.0
