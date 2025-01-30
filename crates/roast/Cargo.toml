@@ -17,7 +17,7 @@ derive_more = { workspace = true, features = ["display", "error", "from"] }
 futures-util = { workspace = true }
 http = { workspace = true }
 log = { workspace = true }
-oas3 = { workspace = true }
+oas3 = { workspace = true, default-features = false }
 once_cell = { workspace = true }
 prettytable-rs = { workspace = true }
 reqwest = { workspace = true, features = ["json"] }
@@ -29,6 +29,7 @@ color-eyre = { workspace = true }
 dotenvy = { workspace = true }
 eyre = { workspace = true }
 maplit = { workspace = true }
+oas3 = { workspace = true, features = ["yaml-spec"] }
 pretty_env_logger = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 

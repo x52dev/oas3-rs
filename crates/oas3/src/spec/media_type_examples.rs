@@ -81,7 +81,7 @@ impl MediaTypeExamples {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "yaml-spec"))]
 mod tests {
     use serde_json::json;
 

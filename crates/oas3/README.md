@@ -24,7 +24,9 @@ specs in the older format.
 ## Example
 
 ```rust
-match oas3::from_path("path/to/openapi.yml") {
+let yaml = std::fs::read_to_string("path/to/openapi.yml").unwrap();
+
+match oas3::from_yaml(yaml) {
   Ok(spec) => println!("spec: {:?}", spec),
   Err(err) => println!("error: {}", err)
 }

@@ -1,5 +1,7 @@
 #![allow(dead_code, unused_variables)]
 
+use std::fs;
+
 use roast::{ConformanceTestSpec, OperationSpec, RequestSpec, ResponseSpec, TestRunner};
 
 #[tokio::main]
@@ -9,7 +11,8 @@ async fn main() -> eyre::Result<()> {
     dotenvy::dotenv().ok();
     pretty_env_logger::init();
 
-    let spec = oas3::from_path("./data/oas-samples/pet-store.yml").expect("api spec parse error");
+    let yaml = fs::read_to_string("./data/oas-samples/pet-store.yml")?;
+    let spec = oas3::from_yaml(yaml)?;
     let base_url: &str = &spec.primary_server().expect("no primary server").url;
     let mut runner = TestRunner::new(base_url, spec.clone());
 

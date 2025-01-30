@@ -11,8 +11,8 @@ edition = { workspace = true }
 rust-version = { workspace = true }
 
 [features]
-default = ["validation"]
-validation = []
+default = []
+yaml-spec = ["dep:serde_yaml"]
 
 [dependencies]
 derive_more = { workspace = true, features = ["display", "error", "from"] }
@@ -23,13 +23,17 @@ regex = { workspace = true }
 semver = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
-serde_yaml = { workspace = true }
+serde_yaml = { workspace = true, optional = true }
 url = { workspace = true, features = ["serde"] }
 
 [dev-dependencies]
 eyre = { workspace = true }
 indoc = { workspace = true }
 pretty_assertions = { workspace = true }
+
+[[example]]
+name = "printer"
+required-features = ["yaml-spec"]
 
 [lints]
 workspace = true

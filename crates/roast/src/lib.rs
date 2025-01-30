@@ -12,15 +12,6 @@ pub use self::{conformance::*, validation::*};
 /// Top-level errors.
 #[derive(Debug, Display, Error, From)]
 pub enum Error {
-    // #[display("I/O error")]
-    // Io(io::Error),
-
-    // #[display("YAML error")]
-    // Yaml(serde_yaml::Error),
-
-    // #[display("JSON error")]
-    // Serialize(serde_json::Error),
-    //
     #[display("Spec error")]
     Spec(oas3::spec::Error),
 

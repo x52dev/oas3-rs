@@ -223,7 +223,7 @@ impl FromRef for Parameter {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "yaml-spec"))]
 mod tests {
     use indoc::indoc;
 

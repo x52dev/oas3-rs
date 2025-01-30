@@ -25,7 +25,7 @@ where
         where
             M: de::MapAccess<'de>,
         {
-            let mut map = HashMap::<serde_yaml::Value, serde_json::Value>::new();
+            let mut map = HashMap::<String, serde_json::Value>::new();
 
             while let Some((key, value)) = access.next_entry()? {
                 map.insert(key, value);
@@ -34,9 +34,7 @@ where
             Ok(map
                 .into_iter()
                 .filter_map(|(key, value)| {
-                    key.as_str()?
-                        .strip_prefix("x-")
-                        .map(|key| (key.to_owned(), value))
+                    key.strip_prefix("x-").map(|key| (key.to_owned(), value))
                 })
                 .collect())
         }
@@ -58,4 +56,66 @@ where
             .iter()
             .map(|(key, value)| (format!("x-{key}"), value)),
     )
+}
+
+#[cfg(all(test, feature = "yaml-spec"))]
+mod tests {
+    use pretty_assertions::assert_eq;
+
+    use crate::Spec;
+
+    #[test]
+    fn spec_extensions_deserialize() {
+        let spec = indoc::indoc! {"
+            openapi: '3.1.0'
+            info:
+              title: test
+              version: v1
+            components: {}
+            x-bar: true
+            qux: true
+        "};
+
+        let spec = serde_yaml::from_str::<Spec>(spec).unwrap();
+        assert!(spec.components.is_some());
+        assert!(!spec.extensions.contains_key("x-bar"));
+        assert!(!spec.extensions.contains_key("qux"));
+        assert_eq!(spec.extensions.get("bar").unwrap(), true);
+    }
+
+    #[test]
+    fn spec_extensions_deserialize_with_numeric_yaml_key_nearby() {
+        let spec = indoc::indoc! {"
+            openapi: '3.1.0'
+            info:
+              title: test
+              version: v1
+            components: {}
+            42: test numeric key doesn't break it
+            x-bar: true
+            44: test numeric key doesn't break it
+        "};
+
+        let spec = serde_yaml::from_str::<Spec>(spec).unwrap();
+        assert!(spec.components.is_some());
+        assert!(!spec.extensions.contains_key("x-bar"));
+        assert_eq!(spec.extensions.get("bar").unwrap(), true);
+    }
+
+    #[test]
+    fn spec_extensions_serialize() {
+        let spec = indoc::indoc! {"
+            openapi: 3.1.0
+            info:
+              title: test
+              version: v1
+            components: {}
+            x-bar: true
+        "};
+
+        let parsed_spec = serde_yaml::from_str::<Spec>(spec).unwrap();
+        let round_trip_spec = serde_yaml::to_string(&parsed_spec).unwrap();
+
+        assert_eq!(spec, round_trip_spec);
+    }
 }
