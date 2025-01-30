@@ -400,7 +400,7 @@ components:
       required: [size]
 "#;
 
-        let spec = oas3::from_reader(spec_str.as_bytes()).unwrap();
+        let spec = oas3::from_yaml(spec_str).unwrap();
 
         let schema = get_schema(&spec, "data");
         let valtree = ValidationTree::from_schema(&schema, &spec).unwrap();
@@ -438,7 +438,7 @@ components:
       items: { type: integer }
 "#;
 
-        let spec = oas3::from_reader(spec_str.as_bytes()).unwrap();
+        let spec = oas3::from_yaml(spec_str).unwrap();
 
         let schema = get_schema(&spec, "assets");
         let valtree = ValidationTree::from_schema(&schema, &spec).unwrap();
@@ -477,7 +477,7 @@ components:
       required: [size]
 "#;
 
-        let spec = oas3::from_reader(spec_str.as_bytes()).unwrap();
+        let spec = oas3::from_yaml(spec_str).unwrap();
 
         let schema = get_schema(&spec, "data");
         let valtree = ValidationTree::from_schema(&schema, &spec).unwrap();
@@ -507,7 +507,7 @@ components:
         anyOf: [{ type: number }, { type: string }]
 "#;
 
-        let spec = oas3::from_reader(spec_str.as_bytes()).unwrap();
+        let spec = oas3::from_yaml(spec_str).unwrap();
 
         let schema = get_schema(&spec, "data");
         let valtree = ValidationTree::from_schema(&schema, &spec).unwrap();

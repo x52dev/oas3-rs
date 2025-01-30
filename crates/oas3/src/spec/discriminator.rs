@@ -24,7 +24,7 @@ pub struct Discriminator {
     pub mapping: Option<BTreeMap<String, String>>,
 }
 
-#[cfg(all(test, feature = "yaml_spec"))]
+#[cfg(all(test, feature = "yaml-spec"))]
 mod tests {
     use super::*;
 

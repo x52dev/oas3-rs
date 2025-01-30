@@ -11,9 +11,8 @@ edition = { workspace = true }
 rust-version = { workspace = true }
 
 [features]
-default = ["validation", "yaml_spec"]
-validation = []
-yaml_spec = ["dep:serde_yaml"]
+default = []
+yaml-spec = ["dep:serde_yaml"]
 
 [dependencies]
 derive_more = { workspace = true, features = ["display", "error", "from"] }
@@ -33,9 +32,8 @@ indoc = { workspace = true }
 pretty_assertions = { workspace = true }
 
 [[example]]
-name = "printers"
-path = "examples/printer.rs"
-required-features = ["yaml_spec"]
+name = "printer"
+required-features = ["yaml-spec"]
 
 [lints]
 workspace = true

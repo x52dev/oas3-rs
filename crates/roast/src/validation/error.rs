@@ -2,7 +2,7 @@ use std::fmt;
 
 use derive_more::derive::{Display, Error};
 use http::{Method, StatusCode};
-use oas3::{spec::SchemaTypeSet, Error as SchemaError};
+use oas3::spec::{Error as SpecError, SchemaTypeSet};
 use serde_json::Value as JsonValue;
 
 use super::Path;
@@ -45,8 +45,8 @@ pub enum Error {
     //
     // Wrapped Errors
     //
-    #[display("Schema error")]
-    Schema(SchemaError),
+    #[display("Spec error")]
+    Spec(SpecError),
 
     //
     // Leaf Errors

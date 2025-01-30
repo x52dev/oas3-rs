@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- Add new crate feature `yaml-spec` (on-by-default).
+- Add top-level `from_json()` function.
+- Add top-level `from_yaml()` function, guarded by the `yaml-spec` crate feature.
+- The top-level `to_json()` function now returns `serde_json` errors directly.
+- The top-level `to_yaml()` function now returns `serde_yaml` errors directly.
+- The top-level `to_yaml()` function is now guarded by the `yaml-spec` crate feature.
+- Remove top-level `from_reader()` function.
+- Remove top-level `from_path()` function.
+- Remove top-level `Error` type.
+
 ## 0.14.0
 
 - Implement `Default` for `spec::{Components, Contact, Example, Flows}`.

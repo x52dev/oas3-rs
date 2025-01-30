@@ -6,7 +6,9 @@
 //! # Example
 //!
 //! ```no_run
-//! match oas3::from_path("path/to/openapi.yml") {
+//! let yaml = std::fs::read_to_string("path/to/openapi.yml").unwrap();
+//!
+//! match oas3::from_yaml(yaml) {
 //!   Ok(spec) => println!("spec: {:?}", spec),
 //!   Err(err) => println!("error: {}", err)
 //! }
@@ -17,12 +19,9 @@
 #![warn(missing_docs)]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
-use std::{fs::File, io::Read, path::Path};
-
-mod error;
 pub mod spec;
 
-pub use self::{error::Error, spec::Spec};
+pub use self::spec::Spec;
 
 /// Version 3.1.0 of the OpenAPI specification.
 ///
@@ -32,63 +31,48 @@ pub use self::{error::Error, spec::Spec};
 pub type OpenApiV3Spec = spec::Spec;
 
 /// Try deserializing an OpenAPI spec (YAML or JSON) from a file, giving the path.
-///
-/// If the `yaml` feature flag is disabled only `JSON` specs are supported
-pub fn from_path<P>(path: P) -> Result<OpenApiV3Spec, Error>
-where
-    P: AsRef<Path>,
-{
-    from_reader(File::open(path)?)
+#[cfg(all(test, feature = "yaml-spec"))]
+pub(crate) fn from_path(
+    path: impl AsRef<std::path::Path>,
+) -> std::io::Result<Result<OpenApiV3Spec, serde_yaml::Error>> {
+    let file = std::fs::File::open(path.as_ref())?;
+    Ok(from_reader(file))
 }
 
 /// Try deserializing an OpenAPI spec (YAML or JSON) from a [`Read`] type.
-///
-/// If the `yaml` feature flag is disabled only `JSON` specs are supported
-pub fn from_reader<R>(read: R) -> Result<OpenApiV3Spec, Error>
-where
-    R: Read,
-{
-    #[cfg(feature = "yaml_spec")]
-    {
-        Ok(serde_yaml::from_reader::<R, OpenApiV3Spec>(read)?)
-    }
-    #[cfg(not(feature = "yaml_spec"))]
-    {
-        Ok(serde_json::from_reader::<R, OpenApiV3Spec>(read)?)
-    }
+#[cfg(all(test, feature = "yaml-spec"))]
+pub(crate) fn from_reader(read: impl std::io::Read) -> Result<OpenApiV3Spec, serde_yaml::Error> {
+    serde_yaml::from_reader::<_, OpenApiV3Spec>(read)
 }
 
-/// Try deserializing an OpenAPI spec (YAML or JSON) from string.
-///
-/// If the `yaml` feature flag is disabled only `JSON` specs are supported
-pub fn from_str(val: impl AsRef<str>) -> Result<OpenApiV3Spec, Error> {
-    #[cfg(feature = "yaml_spec")]
-    {
-        Ok(serde_yaml::from_str::<OpenApiV3Spec>(val.as_ref())?)
-    }
-    #[cfg(not(feature = "yaml_spec"))]
-    {
-        Ok(serde_json::from_str::<OpenApiV3Spec>(val.as_ref())?)
-    }
+/// Deserializes an OpenAPI spec (YAML-format) from a string.
+#[cfg(feature = "yaml-spec")]
+pub fn from_yaml(yaml: impl AsRef<str>) -> Result<OpenApiV3Spec, serde_yaml::Error> {
+    serde_yaml::from_str(yaml.as_ref())
 }
 
-/// Try serializing to a YAML string.
-#[cfg(feature = "yaml_spec")]
-pub fn to_yaml(spec: &OpenApiV3Spec) -> Result<String, Error> {
-    Ok(serde_yaml::to_string(spec)?)
+/// Deserializes an OpenAPI spec (JSON-format) from a string.
+pub fn from_json(json: impl AsRef<str>) -> Result<OpenApiV3Spec, serde_json::Error> {
+    serde_json::from_str(json.as_ref())
 }
 
-/// Try serializing to a JSON string.
-pub fn to_json(spec: &OpenApiV3Spec) -> Result<String, Error> {
-    Ok(serde_json::to_string_pretty(spec)?)
+/// Serializes OpenAPI spec to a YAML string.
+#[cfg(feature = "yaml-spec")]
+pub fn to_yaml(spec: &OpenApiV3Spec) -> Result<String, serde_yaml::Error> {
+    serde_yaml::to_string(spec)
 }
 
-#[cfg(all(test, feature = "yaml_spec"))]
+/// Serializes OpenAPI spec to a JSON string.
+pub fn to_json(spec: &OpenApiV3Spec) -> Result<String, serde_json::Error> {
+    serde_json::to_string_pretty(spec)
+}
+
+#[cfg(all(test, feature = "yaml-spec"))]
 mod tests {
     use std::{
         fs::{self, read_to_string, File},
         io::Write,
-        path,
+        path::{self, Path},
     };
 
     use pretty_assertions::assert_eq;
@@ -143,7 +127,7 @@ mod tests {
         //     File -> `Spec` -> `serde_json::Value` -> `String`
 
         // Parse the input file
-        let parsed_spec = from_path(input_file).unwrap();
+        let parsed_spec = from_path(input_file).unwrap().unwrap();
         // Convert to serde_json::Value
         let parsed_spec_json = serde_json::to_value(parsed_spec).unwrap();
         // Convert to a JSON string
