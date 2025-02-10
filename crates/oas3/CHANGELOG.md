@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.15.0
+
 - Add new crate feature `yaml-spec` (on-by-default).
 - Add top-level `from_json()` function.
 - Add top-level `from_yaml()` function, guarded by the `yaml-spec` crate feature.
