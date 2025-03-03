@@ -28,7 +28,7 @@ jobs:
           components: clippy
 
       - name: Install just, cargo-hack
-        uses: taiki-e/install-action@v2.49.0
+        uses: taiki-e/install-action@v2.49.10
         with:
           tool: just,cargo-hack
 
