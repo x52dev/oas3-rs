@@ -13,10 +13,12 @@
         devShells.default = pkgs.mkShell {
           packages = [
             config.formatter
+            pkgs.cargo-rdme
+            pkgs.just
+            pkgs.libgit2
             pkgs.nodePackages.prettier
             pkgs.taplo
             pkgs.watchexec
-            pkgs.just
           ] ++ lib.optional pkgs.stdenv.isDarwin [
             pkgs.pkgsBuildHost.libiconv
             pkgs.pkgsBuildHost.darwin.apple_sdk.frameworks.AppKit

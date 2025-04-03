@@ -31,6 +31,7 @@ mod r#ref;
 mod request_body;
 mod response;
 mod schema;
+mod security_requirement;
 mod security_scheme;
 mod server;
 mod spec_extensions;
@@ -61,6 +62,7 @@ pub use self::{
         BooleanSchema, Error as SchemaError, ObjectSchema, Schema, Type as SchemaType,
         TypeSet as SchemaTypeSet,
     },
+    security_requirement::*,
     security_scheme::*,
     server::*,
     tag::*,
@@ -107,22 +109,23 @@ pub struct Spec {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub components: Option<Components>,
 
-    // FIXME: Implement
-    // /// A declaration of which security mechanisms can be used across the API.
-    // /// The list of  values includes alternative security requirement objects that can be used.
-    // /// Only one of the security requirement objects need to be satisfied to authorize a request.
-    // /// Individual operations can override this definition.
-    // #[serde(skip_serializing_if = "Option::is_none")]
-    // pub security: Option<SecurityRequirement>,
-    //
+    /// A declaration of which security mechanisms can be used across the API.
+    ///
+    /// The list of values includes alternative Security Requirement Objects that can be used. Only
+    /// one of the Security Requirement Objects need to be satisfied to authorize a request.
+    /// Individual operations can override this definition. The list can be incomplete, up to being
+    /// empty or absent. To make security explicitly optional, an empty security requirement (`{}`)
+    /// can be included in the array.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub security: Vec<SecurityRequirement>,
+
     /// A list of tags used by the specification with additional metadata.
     ///The order of the tags can be used to reflect on their order by the parsing tools.
     /// Not all tags that are used by the
     /// [Operation Object](https://spec.openapis.org/oas/v3.1.0#operation-object)
     /// must be declared. The tags that are not declared MAY be organized randomly or
     /// based on the tools' logic. Each tag name in the list MUST be unique.
-    #[serde(default)]
-    #[serde(skip_serializing_if = "Vec::is_empty")]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub tags: Vec<Tag>,
 
     /// The incoming webhooks that MAY be received as part of this API and that the API consumer MAY

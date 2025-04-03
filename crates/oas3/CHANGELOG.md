@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add `spec::Spec::security` field.
+- Add `spec::Operation::security` field.
+
 ## 0.15.0
 
 - Add new crate feature `yaml-spec` (on-by-default).

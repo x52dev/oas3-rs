@@ -4,7 +4,8 @@ use log::error;
 use serde::{Deserialize, Serialize};
 
 use super::{
-    Callback, Error, ExternalDoc, ObjectOrReference, Parameter, RequestBody, Response, Server, Spec,
+    Callback, Error, ExternalDoc, ObjectOrReference, Parameter, RequestBody, Response,
+    SecurityRequirement, Server, Spec,
 };
 use crate::spec::spec_extensions;
 
@@ -100,15 +101,16 @@ pub struct Operation {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub deprecated: Option<bool>,
 
-    // FIXME: Implement
-    // /// A declaration of which security mechanisms can be used for this operation. The list of
-    // /// values includes alternative security requirement objects that can be used. Only one
-    // /// of the security requirement objects need to be satisfied to authorize a request.
-    // /// This definition overrides any declared top-level
-    // /// [`security`](https://spec.openapis.org/oas/v3.1.0#oasSecurity).
-    // /// To remove a top-level security declaration, an empty array can be used.
-    // pub security: Option<SecurityRequirement>,
-    //
+    /// A declaration of which security mechanisms can be used for this operation.
+    ///
+    /// The list of values includes alternative Security Requirement Objects that can be used. Only
+    /// one of the Security Requirement Objects need to be satisfied to authorize a request. To make
+    /// security optional, an empty security requirement ({}) can be included in the array. This
+    /// definition overrides any declared top-level security. To remove a top-level security
+    /// declaration, an empty array can be used.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub security: Vec<SecurityRequirement>,
+
     /// An alternative `server` array to service this operation.
     ///
     /// If an alternative `server` object is specified at the Path Item Object or Root level, it

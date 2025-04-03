@@ -9,10 +9,12 @@ words:
   - ints
   - maplit
   - msrv
+  - nixpkgs
   - noncomposite
   - nums
   - openapi
   - petstore
+  - pkgs
   - prettytable
   - println
   - refpath
@@ -27,5 +29,7 @@ words:
   - structs
   - subschema
   - subschemas
+  - taplo
   - valtree
   - valtrees
+  - watchexec
