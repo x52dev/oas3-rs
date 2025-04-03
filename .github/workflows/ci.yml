@@ -40,5 +40,14 @@ jobs:
         with:
           toolchain: ${{ matrix.toolchain.version }}
 
+      - name: Install just, nextest
+        uses: taiki-e/install-action@v2.44.25
+        with:
+          tool: just,nextest
+
+      - name: Work around MSRV issues
+        if: matrix.toolchain.name == 'msrv'
+        run: just downgrade-for-msrv
+
       - name: Test
-        run: cargo test --workspace
+        run: just test
