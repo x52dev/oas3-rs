@@ -697,6 +697,24 @@ dependencies = [
 [[package]]
 name = "oas3"
 version = "0.15.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9b0a8e44a8635cc584f311a0acaeb49f6a16f2e922cae882ef8eacc695c75576"
+dependencies = [
+ "derive_more",
+ "http",
+ "log",
+ "once_cell",
+ "regex",
+ "semver",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "url",
+]
+
+[[package]]
+name = "oas3"
+version = "0.16.0"
 dependencies = [
  "derive_more",
  "eyre",
@@ -926,7 +944,7 @@ dependencies = [
  "http",
  "log",
  "maplit",
- "oas3",
+ "oas3 0.15.0",
  "once_cell",
  "pretty_env_logger",
  "prettytable-rs",

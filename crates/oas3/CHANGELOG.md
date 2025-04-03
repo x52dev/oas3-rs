@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.16.0
+
 - Add `spec::Spec::security` field.
 - Add `spec::Operation::security` field.
 
