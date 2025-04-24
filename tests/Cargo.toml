@@ -10,6 +10,9 @@ publish = false
 [dependencies]
 assert_matches.workspace = true
 oas3 = { path = "../crates/oas3", features = ["yaml-spec"] }
+serde_json.workspace = true
+serde_path_to_error = "0.1.17"
+serde_yml = "0.0.12"
 
 [lints]
 workspace = true

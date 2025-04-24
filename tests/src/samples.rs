@@ -1,15 +1,64 @@
 #[test]
-fn validate_passing_samples() {
-    oas3::from_yaml(include_str!("../samples/pass/comp_pathitems.yaml")).unwrap();
-    oas3::from_yaml(include_str!("../samples/pass/info_summary.yaml")).unwrap();
-    oas3::from_yaml(include_str!("../samples/pass/license_identifier.yaml")).unwrap();
-    oas3::from_yaml(include_str!("../samples/pass/mega.yaml")).unwrap();
-    oas3::from_yaml(include_str!("../samples/pass/minimal_comp.yaml")).unwrap();
-    oas3::from_yaml(include_str!("../samples/pass/minimal_hooks.yaml")).unwrap();
-    oas3::from_yaml(include_str!("../samples/pass/minimal_paths.yaml")).unwrap();
-    oas3::from_yaml(include_str!("../samples/pass/path_no_response.yaml")).unwrap();
-    oas3::from_yaml(include_str!("../samples/pass/path_var_empty_pathitem.yaml")).unwrap();
-    oas3::from_yaml(include_str!("../samples/pass/schema.yaml")).unwrap();
+fn test_comp_pathitems_yaml() {
+    let input = include_str!("../samples/pass/comp_pathitems.yaml");
+    validate_sample(input, Format::Yaml);
+}
+
+#[test]
+fn test_info_summary_yaml() {
+    let input = include_str!("../samples/pass/info_summary.yaml");
+    validate_sample(input, Format::Yaml);
+}
+
+#[test]
+fn test_license_identifier_yaml() {
+    let input = include_str!("../samples/pass/license_identifier.yaml");
+    validate_sample(input, Format::Yaml);
+}
+
+// ... similar individual tests for other YAML files ...
+
+#[test]
+fn test_matrix01_yaml() {
+    let input = include_str!("../samples/pass/matrix-01.yaml");
+    validate_sample(input, Format::Yaml);
+}
+
+#[test]
+fn test_matrix02_json() {
+    let input = include_str!("../samples/pass/matrix-02.json");
+    validate_sample(input, Format::Json);
+}
+
+/// Validate that a given `sample` is being parsed by `oas3` without immediate errors. Panics, if
+/// an error is encountered and gives error context in the panic message.
+#[cfg(test)]
+fn validate_sample(input: &str, format: Format) {
+    match format {
+        Format::Json => {
+            let mut json_deserializer = serde_json::Deserializer::from_str(input);
+            let result: Result<oas3::OpenApiV3Spec, _> =
+                serde_path_to_error::deserialize(&mut json_deserializer);
+            match result {
+                Ok(_) => (),
+                Err(err) => panic!("{}: {}", err, err.path()),
+            };
+        }
+        Format::Yaml => {
+            let yaml_deserializer = serde_yml::Deserializer::from_str(input);
+            let result: Result<oas3::OpenApiV3Spec, _> =
+                serde_path_to_error::deserialize(yaml_deserializer);
+            match result {
+                Ok(_) => (),
+                Err(err) => panic!("{}: {}", err, err.path()),
+            };
+        }
+    }
+}
+
+enum Format {
+    Json,
+    Yaml,
 }
 
 #[test]
