@@ -1,0 +1,15 @@
+[package]
+name = "tests"
+version = "0.0.0"
+repository.workspace = true
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish = false
+
+[dependencies]
+assert_matches.workspace = true
+oas3 = { path = "../crates/oas3", features = ["yaml-spec"] }
+
+[lints]
+workspace = true

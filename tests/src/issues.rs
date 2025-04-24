@@ -1,9 +1,8 @@
-use assert_matches::assert_matches;
-use oas3::spec::{self, BooleanSchema};
-
 #[test]
 fn issue_52() {
-    let spec = oas3::from_str(include_str!("issues/issue-52.yaml")).unwrap();
+    use assert_matches::*;
+    use oas3::spec::{self, BooleanSchema};
+    let spec = oas3::from_yaml(include_str!("../issues/issue-52.yaml")).unwrap();
 
     let op = spec.operation_by_id("any").unwrap();
 
@@ -38,7 +37,7 @@ fn issue_52() {
 
 #[test]
 fn issue_79() {
-    let spec = oas3::from_str(include_str!("issues/issue-79.yaml")).unwrap();
+    let spec = oas3::from_yaml(include_str!("../issues/issue-79.yaml")).unwrap();
 
     let op = spec.operation_by_id("listClientIdsWithSize").unwrap();
 
