@@ -1,6 +1,6 @@
-//! Structures and tools to parse, navigate and validate [OpenAPI v3.1] specifications.
+//! Structures and tools to parse, navigate and validate [OpenAPI v3.1.x] specifications.
 //!
-//! Note that due to v3.1 being a breaking change from v3.0, you may have trouble correctly parsing
+//! Note that due to v3.1.x being a breaking change from v3.0.x, you may have trouble correctly parsing
 //! specs in the older format.
 //!
 //! # Example
@@ -14,7 +14,7 @@
 //! }
 //! ```
 //!
-//! [OpenAPI v3.1]: https://spec.openapis.org/oas/v3.1.1
+//! [OpenAPI v3.1.x]: https://spec.openapis.org/oas/v3.1.1
 
 #![warn(missing_docs)]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
@@ -23,7 +23,7 @@ pub mod spec;
 
 pub use self::spec::Spec;
 
-/// Version 3.1.0 of the OpenAPI specification.
+/// Version 3.1.x of the OpenAPI specification.
 ///
 /// Refer to the official [specification] for more information.
 ///

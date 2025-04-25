@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Document compatibility with OAS v3.1.1.
 - Remove non-spec-compliant `spec::Header::allow_empty_value` field.
 - Minimum supported Rust version (MSRV) is now 1.80.
 
