@@ -32,6 +32,48 @@ mod tests {
         validate_sample(input, Format::Json);
     }
 
+    #[test]
+    fn test_security_complex_yaml() {
+        let input = include_str!("../samples/pass/security_complex.yaml");
+        validate_sample(input, Format::Yaml);
+    }
+
+    #[test]
+    fn test_security_disabled_yaml() {
+        let input = include_str!("../samples/pass/security_disabled.yaml");
+        validate_sample(input, Format::Yaml);
+    }
+
+    #[test]
+    fn test_security_multiple_schemes_yaml() {
+        let input = include_str!("../samples/pass/security_multiple_schemes.yaml");
+        validate_sample(input, Format::Yaml);
+    }
+
+    #[test]
+    fn test_security_multiple_scopes_yaml() {
+        let input = include_str!("../samples/pass/security_multiple_scopes.yaml");
+        validate_sample(input, Format::Yaml);
+    }
+
+    #[test]
+    fn test_security_optional_or_yaml() {
+        let input = include_str!("../samples/pass/security_optional_or.yaml");
+        validate_sample(input, Format::Yaml);
+    }
+
+    #[test]
+    fn test_security_optional_yaml() {
+        let input = include_str!("../samples/pass/security_optional.yaml");
+        validate_sample(input, Format::Yaml);
+    }
+
+    #[test]
+    fn test_security_schemes_choice_yaml() {
+        let input = include_str!("../samples/pass/security_schemes_choice.yaml");
+        validate_sample(input, Format::Yaml);
+    }
+
     /// Validate that a given `sample` is being parsed by `oas3` without immediate errors. Panics, if
     /// an error is encountered and gives error context in the panic message.
     fn validate_sample(input: &str, format: Format) {

@@ -1,0 +1,11 @@
+openapi: 3.1.0
+info:
+  title: API
+  version: 1.0.0
+paths:
+  /:
+    get: {}
+    operationId: listFood
+    summary: Get a list of foodstuffs
+    security:
+      - [] # disables security for this path
