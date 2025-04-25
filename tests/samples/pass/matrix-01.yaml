@@ -1,0 +1,144 @@
+{
+  "components":
+    {
+      "securitySchemes":
+        {
+          "accessTokenBearer":
+            {
+              "description": "The `access_token` returned by a call to `/login` or `/register`, using the\n`Authorization: Bearer` header.\n\nIt can also be the `as_token` of an application service.\n\nThis is the preferred method.",
+              "scheme": "bearer",
+              "type": "http",
+            },
+          "accessTokenQuery":
+            {
+              "description": "**Deprecated.** The `access_token` returned by a call to `/login` or `/register`, as a query\nparameter.\n\nIt can also be the `as_token` of an application service.",
+              "in": "query",
+              "name": "access_token",
+              "type": "apiKey",
+            },
+          "appserviceAccessTokenBearer":
+            {
+              "description": "The `as_token` of an application service, using the `Authorization: Bearer`\nheader.\n\nThis is the preferred method.",
+              "scheme": "bearer",
+              "type": "http",
+            },
+          "appserviceAccessTokenQuery":
+            {
+              "description": "**Deprecated.** The `as_token` of an application service, as a query\nparameter.",
+              "in": "query",
+              "name": "access_token",
+              "type": "apiKey",
+            },
+        },
+    },
+  "info": { "title": "Matrix Client-Server API", "version": "unstable" },
+  "openapi": "3.1.0",
+  "paths":
+    {
+      "/.well-known/matrix/client":
+        {
+          "get":
+            {
+              "description": "Gets discovery information about the domain. The file may include\nadditional keys, which MUST follow the Java package naming convention,\ne.g. `com.example.myapp.property`. This ensures property names are\nsuitably namespaced for each application and reduces the risk of\nclashes.\n\nNote that this endpoint is not necessarily handled by the homeserver,\nbut by another webserver, to be used for discovering the homeserver URL.",
+              "operationId": "getWellknown",
+              "responses":
+                {
+                  "200":
+                    {
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "additionalProperties":
+                                    {
+                                      "description": "Application-dependent keys using Java package naming convention.",
+                                    },
+                                  "description": "Used by clients to determine the homeserver, identity server, and other\noptional components they should be interacting with.",
+                                  "example":
+                                    {
+                                      "m.homeserver":
+                                        {
+                                          "base_url": "https://matrix.example.com",
+                                        },
+                                      "m.identity_server":
+                                        {
+                                          "base_url": "https://identity.example.com",
+                                        },
+                                      "org.example.custom.property":
+                                        {
+                                          "app_url": "https://custom.app.example.org",
+                                        },
+                                    },
+                                  "properties":
+                                    {
+                                      "m.homeserver":
+                                        {
+                                          "description": "Used by clients to discover homeserver information.",
+                                          "properties":
+                                            {
+                                              "base_url":
+                                                {
+                                                  "description": "The base URL for the homeserver for client-server connections.",
+                                                  "example": "https://matrix.example.com",
+                                                  "format": "uri",
+                                                  "type": "string",
+                                                },
+                                            },
+                                          "required": ["base_url"],
+                                          "title": "Homeserver Information",
+                                          "type": "object",
+                                        },
+                                      "m.identity_server":
+                                        {
+                                          "description": "Used by clients to discover identity server information.",
+                                          "properties":
+                                            {
+                                              "base_url":
+                                                {
+                                                  "description": "The base URL for the identity server for client-server connections.",
+                                                  "example": "https://identity.example.com",
+                                                  "format": "uri",
+                                                  "type": "string",
+                                                },
+                                            },
+                                          "required": ["base_url"],
+                                          "title": "Identity Server Information",
+                                          "type": "object",
+                                        },
+                                    },
+                                  "required": ["m.homeserver"],
+                                  "title": "Discovery Information",
+                                  "type": "object",
+                                },
+                            },
+                        },
+                      "description": "Server discovery information.",
+                    },
+                  "404":
+                    {
+                      "description": "No server discovery information available.",
+                    },
+                },
+              "summary": "Gets Matrix server discovery information about the domain.",
+              "tags": ["Server administration"],
+            },
+        },
+    },
+  "servers":
+    [
+      { "url": "https://matrix.org" },
+      {
+        "url": "https://{homeserver_address}",
+        "variables":
+          {
+            "homeserver_address":
+              {
+                "default": "matrix-client.matrix.org",
+                "description": "The base URL for your homeserver",
+              },
+          },
+      },
+    ],
+}
