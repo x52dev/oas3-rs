@@ -7,7 +7,10 @@ use super::{
     Ref, RefError, RefType, Spec,
 };
 
-/// The Header Object mostly follows the structure of the [Parameter Object].
+/// Describes a single header for HTTP responses and for individual parts in multipart
+/// representations.
+///
+/// This mostly follows the structure of the [Parameter Object].
 ///
 /// Deviations from Parameter Object:
 /// 1. `name` MUST NOT be specified, it is given in the corresponding `headers` map.
@@ -15,16 +18,19 @@ use super::{
 /// 1. All traits that are affected by the location MUST be applicable to a location of
 ///    `header` (for example, [`style`]).
 ///
-/// See <https://spec.openapis.org/oas/v3.1.0#header-object>.
+/// See <https://spec.openapis.org/oas/v3.1.1#header-object>.
 ///
-/// [Parameter Object]: https://spec.openapis.org/oas/v3.1.0#parameter-object
-/// [`style`]: https://spec.openapis.org/oas/v3.1.0#parameterStyle
+/// [Parameter Object]: https://spec.openapis.org/oas/v3.1.1#parameter-object
+/// [`style`]: https://spec.openapis.org/oas/v3.1.1#parameterStyle
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
+#[serde(rename_all = "camelCase")]
 pub struct Header {
     /// A brief description of the header.
     ///
-    /// This could contain examples of use. CommonMark syntax MAY be used for rich text
+    /// This could contain examples of use. [CommonMark] syntax MAY be used for rich text
     /// representation.
+    ///
+    /// [CommonMark]: https://spec.commonmark.org
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
 
@@ -40,27 +46,17 @@ pub struct Header {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub deprecated: Option<bool>,
 
-    /// Sets the ability to pass empty-valued header.
-    ///
-    /// This is valid only for query header and allows sending a parameter with an empty value.
-    /// Default value is false. If style is used, and if behavior is n/a (cannot be serialized), the
-    /// value of `allowEmptyValue` SHALL be ignored. Use of this property is NOT RECOMMENDED, as it
-    /// is likely to be removed in a later revision.
-    #[serde(
-        rename = "allowEmptyValue",
-        default,
-        skip_serializing_if = "Option::is_none"
-    )]
-    pub allow_empty_value: Option<bool>,
-
     /// Describes how the header value will be serialized.
     ///
-    /// Default value is `simple`.
+    /// If used, the value must be `simple`.
+    // TODO: validation for style requirement
     #[serde(skip_serializing_if = "Option::is_none")]
     pub style: Option<ParameterStyle>,
 
-    /// True if array/object header values generate separate headers for each value of the array or
-    /// key-value pair of the map.
+    /// True if array/object parameter values generate separate parameters for each value of the
+    /// array or key-value pair of the map.
+    ///
+    /// For other types of parameters this property has no effect.
     ///
     /// Default value is false.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -103,7 +99,7 @@ pub struct Header {
     ///
     /// Only "x-" prefixed keys are collected, and the prefix is stripped.
     ///
-    /// See <https://spec.openapis.org/oas/v3.1.0#specification-extensions>.
+    /// See <https://spec.openapis.org/oas/v3.1.1#specification-extensions>.
     #[serde(flatten, with = "spec_extensions")]
     pub extensions: BTreeMap<String, serde_json::Value>,
 }

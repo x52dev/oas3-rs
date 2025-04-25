@@ -12,7 +12,7 @@ use super::{
 /// All objects defined within the components object will have no effect on the API unless
 /// they are explicitly referenced from properties outside the components object.
 ///
-/// See <https://spec.openapis.org/oas/v3.1.0#components-object>.
+/// See <https://spec.openapis.org/oas/v3.1.1#components-object>.
 #[derive(Debug, Clone, Default, PartialEq, Deserialize, Serialize)]
 pub struct Components {
     /// An object to hold reusable [Schema Objects](ObjectSchema).
@@ -71,7 +71,7 @@ pub struct Components {
     ///
     /// Only "x-" prefixed keys are collected, and the prefix is stripped.
     ///
-    /// See <https://spec.openapis.org/oas/v3.1.0#specification-extensions>.
+    /// See <https://spec.openapis.org/oas/v3.1.1#specification-extensions>.
     #[serde(flatten, with = "spec_extensions")]
     pub extensions: BTreeMap<String, serde_json::Value>,
 }

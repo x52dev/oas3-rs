@@ -17,7 +17,7 @@ pub enum ParameterIn {
     /// This does not include the host or base path of the API. For example, in `/items/{itemId}`,
     /// the path parameter is `itemId`.
     ///
-    /// [path templating]: https://spec.openapis.org/oas/v3.1.0#path-templating
+    /// [path templating]: https://spec.openapis.org/oas/v3.1.1#path-templating
     Path,
 
     /// Parameters that are appended to the URL. For example, in `/items?id=###`, the query
@@ -87,21 +87,39 @@ pub enum ParameterStyle {
 ///
 /// A unique parameter is defined by a combination of a `name` and location (`in`).
 ///
-/// See <https://spec.openapis.org/oas/v3.1.0#parameter-object>.
+/// The rules for serialization of the parameter are specified in one of two ways. Parameter Objects
+/// MUST include either a `content` field or a `schema` field, but not both.
+///
+/// See <https://spec.openapis.org/oas/v3.1.1#parameter-object>.
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Parameter {
     /// The name of the parameter.
+    ///
+    /// Parameter names are case sensitive unless this is a header parameter.
+    ///
+    /// - If `in` is "path", the `name` field MUST correspond to a template expression occurring
+    ///   within the `path` field in the [Paths Object](super::Spec::paths).
+    /// - If `in` is "header" and the name field is "Accept", "Content-Type" or "Authorization", the
+    ///   parameter definition SHALL be ignored.
+    // TODO: actually ignore them
+    /// - For all other cases, the `name` corresponds to the parameter name used by the `in` field.
     pub name: String,
 
     /// The location of the parameter.
     ///
     /// Given by the `in` field.
+    ///
+    /// Possible values are "query", "header", "path" or "cookie".
     #[serde(rename = "in")]
     pub location: ParameterIn,
 
     /// A brief description of the parameter.
     ///
-    /// This could contain examples of use. CommonMark syntax MAY be used for rich text representation.
+    /// This could contain examples of use. [CommonMark] syntax MAY be used for rich text
+    /// representation.
+    ///
+    /// [CommonMark]: https://spec.commonmark.org
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
 
@@ -120,15 +138,16 @@ pub struct Parameter {
 
     /// Sets the ability to pass empty-valued parameters.
     ///
-    /// This is valid only for query parameters and allows sending a parameter with an empty value.
-    /// Default value is false. If style is used, and if behavior is n/a (cannot be serialized), the
-    /// value of `allowEmptyValue` SHALL be ignored. Use of this property is NOT RECOMMENDED, as it
-    /// is likely to be removed in a later revision.
-    #[serde(
-        rename = "allowEmptyValue",
-        default,
-        skip_serializing_if = "Option::is_none"
-    )]
+    /// This is valid only for `query` parameters and if true, clients MAY pass a zero-length string
+    /// value in place of parameters that would otherwise be omitted entirely.
+    ///
+    /// Default value is false.
+    ///
+    /// If style is used, and if behavior is n/a (cannot be serialized), the value of
+    /// `allowEmptyValue` SHALL be ignored.
+    ///
+    /// Use of this property is NOT RECOMMENDED, as it is likely to be removed in a later revision.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub allow_empty_value: Option<bool>,
 
     /// Describes how the parameter value will be serialized depending on the type of the parameter
@@ -142,23 +161,25 @@ pub struct Parameter {
     /// True if array/object parameter values generate separate parameters for each value of the
     /// array or key-value pair of the map.
     ///
-    /// For other types of parameters this property has no effect. When `style` is `form`, the
-    /// default value is true. For all other styles, the default value is false.
+    /// For other types of parameters this property has no effect.
+    ///
+    /// When `style` is `form`, the default value is true. For all other styles, the default value
+    /// is false.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub explode: Option<bool>,
 
-    /// Determines whether the parameter value SHOULD allow reserved characters to be included
+    /// True if the parameter value SHOULD allow reserved characters to be included
     /// without percent-encoding.
     ///
     /// Reserved characters as defined by [RFC 3986 §2.2]: `:/?#[]@!$&'()*+,;=`. This property only
-    /// applies to parameters with an `in` value of `query`. The default value is false.
+    /// applies to parameters with an `in` value of `query`.
+    ///
+    /// The default value is false.
+    ///
+    /// See <https://spec.openapis.org/oas/v3.1.1#fixed-fields-for-use-with-schema>.
     ///
     /// [RFC 3986 §2.2]: https://datatracker.ietf.org/doc/html/rfc3986#section-2.2
-    #[serde(
-        rename = "allowReserved",
-        default,
-        skip_serializing_if = "Option::is_none"
-    )]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub allow_reserved: Option<bool>,
 
     /// The schema defining the type used for the parameter.
@@ -198,7 +219,7 @@ pub struct Parameter {
     ///
     /// Only "x-" prefixed keys are collected, and the prefix is stripped.
     ///
-    /// See <https://spec.openapis.org/oas/v3.1.0#specification-extensions>.
+    /// See <https://spec.openapis.org/oas/v3.1.1#specification-extensions>.
     #[serde(flatten, with = "spec_extensions")]
     pub extensions: BTreeMap<String, serde_json::Value>,
 }

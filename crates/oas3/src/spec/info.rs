@@ -8,7 +8,7 @@ use super::{spec_extensions, Contact, License};
 /// General information about the API.
 ///
 ///
-/// See <https://spec.openapis.org/oas/v3.1.0#info-object>.
+/// See <https://spec.openapis.org/oas/v3.1.1#info-object>.
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 // #[serde(rename_all = "lowercase")]
 pub struct Info {
@@ -28,7 +28,7 @@ pub struct Info {
     pub terms_of_service: Option<Url>,
 
     /// The version of the OpenAPI document (which is distinct from the [OpenAPI Specification
-    /// version](https://spec.openapis.org/oas/v3.1.0#oasVersion)
+    /// version](https://spec.openapis.org/oas/v3.1.1#oasVersion)
     /// or the API implementation version).
     pub version: String,
 
@@ -44,7 +44,7 @@ pub struct Info {
     ///
     /// Only "x-" prefixed keys are collected, and the prefix is stripped.
     ///
-    /// See <https://spec.openapis.org/oas/v3.1.0#specification-extensions>.
+    /// See <https://spec.openapis.org/oas/v3.1.1#specification-extensions>.
     #[serde(flatten, with = "spec_extensions")]
     pub extensions: BTreeMap<String, serde_json::Value>,
 }

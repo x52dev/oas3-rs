@@ -108,7 +108,7 @@ mod tests {
     #[test]
     fn validate_failing_samples() {
         // TODO: implement validation for one-of: [paths, components, webhooks]
-        // see https://spec.openapis.org/oas/v3.1.0#openapi-document
+        // see https://spec.openapis.org/oas/v3.1.1#openapi-document
         // oas3::from_str(include_str!("samples/fail/no_containers.yaml")).unwrap_err();
 
         // TODO: implement validation for non-empty server enum

@@ -7,7 +7,7 @@ use super::spec_extensions;
 
 /// Allows configuration of the supported OAuth Flows.
 ///
-/// See <https://spec.openapis.org/oas/v3.1.0#oauth-flows-object>.
+/// See <https://spec.openapis.org/oas/v3.1.1#oauth-flows-object>.
 #[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct Flows {
@@ -31,14 +31,14 @@ pub struct Flows {
     ///
     /// Only "x-" prefixed keys are collected, and the prefix is stripped.
     ///
-    /// See <https://spec.openapis.org/oas/v3.1.0#specification-extensions>.
+    /// See <https://spec.openapis.org/oas/v3.1.1#specification-extensions>.
     #[serde(flatten, with = "spec_extensions")]
     pub extensions: BTreeMap<String, serde_json::Value>,
 }
 
 /// Configuration details for a implicit OAuth Flow.
 ///
-/// See <https://spec.openapis.org/oas/v3.1.0#oauth-flow-object>.
+/// See <https://spec.openapis.org/oas/v3.1.1#oauth-flow-object>.
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct ImplicitFlow {
@@ -63,14 +63,14 @@ pub struct ImplicitFlow {
     ///
     /// Only "x-" prefixed keys are collected, and the prefix is stripped.
     ///
-    /// See <https://spec.openapis.org/oas/v3.1.0#specification-extensions>.
+    /// See <https://spec.openapis.org/oas/v3.1.1#specification-extensions>.
     #[serde(flatten, with = "spec_extensions")]
     pub extensions: BTreeMap<String, serde_json::Value>,
 }
 
 /// Configuration details for a password OAuth Flow.
 ///
-/// See <https://spec.openapis.org/oas/v3.1.0#oauth-flow-object>.
+/// See <https://spec.openapis.org/oas/v3.1.1#oauth-flow-object>.
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct PasswordFlow {
@@ -94,7 +94,7 @@ pub struct PasswordFlow {
 
 /// Configuration details for a client credentials OAuth Flow.
 ///
-/// See <https://spec.openapis.org/oas/v3.1.0#oauth-flow-object>.
+/// See <https://spec.openapis.org/oas/v3.1.1#oauth-flow-object>.
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct ClientCredentialsFlow {
@@ -118,7 +118,7 @@ pub struct ClientCredentialsFlow {
 
 /// Configuration details for a authorization code OAuth Flow.
 ///
-/// See <https://spec.openapis.org/oas/v3.1.0#oauth-flow-object>.
+/// See <https://spec.openapis.org/oas/v3.1.1#oauth-flow-object>.
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct AuthorizationCodeFlow {
@@ -153,16 +153,16 @@ pub struct AuthorizationCodeFlow {
 /// callback object is an expression, evaluated at runtime, that identifies a URL to use for the
 /// callback operation.
 ///
-/// See <https://spec.openapis.org/oas/v3.1.0#callback-object>.
+/// See <https://spec.openapis.org/oas/v3.1.1#callback-object>.
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
 pub struct Callback(
     /// A Path Item Object used to define a callback request and expected responses.
-    serde_json::Value, // TODO: Add "Specification Extensions" https://spec.openapis.org/oas/v3.1.0#specificationExtensions}
+    serde_json::Value, // TODO: Add "Specification Extensions" https://spec.openapis.org/oas/v3.1.1#specificationExtensions}
 );
 
 // FIXME: Implement
 // /// Allows configuration of the supported OAuth Flows.
-// /// https://spec.openapis.org/oas/v3.1.0#oauthFlowsObject
+// /// https://spec.openapis.org/oas/v3.1.1#oauthFlowsObject
 // #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
 // pub struct OAuthFlows {
 // }

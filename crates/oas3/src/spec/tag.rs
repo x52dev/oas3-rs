@@ -8,9 +8,9 @@ use super::spec_extensions;
 ///
 /// It is not mandatory to have a Tag Object per tag defined in the Operation Object instances.
 ///
-/// See <https://spec.openapis.org/oas/v3.1.0#tag-object>.
+/// See <https://spec.openapis.org/oas/v3.1.1#tag-object>.
 ///
-/// [Operation Object]: https://spec.openapis.org/oas/v3.1.0#operation-object
+/// [Operation Object]: https://spec.openapis.org/oas/v3.1.1#operation-object
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct Tag {
     /// The name of the tag.
@@ -31,7 +31,7 @@ pub struct Tag {
     ///
     /// Only "x-" prefixed keys are collected, and the prefix is stripped.
     ///
-    /// See <https://spec.openapis.org/oas/v3.1.0#specification-extensions>.
+    /// See <https://spec.openapis.org/oas/v3.1.1#specification-extensions>.
     #[serde(flatten, with = "spec_extensions")]
     pub extensions: BTreeMap<String, serde_json::Value>,
 }

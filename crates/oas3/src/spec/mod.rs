@@ -75,11 +75,11 @@ const OPENAPI_SUPPORTED_VERSION_RANGE: &str = "~3.1";
 pub struct Spec {
     /// This string MUST be the [semantic version number](https://semver.org/spec/v2.0.0.html)
     /// of the
-    /// [OpenAPI Specification version](https://spec.openapis.org/oas/v3.1.0#versions)
+    /// [OpenAPI Specification version](https://spec.openapis.org/oas/v3.1.1#versions)
     /// that the OpenAPI document uses. The `openapi` field SHOULD be used by tooling
     /// specifications and clients to interpret the OpenAPI document. This is not related to
     /// the API
-    /// [`info.version`](https://spec.openapis.org/oas/v3.1.0#infoVersion)
+    /// [`info.version`](https://spec.openapis.org/oas/v3.1.1#infoVersion)
     /// string.
     pub openapi: String,
 
@@ -89,9 +89,9 @@ pub struct Spec {
     /// An array of Server Objects, which provide connectivity information to a target server.
     /// If the `servers` property is not provided, or is an empty array, the default value would
     /// be a
-    /// [Server Object](https://spec.openapis.org/oas/v3.1.0#server-object)
+    /// [Server Object](https://spec.openapis.org/oas/v3.1.1#server-object)
     /// with a
-    /// [url](https://spec.openapis.org/oas/v3.1.0#serverUrl)
+    /// [url](https://spec.openapis.org/oas/v3.1.1#serverUrl)
     /// value of `/`.
     // FIXME: Provide a default value as specified in documentation instead of `None`.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -99,9 +99,9 @@ pub struct Spec {
 
     /// Holds the relative paths to the individual endpoints and their operations. The path is
     /// appended to the URL from the
-    /// [`Server Object`](https://spec.openapis.org/oas/v3.1.0#server-object)
+    /// [`Server Object`](https://spec.openapis.org/oas/v3.1.1#server-object)
     /// in order to construct the full URL. The Paths MAY be empty, due to
-    /// [ACL constraints](https://spec.openapis.org/oas/v3.1.0#securityFiltering).
+    /// [ACL constraints](https://spec.openapis.org/oas/v3.1.1#securityFiltering).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub paths: Option<BTreeMap<String, PathItem>>,
 
@@ -122,7 +122,7 @@ pub struct Spec {
     /// A list of tags used by the specification with additional metadata.
     ///The order of the tags can be used to reflect on their order by the parsing tools.
     /// Not all tags that are used by the
-    /// [Operation Object](https://spec.openapis.org/oas/v3.1.0#operation-object)
+    /// [Operation Object](https://spec.openapis.org/oas/v3.1.1#operation-object)
     /// must be declared. The tags that are not declared MAY be organized randomly or
     /// based on the tools' logic. Each tag name in the list MUST be unique.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -148,7 +148,7 @@ pub struct Spec {
     ///
     /// Only "x-" prefixed keys are collected, and the prefix is stripped.
     ///
-    /// See <https://spec.openapis.org/oas/v3.1.0#specification-extensions>.
+    /// See <https://spec.openapis.org/oas/v3.1.1#specification-extensions>.
     #[serde(flatten, with = "spec_extensions")]
     pub extensions: BTreeMap<String, serde_json::Value>,
 }

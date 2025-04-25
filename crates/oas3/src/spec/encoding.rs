@@ -25,9 +25,9 @@ pub struct Encoding {
     pub headers: BTreeMap<String, ObjectOrReference<Header>>,
 
     /// Describes how a specific property value will be serialized depending on its type.
-    /// See [Parameter Object](https://spec.openapis.org/oas/v3.1.0#parameter-object)
+    /// See [Parameter Object](https://spec.openapis.org/oas/v3.1.1#parameter-object)
     /// for details on the
-    /// [`style`](https://spec.openapis.org/oas/v3.1.0#parameterStyle)
+    /// [`style`](https://spec.openapis.org/oas/v3.1.1#parameterStyle)
     /// property. The behavior follows the same values as `query` parameters, including
     /// default values. This property SHALL be ignored if the request body media type
     /// is not `application/x-www-form-urlencoded`.
@@ -37,7 +37,7 @@ pub struct Encoding {
     /// When this is true, property values of type `array` or `object` generate
     /// separate parameters for each value of the array, or key-value-pair of the map.
     /// For other types of properties this property has no effect. When
-    /// [`style`](https://spec.openapis.org/oas/v3.1.0#encodingStyle)
+    /// [`style`](https://spec.openapis.org/oas/v3.1.1#encodingStyle)
     /// is `form`, the default value is `true`. For all other styles, the default value
     /// is `false`. This property SHALL be ignored if the request body media type is
     /// not `application/x-www-form-urlencoded`.

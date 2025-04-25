@@ -7,7 +7,7 @@ use super::spec_extensions;
 
 /// License information for the exposed API.
 ///
-/// See <https://spec.openapis.org/oas/v3.1.0#license-object>.
+/// See <https://spec.openapis.org/oas/v3.1.1#license-object>.
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct License {
     /// The license name used for the API.
@@ -25,7 +25,7 @@ pub struct License {
     ///
     /// Only "x-" prefixed keys are collected, and the prefix is stripped.
     ///
-    /// See <https://spec.openapis.org/oas/v3.1.0#specification-extensions>.
+    /// See <https://spec.openapis.org/oas/v3.1.1#specification-extensions>.
     #[serde(flatten, with = "spec_extensions")]
     pub extensions: BTreeMap<String, serde_json::Value>,
 }

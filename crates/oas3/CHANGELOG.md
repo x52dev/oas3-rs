@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Remove non-spec-compliant `spec::Header::allow_empty_value` field.
 - Minimum supported Rust version (MSRV) is now 1.80.
 
 ## 0.16.1
