@@ -1,7 +1,8 @@
 #[test]
 fn issue_52() {
-    use assert_matches::*;
-    use oas3::spec::{self, BooleanSchema};
+    use assert_matches::assert_matches;
+    use oas3::spec;
+
     let spec = oas3::from_yaml(include_str!("../issues/issue-52.yaml")).unwrap();
 
     let op = spec.operation_by_id("any").unwrap();
@@ -17,7 +18,7 @@ fn issue_52() {
         .additional_properties
         .unwrap();
 
-    assert_matches!(schema, spec::Schema::Boolean(BooleanSchema(true)));
+    assert_matches!(schema, spec::Schema::Boolean(spec::BooleanSchema(true)));
 
     let op = spec.operation_by_id("none").unwrap();
 
@@ -32,7 +33,7 @@ fn issue_52() {
         .additional_properties
         .unwrap();
 
-    assert_matches!(schema, spec::Schema::Boolean(BooleanSchema(false)));
+    assert_matches!(schema, spec::Schema::Boolean(spec::BooleanSchema(false)));
 }
 
 #[test]
