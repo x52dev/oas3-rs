@@ -1,0 +1,277 @@
+{
+    "components": {
+        "securitySchemes": {
+            "accessTokenBearer": {
+                "description": "The `access_token` returned by a call to `/login` or `/register`, using the\n`Authorization: Bearer` header.\n\nIt can also be the `as_token` of an application service.\n\nThis is the preferred method.",
+                "scheme": "bearer",
+                "type": "http"
+            },
+            "accessTokenQuery": {
+                "description": "**Deprecated.** The `access_token` returned by a call to `/login` or `/register`, as a query\nparameter.\n\nIt can also be the `as_token` of an application service.",
+                "in": "query",
+                "name": "access_token",
+                "type": "apiKey"
+            },
+            "appserviceAccessTokenBearer": {
+                "description": "The `as_token` of an application service, using the `Authorization: Bearer`\nheader.\n\nThis is the preferred method.",
+                "scheme": "bearer",
+                "type": "http"
+            },
+            "appserviceAccessTokenQuery": {
+                "description": "**Deprecated.** The `as_token` of an application service, as a query\nparameter.",
+                "in": "query",
+                "name": "access_token",
+                "type": "apiKey"
+            }
+        }
+    },
+    "info": {
+        "title": "Matrix Client-Server API",
+        "version": "unstable"
+    },
+    "openapi": "3.1.0",
+    "paths": {
+        "/_matrix/client/v1/appservice/{appserviceId}/ping": {
+            "post": {
+                "description": "This API asks the homeserver to call the\n[`/_matrix/app/v1/ping`](https://spec.matrix.org/unstable/application-service-api/#post_matrixappv1ping) endpoint on the\napplication service to ensure that the homeserver can communicate\nwith the application service.\n\nThis API requires the use of an application service access token (`as_token`)\ninstead of a typical client's access token. This API cannot be invoked by\nusers who are not identified as application services. Additionally, the\nappservice ID in the path must be the same as the appservice whose `as_token`\nis being used.",
+                "operationId": "pingAppservice",
+                "parameters": [
+                    {
+                        "description": "The appservice ID of the appservice to ping. This must be the same\nas the appservice whose `as_token` is being used to authenticate the\nrequest.",
+                        "example": "telegram",
+                        "in": "path",
+                        "name": "appserviceId",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "transaction_id": {
+                                        "description": "An optional transaction ID that is passed through to the `/_matrix/app/v1/ping` call.",
+                                        "example": "mautrix-go_1683636478256400935_123",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "examples": {
+                                    "response": {
+                                        "value": {
+                                            "duration_ms": 123
+                                        }
+                                    }
+                                },
+                                "schema": {
+                                    "properties": {
+                                        "duration_ms": {
+                                            "description": "The duration in milliseconds that the\n[`/_matrix/app/v1/ping`](https://spec.matrix.org/unstable/application-service-api/#post_matrixappv1ping)\nrequest took from the homeserver's point of view.",
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "required": [
+                                        "duration_ms"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "The ping was successful."
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "examples": {
+                                    "response": {
+                                        "value": {
+                                            "errcode": "M_URL_NOT_SET",
+                                            "error": "Application service doesn't have a URL configured"
+                                        }
+                                    }
+                                },
+                                "schema": {
+                                    "description": "A Matrix-level Error",
+                                    "properties": {
+                                        "errcode": {
+                                            "description": "An error code.",
+                                            "example": "M_UNKNOWN",
+                                            "type": "string"
+                                        },
+                                        "error": {
+                                            "description": "A human-readable error message.",
+                                            "example": "An unknown error occurred",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "errcode"
+                                    ],
+                                    "title": "Error",
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "The application service doesn't have a URL configured. The errcode is `M_URL_NOT_SET`."
+                    },
+                    "403": {
+                        "content": {
+                            "application/json": {
+                                "examples": {
+                                    "response": {
+                                        "value": {
+                                            "errcode": "M_FORBIDDEN",
+                                            "error": "Provided access token is not the appservice's as_token"
+                                        }
+                                    }
+                                },
+                                "schema": {
+                                    "description": "A Matrix-level Error",
+                                    "properties": {
+                                        "errcode": {
+                                            "description": "An error code.",
+                                            "example": "M_UNKNOWN",
+                                            "type": "string"
+                                        },
+                                        "error": {
+                                            "description": "A human-readable error message.",
+                                            "example": "An unknown error occurred",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "errcode"
+                                    ],
+                                    "title": "Error",
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "The access token used to authenticate the request doesn't belong to an appservice, or belongs to a different appservice than the one in the path. The errcode is `M_FORBIDDEN`."
+                    },
+                    "502": {
+                        "content": {
+                            "application/json": {
+                                "examples": {
+                                    "response": {
+                                        "value": {
+                                            "body": "{\"errcode\": \"M_UNKNOWN_TOKEN\"}",
+                                            "errcode": "M_BAD_STATUS",
+                                            "error": "Ping returned status 401",
+                                            "status": 401
+                                        }
+                                    }
+                                },
+                                "schema": {
+                                    "description": "A Matrix-level Error",
+                                    "properties": {
+                                        "body": {
+                                            "description": "The HTTP response body returned by the appservice.",
+                                            "example": "{\"errcode\": \"M_UNKNOWN_TOKEN\"}",
+                                            "type": "string"
+                                        },
+                                        "errcode": {
+                                            "description": "An error code.",
+                                            "enum": [
+                                                "M_BAD_STATUS",
+                                                "M_CONNECTION_FAILED"
+                                            ],
+                                            "type": "string"
+                                        },
+                                        "error": {
+                                            "description": "A human-readable error message.",
+                                            "example": "Ping returned status 401",
+                                            "type": "string"
+                                        },
+                                        "status": {
+                                            "description": "The HTTP status code returned by the appservice.",
+                                            "example": 401,
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "required": [
+                                        "errcode"
+                                    ],
+                                    "title": "Error",
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "The application service returned a bad status, or the connection failed.\nThe errcode is `M_BAD_STATUS` or `M_CONNECTION_FAILED`.\n\nFor bad statuses, the response may include `status` and `body`\nfields containing the HTTP status code and response body text\nrespectively to aid with debugging."
+                    },
+                    "504": {
+                        "content": {
+                            "application/json": {
+                                "examples": {
+                                    "response": {
+                                        "value": {
+                                            "errcode": "M_CONNECTION_TIMEOUT",
+                                            "error": "Connection to application service timed out"
+                                        }
+                                    }
+                                },
+                                "schema": {
+                                    "description": "A Matrix-level Error",
+                                    "properties": {
+                                        "errcode": {
+                                            "description": "An error code.",
+                                            "example": "M_UNKNOWN",
+                                            "type": "string"
+                                        },
+                                        "error": {
+                                            "description": "A human-readable error message.",
+                                            "example": "An unknown error occurred",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "errcode"
+                                    ],
+                                    "title": "Error",
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "The connection to the application service timed out. The errcode is `M_CONNECTION_TIMEOUT`."
+                    }
+                },
+                "security": [
+                    {
+                        "appserviceAccessTokenQuery": []
+                    },
+                    {
+                        "appserviceAccessTokenBearer": []
+                    }
+                ],
+                "summary": "Ask the homeserver to ping the application service to ensure the connection works.",
+                "x-addedInMatrixVersion": "1.7"
+            }
+        }
+    },
+    "servers": [
+        {
+            "url": "https://matrix.org"
+        },
+        {
+            "url": "https://{homeserver_address}",
+            "variables": {
+                "homeserver_address": {
+                    "default": "matrix-client.matrix.org",
+                    "description": "The base URL for your homeserver"
+                }
+            }
+        }
+    ]
+}

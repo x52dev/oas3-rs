@@ -25,4 +25,4 @@ use serde::{Deserialize, Serialize};
 /// contain a list of role names which are required for the execution, but are not otherwise defined
 /// or exchanged in-band.
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
-pub struct SecurityRequirement(BTreeMap<String, String>);
+pub struct SecurityRequirement(BTreeMap<String, Vec<String>>);
