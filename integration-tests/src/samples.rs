@@ -74,6 +74,12 @@ mod tests {
         validate_sample(input, Format::Yaml);
     }
 
+    /// Describes the format of the text input.
+    enum Format {
+        Json,
+        Yaml,
+    }
+
     /// Validate that a given `sample` is being parsed by `oas3` without immediate errors. Panics, if
     /// an error is encountered and gives error context in the panic message.
     fn validate_sample(input: &str, format: Format) {
@@ -88,7 +94,7 @@ mod tests {
                 };
             }
             Format::Yaml => {
-                let yaml_deserializer = serde_yml::Deserializer::from_str(input);
+                let yaml_deserializer = serde_yaml::Deserializer::from_str(input);
                 let result: Result<oas3::OpenApiV3Spec, _> =
                     serde_path_to_error::deserialize(yaml_deserializer);
                 match result {
@@ -97,12 +103,6 @@ mod tests {
                 };
             }
         }
-    }
-
-    /// Describes the format of the text input.
-    enum Format {
-        Json,
-        Yaml,
     }
 
     #[test]
