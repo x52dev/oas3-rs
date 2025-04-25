@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.16.1
+
 - The map value type of `spec::SecurityRequirement` is now `Vec<String>`.
 - Expose inner field of `spec::SecurityRequirement`.
 
