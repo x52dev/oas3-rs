@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Minimum supported Rust version (MSRV) is now 1.80.
+
 ## 0.16.1
 
 - The map value type of `spec::SecurityRequirement` is now `Vec<String>`.

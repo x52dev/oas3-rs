@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Minimum supported Rust version (MSRV) is now 1.80.
+
 ## 0.6.0
 
 - Update `oas3` dependency to `0.16`.
