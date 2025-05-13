@@ -1,6 +1,7 @@
 version: "0.2"
 words:
   - btreemap
+  - clippy
   - deque
   - deserializable
   - docsrs
@@ -8,7 +9,8 @@ words:
   - indoc
   - ints
   - maplit
-  - msrv
+  - MSRV
+  - nextest
   - nixpkgs
   - noncomposite
   - nums
@@ -19,11 +21,11 @@ words:
   - println
   - refpath
   - reqwest
+  - RUSTDOCFLAGS
   - rustfmt
   - rustup
   - semver
   - serde
-  - spdx
   - strs
   - struct
   - structs
