@@ -1,6 +1,10 @@
 use serde::{Deserialize, Serialize};
 
 use super::Flows;
+use crate::{
+    spec::{FromRef, Ref, RefError, RefType},
+    Spec,
+};
 
 /// Defines a security scheme that can be used by the operations.
 ///
@@ -99,6 +103,22 @@ pub enum SecurityScheme {
         #[serde(skip_serializing_if = "Option::is_none")]
         description: Option<String>,
     },
+}
+
+impl FromRef for SecurityScheme {
+    fn from_ref(spec: &Spec, path: &str) -> Result<Self, RefError> {
+        let refpath = path.parse::<Ref>()?;
+
+        match refpath.kind {
+            RefType::SecurityScheme => spec
+                .components
+                .as_ref()
+                .and_then(|cs| cs.security_schemes.get(&refpath.name))
+                .ok_or_else(|| RefError::Unresolvable(path.to_owned()))
+                .and_then(|oor| oor.resolve(spec)),
+            typ => Err(RefError::MismatchedType(typ, RefType::SecurityScheme)),
+        }
+    }
 }
 
 #[cfg(test)]
