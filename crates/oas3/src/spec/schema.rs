@@ -667,4 +667,121 @@ mod tests {
         assert!(schema.discriminator.is_some());
         assert_eq!(2, schema.discriminator.unwrap().mapping.unwrap().len());
     }
+
+    #[test]
+    fn prefix_items_basic() {
+        let spec = indoc::indoc! {"
+          type: array
+          prefixItems:
+            - type: string
+            - $ref: '#/components/schemas/Age'
+            - type: integer
+        "};
+        let schema = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
+
+        assert_eq!(schema.prefix_items.len(), 3);
+
+        // Check first schema (inline)
+        if let ObjectOrReference::Object(first_schema) = &schema.prefix_items[0] {
+            assert_eq!(
+                first_schema.schema_type,
+                Some(TypeSet::Single(Type::String))
+            );
+        } else {
+            panic!("Expected inline schema for first prefixItems element");
+        }
+
+        // Check second schema (reference)
+        if let ObjectOrReference::Ref { ref_path } = &schema.prefix_items[1] {
+            assert_eq!(ref_path, "#/components/schemas/Age");
+        } else {
+            panic!("Expected reference for second prefixItems element");
+        }
+
+        // Check third schema (inline)
+        if let ObjectOrReference::Object(third_schema) = &schema.prefix_items[2] {
+            assert_eq!(
+                third_schema.schema_type,
+                Some(TypeSet::Single(Type::Integer))
+            );
+        } else {
+            panic!("Expected inline schema for third prefixItems element");
+        }
+    }
+
+    #[test]
+    fn prefix_items_with_items() {
+        let spec = indoc::indoc! {"
+          type: array
+          prefixItems:
+            - type: string
+          items:
+            type: number
+        "};
+        let schema = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
+
+        assert_eq!(schema.prefix_items.len(), 1);
+        assert!(schema.items.is_some());
+
+        // Check prefixItems
+        if let ObjectOrReference::Object(prefix_schema) = &schema.prefix_items[0] {
+            assert_eq!(
+                prefix_schema.schema_type,
+                Some(TypeSet::Single(Type::String))
+            );
+        } else {
+            panic!("Expected inline schema for prefixItems element");
+        }
+
+        // Check items
+        if let Some(items_box) = &schema.items {
+            if let ObjectOrReference::Object(items_schema) = items_box.as_ref() {
+                assert_eq!(
+                    items_schema.schema_type,
+                    Some(TypeSet::Single(Type::Number))
+                );
+            } else {
+                panic!("Expected inline schema for items");
+            }
+        } else {
+            panic!("Expected items to be present");
+        }
+    }
+
+    #[test]
+    fn prefix_items_empty() {
+        let spec = indoc::indoc! {"
+          type: array
+          prefixItems: []
+        "};
+        let schema = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
+
+        assert_eq!(schema.prefix_items.len(), 0);
+    }
+
+    #[test]
+    fn prefix_items_serialization_round_trip() {
+        let spec = indoc::indoc! {"
+          type: array
+          prefixItems:
+            - type: string
+              minLength: 5
+            - type: integer
+              minimum: 0
+          items:
+            type: boolean
+        "};
+
+        // Deserialize from YAML
+        let original = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
+
+        // Serialize to YAML
+        let serialized = serde_yaml::to_string(&original).unwrap();
+
+        // Deserialize back
+        let round_tripped = serde_yaml::from_str::<ObjectSchema>(&serialized).unwrap();
+
+        // Compare structures (not YAML strings)
+        assert_eq!(original, round_tripped);
+    }
 }
