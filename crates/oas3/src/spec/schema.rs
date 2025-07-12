@@ -792,4 +792,58 @@ mod tests {
         // Compare structures (not YAML strings)
         assert_eq!(original, round_tripped);
     }
+
+    #[test]
+    fn items_object_schema_still_works() {
+        let spec = indoc::indoc! {"
+          type: array
+          items:
+            type: string
+            minLength: 5
+        "};
+        let schema = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
+        
+        assert!(schema.items.is_some());
+        
+        if let Some(items) = &schema.items {
+            match items.as_ref() {
+                Schema::Object(obj_ref) => {
+                    if let ObjectOrReference::Object(items_schema) = obj_ref.as_ref() {
+                        assert_eq!(
+                            items_schema.schema_type,
+                            Some(TypeSet::Single(Type::String))
+                        );
+                        assert_eq!(items_schema.min_length, Some(5));
+                    } else {
+                        panic!("Expected inline schema");
+                    }
+                },
+                _ => panic!("Expected object schema for items"),
+            }
+        } else {
+            panic!("Expected items to be present");
+        }
+    }
+
+    #[test]
+    fn items_boolean_serialization_round_trip() {
+        let spec = indoc::indoc! {"
+          type: array
+          prefixItems:
+            - type: string
+          items: false
+        "};
+
+        // Deserialize from YAML
+        let original = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
+
+        // Serialize to YAML
+        let serialized = serde_yaml::to_string(&original).unwrap();
+
+        // Deserialize back
+        let round_tripped = serde_yaml::from_str::<ObjectSchema>(&serialized).unwrap();
+
+        // Compare structures (not YAML strings)
+        assert_eq!(original, round_tripped);
+    }
 }
