@@ -169,8 +169,18 @@ pub struct ObjectSchema {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub items: Option<Box<ObjectOrReference<ObjectSchema>>>,
 
+    /// Validation succeeds if each element of the instance validates against the
+    /// schema at the same position, if any.
+    ///
+    /// This keyword does not constrain the length of the array.
+    /// If the array is longer than this keyword's value,
+    /// this keyword validates only the prefix of matching length.
+    ///
+    /// See <https://json-schema.org/draft/2020-12/json-schema-core#name-prefixitems>.
+    #[serde(rename = "prefixItems", default, skip_serializing_if = "Vec::is_empty")]
+    pub prefix_items: Vec<ObjectOrReference<ObjectSchema>>,
+
     // TODO: missing fields
-    // - prefixItems
     // - contains
 
     // #########################################################################
