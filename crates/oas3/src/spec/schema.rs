@@ -802,9 +802,9 @@ mod tests {
             minLength: 5
         "};
         let schema = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
-        
+
         assert!(schema.items.is_some());
-        
+
         if let Some(items) = &schema.items {
             match items.as_ref() {
                 Schema::Object(obj_ref) => {
@@ -817,7 +817,7 @@ mod tests {
                     } else {
                         panic!("Expected inline schema");
                     }
-                },
+                }
                 _ => panic!("Expected object schema for items"),
             }
         } else {
