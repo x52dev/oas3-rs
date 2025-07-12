@@ -45,7 +45,7 @@ components:
               type: string
               pattern: '^[a-f0-9]{64}$'
           required: [checksum]
-      maxItems: 3
+      items: false
 
     EmptyPrefixArray:
       type: array
@@ -90,3 +90,24 @@ components:
           type: string
           enum: ["utf-8", "base64", "hex"]
       required: [data, encoding]
+
+    # Test boolean items schemas
+    BooleanItemsFalse:
+      type: array
+      description: Array that allows no items (empty array only)
+      items: false
+      
+    BooleanItemsTrue:
+      type: array
+      description: Array that allows any items
+      items: true
+      
+    MixedBooleanItems:
+      type: array
+      description: Tuple with fixed prefix and no additional items
+      prefixItems:
+        - type: string
+          enum: ["v1", "v2", "v3"]
+        - type: number
+          minimum: 0
+      items: false
