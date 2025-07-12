@@ -74,6 +74,18 @@ mod tests {
         validate_sample(input, Format::Yaml);
     }
 
+    #[test]
+    fn test_schema_prefix_items_yaml() {
+        let input = include_str!("../samples/pass/schema_prefix_items.yaml");
+        validate_sample(input, Format::Yaml);
+    }
+
+    #[test]
+    fn test_schema_prefix_items_simple_yaml() {
+        let input = include_str!("../samples/pass/schema_prefix_items_simple.yaml");
+        validate_sample(input, Format::Yaml);
+    }
+
     /// Describes the format of the text input.
     enum Format {
         Json,

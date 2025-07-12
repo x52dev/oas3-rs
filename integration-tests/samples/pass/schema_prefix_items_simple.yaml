@@ -1,0 +1,14 @@
+openapi: 3.1.0
+info:
+  title: Simple prefixItems Test
+  version: 1.0.0
+paths: {}
+components:
+  schemas:
+    SimpleTuple:
+      type: array
+      prefixItems:
+        - type: string
+        - type: integer
+      items:
+        type: boolean
