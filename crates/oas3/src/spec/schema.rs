@@ -821,13 +821,13 @@ mod tests {
           items: false
         "};
         let schema = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
-        
+
         assert_eq!(schema.prefix_items.len(), 2);
         assert!(schema.items.is_some());
-        
+
         if let Some(items) = &schema.items {
             match items.as_ref() {
-                Schema::Boolean(BooleanSchema(false)) => {},
+                Schema::Boolean(BooleanSchema(false)) => {}
                 _ => panic!("Expected items: false"),
             }
         } else {
@@ -842,12 +842,12 @@ mod tests {
           items: true
         "};
         let schema = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
-        
+
         assert!(schema.items.is_some());
-        
+
         if let Some(items) = &schema.items {
             match items.as_ref() {
-                Schema::Boolean(BooleanSchema(true)) => {},
+                Schema::Boolean(BooleanSchema(true)) => {}
                 _ => panic!("Expected items: true"),
             }
         } else {
@@ -864,9 +864,9 @@ mod tests {
             minLength: 5
         "};
         let schema = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
-        
+
         assert!(schema.items.is_some());
-        
+
         if let Some(items) = &schema.items {
             match items.as_ref() {
                 Schema::Object(obj_ref) => {
@@ -879,7 +879,7 @@ mod tests {
                     } else {
                         panic!("Expected inline schema");
                     }
-                },
+                }
                 _ => panic!("Expected object schema for items"),
             }
         } else {
@@ -895,23 +895,23 @@ mod tests {
             - type: string
           items: false
         "};
-        
+
         // Deserialize
         let schema = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
-        
+
         // Serialize back to YAML
         let serialized = serde_yaml::to_string(&schema).unwrap();
-        
+
         // Deserialize again
         let schema2 = serde_yaml::from_str::<ObjectSchema>(&serialized).unwrap();
-        
+
         // Compare
         assert_eq!(schema.items, schema2.items);
-        
+
         // Verify it's still false
         if let Some(items) = &schema2.items {
             match items.as_ref() {
-                Schema::Boolean(BooleanSchema(false)) => {},
+                Schema::Boolean(BooleanSchema(false)) => {}
                 _ => panic!("Expected items: false after round trip"),
             }
         }

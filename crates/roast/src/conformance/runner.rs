@@ -165,7 +165,7 @@ impl TestRunner {
             .map(|(test_spec, test)| {
                 let num = Arc::clone(&num).fetch_sub(1, Ordering::SeqCst);
 
-                println!("running test: {}", num);
+                println!("running test: {num}");
                 trace!("run test: {:?}", &test);
 
                 self.run_test(test).map(|result| (test_spec, result))
@@ -198,7 +198,7 @@ impl TestRunner {
             let test_desc = if let Some(name) = &test.name {
                 let test_name = name.yellow();
                 let op_spec = op.to_string().italic();
-                format!("{}\n{}", test_name, op_spec)
+                format!("{test_name}\n{op_spec}")
             } else {
                 let op_spec = op.to_string().italic();
                 op_spec.to_string()

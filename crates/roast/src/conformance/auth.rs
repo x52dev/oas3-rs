@@ -42,7 +42,7 @@ impl fmt::Debug for TestAuthentication {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Custom(_) => write!(f, "[custom auth transformer]"),
-            other => write!(f, "{:?}", other),
+            other => write!(f, "{other:?}"),
         }
     }
 }

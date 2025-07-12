@@ -146,7 +146,7 @@ impl Operation {
                 oor.resolve(spec)
                     .map(|obj| (name.clone(), obj))
                     // TODO: find better error solution
-                    .map_err(|err| error!("{}", err))
+                    .map_err(|err| error!("{err}"))
                     .ok()
             })
             .collect()
@@ -158,7 +158,7 @@ impl Operation {
             .parameters
             .iter()
             // TODO: find better error solution, maybe vec<result<_>>
-            .filter_map(|oor| oor.resolve(spec).map_err(|err| error!("{}", err)).ok())
+            .filter_map(|oor| oor.resolve(spec).map_err(|err| error!("{err}")).ok())
             .collect();
 
         Ok(params)
