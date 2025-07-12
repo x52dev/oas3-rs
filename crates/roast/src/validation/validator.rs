@@ -84,10 +84,22 @@ impl ValidationTree {
                 trace!("adding array validators");
 
                 if let Some(schema_ref) = schema.items.as_ref() {
-                    let sub_schema = schema_ref.resolve(spec).unwrap();
-                    let vls = ValidationTree::from_schema(&sub_schema, spec).unwrap();
-
-                    valtree.branch = ValidationBranch::Array(Box::new(vls))
+                    match schema_ref.as_ref() {
+                        oas3::spec::Schema::Boolean(oas3::spec::BooleanSchema(false)) => {
+                            // items: false means no additional items allowed
+                            // For now, we treat this as having no array validation
+                            // TODO: A more complete implementation would validate array length against prefixItems
+                        }
+                        oas3::spec::Schema::Boolean(oas3::spec::BooleanSchema(true)) => {
+                            // items: true means any additional items allowed
+                            // No additional validation needed
+                        }
+                        oas3::spec::Schema::Object(obj_ref) => {
+                            let sub_schema = obj_ref.resolve(spec).unwrap();
+                            let vls = ValidationTree::from_schema(&sub_schema, spec).unwrap();
+                            valtree.branch = ValidationBranch::Array(Box::new(vls))
+                        }
+                    }
                 }
             }
 

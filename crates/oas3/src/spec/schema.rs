@@ -165,9 +165,13 @@ pub struct ObjectSchema {
     ///
     /// Omitting this keyword has the same assertion behavior as an empty schema.
     ///
+    /// This keyword can be either:
+    /// - A boolean value: `false` means no additional items allowed, `true` means any additional items allowed
+    /// - A schema object: validates all additional items against this schema
+    ///
     /// See <https://json-schema.org/draft/2020-12/json-schema-core#name-items>.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub items: Option<Box<ObjectOrReference<ObjectSchema>>>,
+    pub items: Option<Box<Schema>>,
 
     /// Validation succeeds if each element of the instance validates against the
     /// schema at the same position, if any.
@@ -735,13 +739,17 @@ mod tests {
 
         // Check items
         if let Some(items_box) = &schema.items {
-            if let ObjectOrReference::Object(items_schema) = items_box.as_ref() {
-                assert_eq!(
-                    items_schema.schema_type,
-                    Some(TypeSet::Single(Type::Number))
-                );
+            if let Schema::Object(obj_ref) = items_box.as_ref() {
+                if let ObjectOrReference::Object(items_schema) = obj_ref.as_ref() {
+                    assert_eq!(
+                        items_schema.schema_type,
+                        Some(TypeSet::Single(Type::Number))
+                    );
+                } else {
+                    panic!("Expected inline schema for items");
+                }
             } else {
-                panic!("Expected inline schema for items");
+                panic!("Expected object schema for items");
             }
         } else {
             panic!("Expected items to be present");
