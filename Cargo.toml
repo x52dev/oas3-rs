@@ -8,12 +8,6 @@ license = "MIT"
 edition = "2021"
 rust-version = "1.80"
 
-[workspace.lints.rust]
-rust_2018_idioms = "deny"
-nonstandard_style = "deny"
-future_incompatible = "deny"
-missing_debug_implementations = { level = "warn", priority = -1 }
-
 [workspace.dependencies]
 assert_matches = "1"
 bytes = "1.10"
@@ -40,9 +34,19 @@ serde_json = "1"
 serde_path_to_error = "0.1.17"
 serde_with = "3"
 serde_yaml = "0.9.34-deprecated"
-tokio = "1.45.1"
+tokio = "1.46.1"
 url = "2"
 
 [patch.crates-io]
 oas3 = { path = "crates/oas3" }
 roast = { path = "crates/roast" }
+
+[workspace.lints.rust]
+rust-2018-idioms = "deny"
+nonstandard-style = "deny"
+future-incompatible = "deny"
+missing-debug-implementations = { level = "warn", priority = -1 }
+
+[workspace.lints.clippy]
+uninlined-format-args = "warn"
+disallowed-names = "warn"

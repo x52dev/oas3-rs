@@ -207,7 +207,7 @@ impl ConformanceTestSpec {
         };
 
         if let Some(TestAuthentication::Bearer(ref jwt)) = self.request.auth {
-            let val = format!("Bearer {}", jwt);
+            let val = format!("Bearer {jwt}");
             req.headers
                 .insert("Authorization", val.parse().expect("invalid auth token"));
         }

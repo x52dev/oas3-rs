@@ -73,7 +73,7 @@ impl MediaTypeExamples {
                 .filter_map(|(name, oor)| {
                     oor.resolve(spec)
                         .map(|obj| (name.clone(), obj))
-                        .map_err(|err| error!("{}", err))
+                        .map_err(|err| error!("{err}"))
                         .ok()
                 })
                 .collect(),

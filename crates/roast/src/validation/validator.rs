@@ -37,7 +37,7 @@ impl ValidationTree {
         };
 
         if let Some(type_) = &schema.schema_type {
-            trace!("restricting data type: {:?}", type_);
+            trace!("restricting data type: {type_:?}");
 
             let type_val = if let Some(nullable) = schema.is_nullable() {
                 DataType::new(type_.clone()).set_nullable(nullable)
@@ -233,7 +233,7 @@ impl ValidationTree {
                 match val {
                     JsonValue::Array(items) => {
                         for (i, item) in items.iter().enumerate() {
-                            let child_path = path.extend(format!("[{}]", i));
+                            let child_path = path.extend(format!("[{i}]"));
                             v.validate_inner(item, child_path)?;
                         }
                     }
