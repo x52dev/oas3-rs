@@ -84,7 +84,7 @@ mod tests {
     where
         P: AsRef<Path> + std::fmt::Debug,
     {
-        println!("    Saving string to {:?}...", path);
+        println!("    Saving string to {path:?}...");
         std::fs::create_dir_all(&path).unwrap();
         let full_filename = path.as_ref().to_path_buf().join(filename);
         let mut f = File::create(full_filename).unwrap();
@@ -119,7 +119,7 @@ mod tests {
 
         // Read the original file to string
         let spec_yaml_str = read_to_string(input_file)
-            .unwrap_or_else(|e| panic!("failed to read contents of {:?}: {}", input_file, e));
+            .unwrap_or_else(|err| panic!("failed to read contents of {input_file:?}: {err}"));
         // Convert YAML string to JSON string
         let spec_json_str = convert_yaml_str_to_json(&spec_yaml_str);
 
@@ -164,7 +164,7 @@ mod tests {
             let entry = entry.unwrap();
             let path = entry.path();
 
-            println!("Testing if {:?} is deserializable", path);
+            println!("Testing if {path:?} is deserializable");
 
             let (api_filename, parsed_spec_json_str, spec_json_str) =
                 compare_spec_through_json(&path, &save_path_base);

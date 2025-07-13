@@ -31,7 +31,7 @@ impl fmt::Display for AggregateError {
         let errs = self
             .errors
             .iter()
-            .map(|err| format!("  => {}", err))
+            .map(|err| format!("  => {err}"))
             .collect::<Vec<_>>()
             .join("\n");
 
