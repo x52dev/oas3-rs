@@ -35,3 +35,4 @@ match oas3::from_yaml(yaml) {
 [OpenAPI v3.1]: https://spec.openapis.org/oas/v3.1.1
 
 <!-- cargo-rdme end -->
+
