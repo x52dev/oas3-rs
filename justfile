@@ -2,7 +2,6 @@ _list:
     @just --list
 
 toolchain := ""
-
 msrv := ```
     cargo metadata --format-version=1 \
     | jq -r 'first(.packages[] | select(.source == null and .rust_version)) | .rust_version' \
@@ -60,7 +59,7 @@ test toolchain="":
     cargo {{ toolchain }} nextest run --workspace --no-default-features
     cargo {{ toolchain }} nextest run --workspace --all-features
     cargo {{ toolchain }} test --doc --workspace --all-features
-    RUSTDOCFLAGS="-D warnings" cargo {{ toolchain }} doc --workspace --no-deps --all-features
+    RUSTDOCFLAGS="--cfg=docsrs -D warnings" cargo {{ toolchain }} doc --workspace --no-deps --all-features
 
 # Test workspace and generate Codecov coverage file
 test-coverage-codecov toolchain="":
@@ -72,4 +71,4 @@ test-coverage-lcov toolchain="":
 
 # Document crates in workspace.
 doc *args:
-    RUSTDOCFLAGS="--cfg=docsrs -Dwarnings" cargo +nightly doc --workspace --all-features {{ args }}
+    RUSTDOCFLAGS="--cfg=docsrs -D warnings" cargo +nightly doc --workspace --all-features {{ args }}

@@ -3,8 +3,8 @@
 <!-- prettier-ignore-start -->
 
 [![crates.io](https://img.shields.io/crates/v/oas3?label=latest)](https://crates.io/crates/oas3)
-[![Documentation](https://docs.rs/oas3/badge.svg?version=0.16.1)](https://docs.rs/oas3/0.16.1)
-[![dependency status](https://deps.rs/crate/oas3/0.16.1/status.svg)](https://deps.rs/crate/oas3/0.16.1)
+[![Documentation](https://docs.rs/oas3/badge.svg?version=0.17.0)](https://docs.rs/oas3/0.17.0)
+[![dependency status](https://deps.rs/crate/oas3/0.17.0/status.svg)](https://deps.rs/crate/oas3/0.17.0)
 ![MIT or Apache 2.0 licensed](https://img.shields.io/crates/l/oas3.svg)
 <br />
 [![CI](https://github.com/x52dev/oas3-rs/actions/workflows/ci.yml/badge.svg)](https://github.com/x52dev/oas3-rs/actions/workflows/ci.yml)
@@ -16,9 +16,9 @@
 
 <!-- cargo-rdme start -->
 
-Structures and tools to parse, navigate and validate [OpenAPI v3.1] specifications.
+Structures and tools to parse, navigate and validate [OpenAPI v3.1.x] specifications.
 
-Note that due to v3.1 being a breaking change from v3.0, you may have trouble correctly parsing
+Note that due to v3.1.x being a breaking change from v3.0.x, you may have trouble correctly parsing
 specs in the older format.
 
 ## Example
@@ -32,6 +32,6 @@ match oas3::from_yaml(yaml) {
 }
 ```
 
-[OpenAPI v3.1]: https://spec.openapis.org/oas/v3.1.1
+[OpenAPI v3.1.x]: https://spec.openapis.org/oas/v3.1.1
 
 <!-- cargo-rdme end -->

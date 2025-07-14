@@ -2,10 +2,13 @@
 
 ## Unreleased
 
-- Document compatibility with OAS v3.1.1.
+## 0.17.0
+
 - Remove non-spec-compliant `spec::Header::allow_empty_value` field.
+- Implement `FromRef` for `spec::SecurityScheme`.
+- Add `spec::ObjectSchema::prefixItems` field.
+- Document compatibility with OAS v3.1.1.
 - Minimum supported Rust version (MSRV) is now 1.80.
-- Implement `FromRef` for `spec::SecurityScheme`
 
 ## 0.16.1
 
