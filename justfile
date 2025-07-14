@@ -2,7 +2,6 @@ _list:
     @just --list
 
 toolchain := ""
-
 msrv := ```
     cargo metadata --format-version=1 \
     | jq -r 'first(.packages[] | select(.source == null and .rust_version)) | .rust_version' \
@@ -72,4 +71,4 @@ test-coverage-lcov toolchain="":
 
 # Document crates in workspace.
 doc *args:
-    RUSTDOCFLAGS="--cfg=docsrs -Dwarnings" cargo +nightly doc --workspace --all-features {{ args }}
+    RUSTDOCFLAGS="--cfg=docsrs -D warnings" cargo +nightly doc --workspace --all-features {{ args }}

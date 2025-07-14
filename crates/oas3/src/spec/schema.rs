@@ -159,26 +159,24 @@ pub struct ObjectSchema {
     // Keywords for Applying Subschemas to Arrays
     // https://json-schema.org/draft/2020-12/json-schema-core#name-keywords-for-applying-subschema
     // #########################################################################
-
-    //
     /// This keyword applies its subschema to all instance array elements.
     ///
     /// Omitting this keyword has the same assertion behavior as an empty schema.
     ///
-    /// This keyword can be either:
-    /// - A boolean value: `false` means no additional items allowed, `true` means any additional items allowed
-    /// - A schema object: validates all additional items against this schema
+    /// This keyword interacts with `prefixItems`, where it can be either:
+    /// - A boolean value: `false` means no additional items allowed, `true` means any additional
+    ///   items allowed;
+    /// - A schema object: validates all additional items against this schema.
     ///
     /// See <https://json-schema.org/draft/2020-12/json-schema-core#name-items>.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub items: Option<Box<Schema>>,
 
-    /// Validation succeeds if each element of the instance validates against the
-    /// schema at the same position, if any.
+    /// Validation succeeds if each element of the instance validates against the schema at the same
+    /// position, if any.
     ///
-    /// This keyword does not constrain the length of the array.
-    /// If the array is longer than this keyword's value,
-    /// this keyword validates only the prefix of matching length.
+    /// This keyword does not constrain the length of the array. If the array is longer than this
+    /// keyword's value, this keyword validates only the prefix of matching length.
     ///
     /// See <https://json-schema.org/draft/2020-12/json-schema-core#name-prefixitems>.
     #[serde(rename = "prefixItems", default, skip_serializing_if = "Vec::is_empty")]
@@ -609,6 +607,8 @@ where
 
 #[cfg(all(test, feature = "yaml-spec"))]
 mod tests {
+    use assert_matches::assert_matches;
+
     use super::*;
 
     #[test]
@@ -673,177 +673,124 @@ mod tests {
     }
 
     #[test]
-    fn prefix_items_basic() {
+    fn prefix_items_supports_inline_and_reference_schemas() {
         let spec = indoc::indoc! {"
           type: array
           prefixItems:
             - type: string
             - $ref: '#/components/schemas/Age'
-            - type: integer
         "};
         let schema = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
 
-        assert_eq!(schema.prefix_items.len(), 3);
+        assert_eq!(
+            2,
+            schema.prefix_items.len(),
+            "prefixItems should only parse to two elements",
+        );
 
-        // Check first schema (inline)
-        if let ObjectOrReference::Object(first_schema) = &schema.prefix_items[0] {
-            assert_eq!(
-                first_schema.schema_type,
-                Some(TypeSet::Single(Type::String))
-            );
-        } else {
-            panic!("Expected inline schema for first prefixItems element");
-        }
+        assert_matches!(
+            &schema.prefix_items[0],
+            ObjectOrReference::Object(ObjectSchema {
+                schema_type: Some(TypeSet::Single(Type::String)),
+                ..
+            }),
+            "First prefixItems element should be inline string schema",
+        );
 
-        // Check second schema (reference)
-        if let ObjectOrReference::Ref { ref_path } = &schema.prefix_items[1] {
-            assert_eq!(ref_path, "#/components/schemas/Age");
-        } else {
-            panic!("Expected reference for second prefixItems element");
-        }
-
-        // Check third schema (inline)
-        if let ObjectOrReference::Object(third_schema) = &schema.prefix_items[2] {
-            assert_eq!(
-                third_schema.schema_type,
-                Some(TypeSet::Single(Type::Integer))
-            );
-        } else {
-            panic!("Expected inline schema for third prefixItems element");
-        }
+        assert_matches!(
+            &schema.prefix_items[1],
+            ObjectOrReference::Ref { ref_path } if ref_path == "#/components/schemas/Age",
+            "Second prefixItems element should be reference to an Age schema",
+        );
     }
 
     #[test]
-    fn prefix_items_with_items() {
-        let spec = indoc::indoc! {"
-          type: array
-          prefixItems:
-            - type: string
-          items:
-            type: number
-        "};
-        let schema = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
-
-        assert_eq!(schema.prefix_items.len(), 1);
-        assert!(schema.items.is_some());
-
-        // Check prefixItems
-        if let ObjectOrReference::Object(prefix_schema) = &schema.prefix_items[0] {
-            assert_eq!(
-                prefix_schema.schema_type,
-                Some(TypeSet::Single(Type::String))
-            );
-        } else {
-            panic!("Expected inline schema for prefixItems element");
-        }
-
-        // Check items
-        if let Some(items_box) = &schema.items {
-            if let Schema::Object(obj_ref) = items_box.as_ref() {
-                if let ObjectOrReference::Object(items_schema) = obj_ref.as_ref() {
-                    assert_eq!(
-                        items_schema.schema_type,
-                        Some(TypeSet::Single(Type::Number))
-                    );
-                } else {
-                    panic!("Expected inline schema for items");
-                }
-            } else {
-                panic!("Expected object schema for items");
-            }
-        } else {
-            panic!("Expected items to be present");
-        }
-    }
-
-    #[test]
-    fn prefix_items_empty() {
+    fn prefix_items_supports_empty_list() {
         let spec = indoc::indoc! {"
           type: array
           prefixItems: []
         "};
         let schema = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
+        assert_eq!(0, schema.prefix_items.len());
+    }
 
-        assert_eq!(schema.prefix_items.len(), 0);
+    #[test]
+    fn items_supports_inline_schema() {
+        let spec = indoc::indoc! {"
+          type: array
+          items:
+            type: number
+        "};
+        let schema = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
+
+        let items = schema
+            .items
+            .expect("Parsed schema should contain items property");
+
+        let Schema::Object(obj) = *items else {
+            panic!("Expected object schema for items");
+        };
+
+        assert_matches!(
+            &*obj,
+            ObjectOrReference::Object(ObjectSchema {
+                schema_type: Some(TypeSet::Single(Type::Number)),
+                ..
+            }),
+            "items should be inline number schema",
+        );
+    }
+
+    #[test]
+    fn items_supports_boolean_schema() {
+        let spec = indoc::indoc! {"
+          type: array
+          items: true
+        "};
+        let schema = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
+
+        let items = schema
+            .items
+            .expect("Parsed schema should contain items property");
+
+        assert_matches!(
+            *items,
+            Schema::Boolean(BooleanSchema(true)),
+            "items should be boolean schema",
+        );
     }
 
     #[test]
     fn prefix_items_serialization_round_trip() {
         let spec = indoc::indoc! {"
-          type: array
-          prefixItems:
+            items:
+              type: boolean
+            prefixItems:
             - type: string
               minLength: 5
             - type: integer
               minimum: 0
-          items:
-            type: boolean
+            type: array
         "};
 
-        // Deserialize from YAML
         let original = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
-
-        // Serialize to YAML
         let serialized = serde_yaml::to_string(&original).unwrap();
 
-        // Deserialize back
-        let round_tripped = serde_yaml::from_str::<ObjectSchema>(&serialized).unwrap();
-
-        // Compare structures (not YAML strings)
-        assert_eq!(original, round_tripped);
-    }
-
-    #[test]
-    fn items_object_schema_still_works() {
-        let spec = indoc::indoc! {"
-          type: array
-          items:
-            type: string
-            minLength: 5
-        "};
-        let schema = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
-
-        assert!(schema.items.is_some());
-
-        if let Some(items) = &schema.items {
-            match items.as_ref() {
-                Schema::Object(obj_ref) => {
-                    if let ObjectOrReference::Object(items_schema) = obj_ref.as_ref() {
-                        assert_eq!(
-                            items_schema.schema_type,
-                            Some(TypeSet::Single(Type::String))
-                        );
-                        assert_eq!(items_schema.min_length, Some(5));
-                    } else {
-                        panic!("Expected inline schema");
-                    }
-                }
-                _ => panic!("Expected object schema for items"),
-            }
-        } else {
-            panic!("Expected items to be present");
-        }
+        pretty_assertions::assert_eq!(spec, serialized);
     }
 
     #[test]
     fn items_boolean_serialization_round_trip() {
         let spec = indoc::indoc! {"
-          type: array
-          prefixItems:
+            items: false
+            prefixItems:
             - type: string
-          items: false
+            type: array
         "};
 
-        // Deserialize from YAML
         let original = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
-
-        // Serialize to YAML
         let serialized = serde_yaml::to_string(&original).unwrap();
 
-        // Deserialize back
-        let round_tripped = serde_yaml::from_str::<ObjectSchema>(&serialized).unwrap();
-
-        // Compare structures (not YAML strings)
-        assert_eq!(original, round_tripped);
+        pretty_assertions::assert_eq!(spec, serialized);
     }
 }
