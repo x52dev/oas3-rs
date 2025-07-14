@@ -1,0 +1,113 @@
+openapi: 3.1.0
+info:
+  title: prefixItems Test API
+  version: 1.0.0
+paths: {}
+components:
+  schemas:
+    PersonTuple:
+      type: array
+      description: A tuple representing [firstName, lastName, age]
+      prefixItems:
+        - type: string
+          description: First name
+          minLength: 1
+        - type: string
+          description: Last name
+          minLength: 1
+        - type: integer
+          description: Age
+          minimum: 0
+          maximum: 150
+      minItems: 3
+      maxItems: 3
+
+    ExtendableTuple:
+      type: array
+      description: A tuple with fixed prefix and flexible additional items
+      prefixItems:
+        - type: string
+          enum: ["header", "body", "footer"]
+        - type: integer
+      items:
+        type: string
+        description: Additional string items allowed after the prefix
+
+    ComplexTuple:
+      type: array
+      description: A tuple using component references
+      prefixItems:
+        - $ref: '#/components/schemas/Header'
+        - $ref: '#/components/schemas/Payload'
+        - type: object
+          properties:
+            checksum:
+              type: string
+              pattern: '^[a-f0-9]{64}$'
+          required: [checksum]
+      items: false
+
+    EmptyPrefixArray:
+      type: array
+      prefixItems: []
+      items:
+        type: number
+      description: Array with empty prefixItems - all items follow the items schema
+
+    ValidatedTuple:
+      type: array
+      prefixItems:
+        - type: string
+          pattern: '^[A-Z]{2}$'
+          description: Two-letter country code
+        - type: number
+          multipleOf: 0.01
+          description: Price with cents
+        - type: boolean
+          description: Is available
+      items:
+        type: object
+        additionalProperties: true
+        description: Additional metadata objects
+
+    Header:
+      type: object
+      properties:
+        version:
+          type: string
+          pattern: '^\d+\.\d+\.\d+$'
+        timestamp:
+          type: integer
+          description: Unix timestamp
+      required: [version, timestamp]
+
+    Payload:
+      type: object
+      properties:
+        data:
+          type: string
+        encoding:
+          type: string
+          enum: ["utf-8", "base64", "hex"]
+      required: [data, encoding]
+
+    # Test boolean items schemas
+    BooleanItemsFalse:
+      type: array
+      description: Array that allows no items (empty array only)
+      items: false
+      
+    BooleanItemsTrue:
+      type: array
+      description: Array that allows any items
+      items: true
+      
+    MixedBooleanItems:
+      type: array
+      description: Tuple with fixed prefix and no additional items
+      prefixItems:
+        - type: string
+          enum: ["v1", "v2", "v3"]
+        - type: number
+          minimum: 0
+      items: false
