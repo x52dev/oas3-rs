@@ -54,6 +54,10 @@ pub enum RefError {
     /// Reference path points outside the given spec file.
     #[display("Unresolvable path: {}", _0)]
     Unresolvable(#[error(not(source))] String), // TODO: use some kind of path structure
+
+    /// `Option<ObjectOrReference<_>>` evaluated to be `None`.
+    #[display("Cannot attempt to resolve this reference because Option<ObjectOrReference<{}>> evaluated to None", _0)]
+    NoReference(#[error(not(source))] RefType),
 }
 
 /// Component type of a reference.
