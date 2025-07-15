@@ -33,7 +33,7 @@ impl MediaType {
     pub fn schema(&self, spec: &Spec) -> Result<ObjectSchema, Error> {
         self.schema
             .as_ref()
-            .unwrap()
+            .ok_or(Error::Schema(super::SchemaError::NoSchema))?
             .resolve(spec)
             .map_err(Error::Ref)
     }
