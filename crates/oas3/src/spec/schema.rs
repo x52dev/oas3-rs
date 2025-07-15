@@ -24,6 +24,10 @@ pub enum Error {
     /// Required property list specified for a non-object schema.
     #[display("Required property list specified for a non-object schema")]
     RequiredSpecifiedOnNonObject,
+
+    /// `Option<ObjectOrReference<ObjectSchema>>` evaluated to be `None`.
+    #[display("Cannot attempt to resolve this schema because Option<ObjectOrReference<ObjectSchema>> evaluated to None")]
+    NoSchema,
 }
 
 /// Single schema type.
