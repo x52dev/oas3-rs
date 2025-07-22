@@ -132,7 +132,9 @@ impl Operation {
     pub fn request_body(&self, spec: &Spec) -> Result<RequestBody, Error> {
         self.request_body
             .as_ref()
-            .unwrap()
+            .ok_or(Error::Ref(super::RefError::NoReference(
+                super::RefType::RequestBody,
+            )))?
             .resolve(spec)
             .map_err(Error::Ref)
     }
