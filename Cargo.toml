@@ -34,7 +34,7 @@ serde_json = "1"
 serde_path_to_error = "0.1.17"
 serde_with = "3"
 serde_yaml = "0.9.34-deprecated"
-tokio = "1.46.1"
+tokio = "1.47.1"
 url = "2"
 
 [patch.crates-io]
