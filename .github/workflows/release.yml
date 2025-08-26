@@ -36,21 +36,14 @@ jobs:
       - name: Bump changelog versions
         if: ${{ steps.release-plz.outputs.prs_created }}
         run: |
-          # store release-plz output locally
-          echo '${{ steps.release-plz.outputs.pr }}' > rplz.json
-
           # bump while still on main so that versions in manifests are current
-          scripts/bump-changelogs "$(cat rplz.json)"
+          scripts/bump-changelogs '${{ steps.release-plz.outputs.pr }}'
 
-          # apply changelog updates to branch using next versions
-          head_branch="$(<rplz.json jq -r '.head_branch')"
-          git fetch origin
-          git switch "$head_branch"
-
-          # clean up temporaries
-          rm -f rplz.json
-
-          # update release PR
-          git add --all
-          git commit -m "docs: update changelog versions"
-          git push origin "$head_branch"
+          # update release PR if one was created
+          pr_number="${{ fromJSON(steps.release-plz.outputs.pr).number }}"
+          if [[ -n "$pr_number" ]]; then
+            gh pr checkout "$pr_number"
+            git add --all
+            git commit -m "docs: update changelog versions"
+            git push
+          fi
