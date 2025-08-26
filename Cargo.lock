@@ -681,6 +681,24 @@ dependencies = [
 [[package]]
 name = "oas3"
 version = "0.17.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0ecc0ddb68858bb2babd656e59d8ad2c74c87bfff390dd6cb675d61655ac42d2"
+dependencies = [
+ "derive_more",
+ "http",
+ "log",
+ "once_cell",
+ "regex",
+ "semver",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "url",
+]
+
+[[package]]
+name = "oas3"
+version = "0.18.0"
 dependencies = [
  "assert_matches",
  "derive_more",
@@ -904,7 +922,7 @@ dependencies = [
 
 [[package]]
 name = "roast"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "bytes",
  "color-eyre",
@@ -916,7 +934,7 @@ dependencies = [
  "http",
  "log",
  "maplit",
- "oas3",
+ "oas3 0.17.0",
  "once_cell",
  "pretty_env_logger",
  "prettytable-rs",
@@ -1135,7 +1153,7 @@ name = "tests"
 version = "0.0.0"
 dependencies = [
  "assert_matches",
- "oas3",
+ "oas3 0.17.0",
  "serde_json",
  "serde_path_to_error",
  "serde_yaml",
