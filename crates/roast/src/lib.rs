@@ -10,7 +10,7 @@ use derive_more::derive::{Display, Error, From};
 pub use self::{conformance::*, validation::*};
 
 /// Top-level errors.
-#[expect(missing_docs)]
+#[allow(missing_docs)]
 #[derive(Debug, Display, Error, From)]
 pub enum Error {
     #[display("Spec error")]

@@ -1,4 +1,4 @@
-#![expect(missing_docs)]
+#![allow(missing_docs)]
 
 use bytes::Bytes;
 use http::HeaderMap;

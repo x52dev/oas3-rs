@@ -1,6 +1,6 @@
 //! Data validation for JSON structures.
 
-#![expect(missing_docs)]
+#![allow(missing_docs)]
 
 use std::fmt::Debug;
 

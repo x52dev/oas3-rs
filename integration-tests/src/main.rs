@@ -1,4 +1,4 @@
-#![expect(missing_docs)]
+#![allow(missing_docs)]
 
 mod issues;
 mod samples;

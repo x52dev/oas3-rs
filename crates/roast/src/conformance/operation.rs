@@ -1,4 +1,4 @@
-#![expect(missing_docs)]
+#![allow(missing_docs)]
 
 use derive_more::derive::Display;
 use http::Method;
