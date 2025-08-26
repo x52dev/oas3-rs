@@ -1,0 +1,6 @@
+[workspace]
+changelog_update = false
+dependencies_update = false
+git_release_draft = true
+pr_draft = true
+pr_labels = ["release"]
