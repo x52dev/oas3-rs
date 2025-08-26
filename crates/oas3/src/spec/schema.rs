@@ -699,7 +699,7 @@ mod tests {
 
         assert_matches!(
             &schema.prefix_items[1],
-            ObjectOrReference::Ref { ref_path } if ref_path == "#/components/schemas/Age",
+            ObjectOrReference::Ref { ref_path, .. } if ref_path == "#/components/schemas/Age",
             "Second prefixItems element should be reference to an Age schema",
         );
     }

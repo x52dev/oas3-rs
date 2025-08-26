@@ -17,10 +17,18 @@ static RE_REF: Lazy<Regex> = Lazy::new(|| {
 #[serde(untagged)]
 pub enum ObjectOrReference<T> {
     /// Object reference.
+    ///
+    /// See <https://spec.openapis.org/oas/v3.1.1#reference-object>.
     Ref {
         /// Path, file reference, or URL pointing to object.
         #[serde(rename = "$ref")]
         ref_path: String,
+
+        /// Summary override.
+        summary: Option<String>,
+
+        /// Description override.
+        description: Option<String>,
     },
 
     /// Inline object.
@@ -35,7 +43,7 @@ where
     pub fn resolve(&self, spec: &Spec) -> Result<T, RefError> {
         match self {
             Self::Object(component) => Ok(component.clone()),
-            Self::Ref { ref_path } => T::from_ref(spec, ref_path),
+            Self::Ref { ref_path, .. } => T::from_ref(spec, ref_path),
         }
     }
 }

@@ -187,12 +187,16 @@ components:
                     "Rust".to_owned(),
                     ObjectOrReference::Ref {
                         ref_path: "#/components/examples/RustMascot".to_owned(),
+                        summary: None,
+                        description: None,
                     },
                 ),
                 (
                     "Go".to_owned(),
                     ObjectOrReference::Ref {
                         ref_path: "#/components/examples/GoMascot".to_owned(),
+                        summary: None,
+                        description: None,
                     },
                 ),
             ]),
