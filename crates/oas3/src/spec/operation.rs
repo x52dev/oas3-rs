@@ -3,11 +3,10 @@ use std::collections::BTreeMap;
 use log::error;
 use serde::{Deserialize, Serialize};
 
-use super::{
-    Callback, Error, ExternalDoc, ObjectOrReference, Parameter, RequestBody, Response,
-    SecurityRequirement, Server, Spec,
+use crate::spec::{
+    spec_extensions, Callback, Error, ExternalDoc, ObjectOrReference, Parameter, RequestBody,
+    Response, SecurityRequirement, Server, Spec,
 };
-use crate::spec::spec_extensions;
 
 /// Describes a single API operation on a path.
 ///
@@ -86,10 +85,9 @@ pub struct Operation {
 
     /// A map of possible out-of band callbacks related to the parent operation.
     ///
-    /// The key is a unique identifier for the Callback Object. Each value in the map is a
+    /// The key is a unique identifier for the [Callback Object]. Each value in the map is a
     /// [Callback Object] that describes a request that may be initiated by the API provider and the
-    /// expected responses. The key value used to identify the callback object is an expression,
-    /// evaluated at runtime, that identifies a URL to use for the callback operation.
+    /// expected responses.
     ///
     /// [Callback Object]: https://spec.openapis.org/oas/v3.1.1#callback-object
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]

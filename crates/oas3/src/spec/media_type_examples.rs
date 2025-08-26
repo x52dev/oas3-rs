@@ -6,20 +6,11 @@ use serde::{Deserialize, Serialize};
 use super::{Example, ObjectOrReference, Spec};
 
 /// Examples for a media type.
+///
+/// See <https://spec.openapis.org/oas/v3.1.1#media-type-object>.
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(untagged)]
 pub enum MediaTypeExamples {
-    /// Example of the media type.
-    ///
-    /// The example object SHOULD be in the correct format as specified by the media type. The
-    /// `example` field is mutually exclusive of the `examples` field. Furthermore, if referencing a
-    /// `schema` which contains an example, the `example` value SHALL override the example provided
-    /// by the schema.
-    Example {
-        /// Example of the media type.
-        example: serde_json::Value,
-    },
-
     /// Examples of the media type.
     ///
     /// Each example object SHOULD match the media type and specified schema if present. The
@@ -29,6 +20,17 @@ pub enum MediaTypeExamples {
     Examples {
         /// Examples of the media type.
         examples: BTreeMap<String, ObjectOrReference<Example>>,
+    },
+
+    /// Example of the media type.
+    ///
+    /// The example object SHOULD be in the correct format as specified by the media type. The
+    /// `example` field is mutually exclusive of the `examples` field. Furthermore, if referencing a
+    /// `schema` which contains an example, the `example` value SHALL override the example provided
+    /// by the schema.
+    Example {
+        /// Example of the media type.
+        example: serde_json::Value,
     },
 }
 
