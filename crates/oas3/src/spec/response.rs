@@ -11,7 +11,7 @@ use super::{
 /// to operations based on the response.
 ///
 /// See <https://spec.openapis.org/oas/v3.1.1#response-object>.
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
+#[derive(Debug, Clone, Default, PartialEq, Deserialize, Serialize)]
 pub struct Response {
     /// A short description of the response.
     ///

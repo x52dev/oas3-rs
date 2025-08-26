@@ -11,7 +11,7 @@ use super::spec_extensions;
 /// See <https://spec.openapis.org/oas/v3.1.1#tag-object>.
 ///
 /// [Operation Object]: https://spec.openapis.org/oas/v3.1.1#operation-object
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Tag {
     /// The name of the tag.
     pub name: String,

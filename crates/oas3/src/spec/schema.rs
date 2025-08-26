@@ -108,7 +108,7 @@ impl TypeSet {
 /// [JSON Schema Specification Wright Draft 00]: https://json-schema.org
 /// [JSON Schema Core]: https://tools.ietf.org/html/draft-wright-json-schema-00
 /// [JSON Schema Validation]: https://tools.ietf.org/html/draft-wright-json-schema-validation-00
-#[derive(Clone, Debug, PartialEq, Default, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq, Default, Deserialize, Serialize)]
 pub struct ObjectSchema {
     // #########################################################################
     // Keywords for Applying Subschemas With Logic
@@ -579,14 +579,14 @@ impl FromRef for ObjectSchema {
 /// A boolean JSON schema.
 ///
 /// See <https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-01#name-boolean-json-schemas>.
-#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(transparent)]
 pub struct BooleanSchema(pub bool);
 
 /// A JSON schema document.
 ///
 /// See <https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-01#name-json-schema-documents>.
-#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(untagged)]
 pub enum Schema {
     /// A boolean JSON schema.

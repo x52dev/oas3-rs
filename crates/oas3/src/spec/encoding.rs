@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use super::{Header, ObjectOrReference};
 
 /// A single encoding definition applied to a single schema property.
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
+#[derive(Debug, Clone, Default, PartialEq, Deserialize, Serialize)]
 pub struct Encoding {
     /// The Content-Type for encoding a specific property. Default value depends on the
     /// property type: for `string` with `format` being `binary` – `application/octet-stream`;

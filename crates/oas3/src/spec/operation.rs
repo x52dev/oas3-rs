@@ -129,12 +129,14 @@ pub struct Operation {
 
 impl Operation {
     /// Resolves and returns this operation's request body.
-    pub fn request_body(&self, spec: &Spec) -> Result<RequestBody, Error> {
-        self.request_body
-            .as_ref()
-            .unwrap()
-            .resolve(spec)
-            .map_err(Error::Ref)
+    pub fn request_body(&self, spec: &Spec) -> Result<Option<RequestBody>, Error> {
+        let Some(req_body) = self.request_body.as_ref() else {
+            return Ok(None);
+        };
+
+        let req_body = req_body.resolve(spec).map_err(Error::Ref)?;
+
+        Ok(Some(req_body))
     }
 
     /// Resolves and returns map of this operation's responses, keyed by status code.
