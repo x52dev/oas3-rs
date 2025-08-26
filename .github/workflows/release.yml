@@ -31,3 +31,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
+        id: release-plz
+
+      - name: Bump changelog versions
+        if: ${{ steps.release-plz.outputs.prs_created }}
+        run: echo "${{ steps.release-plz.outputs.pr }}"

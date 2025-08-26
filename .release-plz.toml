@@ -1,5 +1,5 @@
 [workspace]
-changelog_update = true
+changelog_update = false
 dependencies_update = false
 git_release_draft = true
 pr_draft = true
