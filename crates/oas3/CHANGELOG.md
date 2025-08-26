@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add `spec::ObjectOrReference::Ref::{summary, description}` fields.
+
 ## 0.17.0
 
 - Remove non-spec-compliant `spec::Header::allow_empty_value` field.

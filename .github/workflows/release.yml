@@ -35,4 +35,16 @@ jobs:
 
       - name: Bump changelog versions
         if: ${{ steps.release-plz.outputs.prs_created }}
-        run: echo "${{ steps.release-plz.outputs.pr }}"
+        run: |
+          echo '${{ steps.release-plz.outputs.pr }}' > rplz.json
+
+          git fetch origin
+
+          head_branch="$(<rplz.json jq -r '.head_branch')"
+          git switch "$head_branch"
+
+          scripts/bump-changelog "$(cat rplz.json)"
+
+          git add --all
+          git commit -m "docs: update changelog versions"
+          git push origin "$head_branch"
