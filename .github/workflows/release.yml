@@ -36,6 +36,8 @@ jobs:
       - name: Bump changelog versions
         if: ${{ steps.release-plz.outputs.prs_created }}
         run: |
+          set -e
+
           # bump while still on main so that versions in manifests are current
           scripts/bump-changelogs '${{ steps.release-plz.outputs.pr }}'
 
