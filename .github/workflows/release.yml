@@ -36,3 +36,7 @@ jobs:
       - name: Bump changelog versions
         if: ${{ steps.release-plz.outputs.prs_created == true }}
         run: scripts/bump-changelogs '${{ steps.release-plz.outputs.pr }}'
+
+      - name: Update release notes
+        if: ${{ steps.release-plz.outputs.releases_created == true }}
+        run: scripts/update-release-notes '${{ steps.release-plz.outputs.releases }}'

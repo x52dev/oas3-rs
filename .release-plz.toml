@@ -5,3 +5,4 @@ git_release_draft = true
 pr_draft = true
 pr_labels = ["release"]
 publish_all_features = true
+git_release_name = "{{ package }}: v{{ version }}"

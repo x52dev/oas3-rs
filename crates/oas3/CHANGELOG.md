@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.18.1
+
+- No significant changes since `0.18.0`.
+
 ## 0.18.0
 
 - Add `spec::ObjectOrReference::Ref::{summary, description}` fields.
