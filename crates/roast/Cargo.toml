@@ -1,7 +1,7 @@
 [package]
 name = "roast"
 description = "Structures and tools to parse, navigate, and validate OpenAPI v3.1 specifications"
-version = "0.8.2"
+version = "0.9.0"
 authors = ["Rob Ede <robjtede@icloud.com>"]
 keywords = ["oas3", "openapi", "swagger", "api", "conformance"]
 categories = ["development-tools::testing"]
