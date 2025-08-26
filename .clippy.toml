@@ -1,6 +1,4 @@
 disallowed-names = [
-  "foo",  # placeholder name
-  "baz",  # placeholder name
-  "quux", # placeholder name
-  "e",    # prefer `err`
+  "..",
+  "e",  # prefer `err`
 ]

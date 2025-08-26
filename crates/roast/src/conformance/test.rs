@@ -169,11 +169,11 @@ impl ConformanceTestSpec {
                 ref media_type,
                 ref name,
             } => {
-                let req_body = op.request_body(spec)?;
+                let req_body = op.request_body(spec)?.unwrap();
                 let media_spec = req_body.content.get(media_type).ok_or(SpecError::Ref(
                     RefError::Unresolvable(format!("mediaType/{}", &name)),
                 ))?;
-                let schema = media_spec.schema(spec)?;
+                let schema = media_spec.schema(spec)?.unwrap();
                 let examples = media_spec.examples(spec);
                 let example = examples
                     .get(name)
@@ -241,7 +241,7 @@ impl ConformanceTestSpec {
                     let media_spec = status_spec.content.get(media_type).ok_or(SpecError::Ref(
                         RefError::Unresolvable(format!("mediaType/{}", &media_type)),
                     ))?;
-                    let schema = media_spec.schema(spec)?;
+                    let schema = media_spec.schema(spec)?.unwrap();
 
                     // create validator
                     let validator = ValidationTree::from_schema(&schema, spec)?;
@@ -266,7 +266,7 @@ impl ConformanceTestSpec {
                     let media_spec = status_spec.content.get(media_type).ok_or(SpecError::Ref(
                         RefError::Unresolvable(format!("mediaType/{}", &media_type)),
                     ))?;
-                    let schema = media_spec.schema(spec)?;
+                    let schema = media_spec.schema(spec)?.unwrap();
                     let examples = media_spec.examples(spec);
                     let example =
                         examples

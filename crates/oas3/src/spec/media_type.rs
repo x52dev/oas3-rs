@@ -2,12 +2,15 @@ use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
-use super::{Encoding, Error, Example, MediaTypeExamples, ObjectOrReference, ObjectSchema, Spec};
+use crate::spec::{
+    spec_extensions, Encoding, Error, Example, MediaTypeExamples, ObjectOrReference, ObjectSchema,
+    Spec,
+};
 
 /// Each Media Type Object provides schema and examples for the media type identified by its key.
 ///
 /// See <https://spec.openapis.org/oas/v3.1.1#media-type-object>.
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
+#[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
 pub struct MediaType {
     /// The schema defining the type used for the request body.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -26,16 +29,26 @@ pub struct MediaType {
     #[serde(default)]
     #[serde(skip_serializing_if = "BTreeMap::is_empty")]
     pub encoding: BTreeMap<String, Encoding>,
+
+    /// Specification extensions.
+    ///
+    /// Only "x-" prefixed keys are collected, and the prefix is stripped.
+    ///
+    /// See <https://spec.openapis.org/oas/v3.1.1#specification-extensions>.
+    #[serde(flatten, with = "spec_extensions")]
+    pub extensions: BTreeMap<String, serde_json::Value>,
 }
 
 impl MediaType {
     /// Resolves and returns the JSON schema definition for this media type.
-    pub fn schema(&self, spec: &Spec) -> Result<ObjectSchema, Error> {
-        self.schema
-            .as_ref()
-            .unwrap()
-            .resolve(spec)
-            .map_err(Error::Ref)
+    pub fn schema(&self, spec: &Spec) -> Result<Option<ObjectSchema>, Error> {
+        let Some(schema) = self.schema.as_ref() else {
+            return Ok(None);
+        };
+
+        let schema = schema.resolve(spec).map_err(Error::Ref)?;
+
+        Ok(Some(schema))
     }
 
     /// Resolves and returns the provided examples for this media type.
