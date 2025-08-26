@@ -29,14 +29,18 @@ jobs:
       - name: release-plz
         uses: MarcoIeni/release-plz-action@v0.5.112
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
           CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
         id: release-plz
 
       - name: Bump changelog versions
         if: ${{ steps.release-plz.outputs.prs_created == 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: scripts/bump-changelogs '${{ steps.release-plz.outputs.pr }}'
 
       - name: Update release notes
         if: ${{ steps.release-plz.outputs.releases_created == 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: scripts/update-release-notes '${{ steps.release-plz.outputs.releases }}'
