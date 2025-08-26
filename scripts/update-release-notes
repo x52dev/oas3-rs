@@ -24,7 +24,7 @@ function update_release_notes() {
 
 RELEASE_PLZ_RELEASES_JSON="$1"
 
-specs="$(echo "$RELEASE_PLZ_RELEASES_JSON" | jq -r '.releases[] | "\(.package_name):\(.version):\(.tag)"')"
+specs="$(echo "$RELEASE_PLZ_RELEASES_JSON" | jq -r '.[] | "\(.package_name):\(.version):\(.tag)"')"
 
 for spec in $specs; do
     name="$(echo "$spec" | cut -d: -f1)"
