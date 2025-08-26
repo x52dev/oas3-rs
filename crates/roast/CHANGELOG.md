@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.8.2
+
+- No significant changes since `0.8.1`.
+
 ## 0.8.1
 
 - No significant changes since `0.8.0`.

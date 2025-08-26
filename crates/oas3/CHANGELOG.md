@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.19.0
+
 - Refine structure and deserializer for `Callback` type.
 - Prefer `examples` when deserializing `MediaTypeExamples`.
 
