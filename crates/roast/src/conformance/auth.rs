@@ -1,3 +1,5 @@
+#![expect(missing_docs)]
+
 use std::fmt;
 
 use http::{header, HeaderMap, HeaderValue};

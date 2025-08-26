@@ -1,3 +1,5 @@
+#![expect(missing_docs)]
+
 use derive_more::derive::Display;
 use http::Method;
 use log::debug;

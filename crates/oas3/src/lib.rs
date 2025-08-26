@@ -16,7 +16,6 @@
 //!
 //! [OpenAPI v3.1.x]: https://spec.openapis.org/oas/v3.1.1
 
-#![warn(missing_docs)]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
 pub mod spec;

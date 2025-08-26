@@ -46,6 +46,7 @@ rust-2018-idioms = "deny"
 nonstandard-style = "deny"
 future-incompatible = "deny"
 missing-debug-implementations = { level = "warn", priority = -1 }
+missing-docs = { level = "warn", priority = -1 }
 
 [workspace.lints.clippy]
 uninlined-format-args = "warn"

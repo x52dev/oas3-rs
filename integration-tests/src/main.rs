@@ -1,3 +1,5 @@
+#![expect(missing_docs)]
+
 mod issues;
 mod samples;
 

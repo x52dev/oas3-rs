@@ -1,3 +1,5 @@
+#![expect(missing_docs)]
+
 use http::{HeaderMap, StatusCode};
 use serde_json::Value as JsonValue;
 

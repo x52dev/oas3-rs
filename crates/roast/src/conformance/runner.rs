@@ -1,3 +1,5 @@
+#![expect(missing_docs)]
+
 use std::{
     collections::VecDeque,
     error::Error as StdError,

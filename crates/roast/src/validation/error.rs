@@ -1,3 +1,5 @@
+#![expect(missing_docs)]
+
 use std::fmt;
 
 use derive_more::derive::{Display, Error};

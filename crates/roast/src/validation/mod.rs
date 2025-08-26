@@ -1,5 +1,7 @@
 //! Data validation for JSON structures.
 
+#![expect(missing_docs)]
+
 use std::fmt::Debug;
 
 use serde_json::Value as JsonValue;

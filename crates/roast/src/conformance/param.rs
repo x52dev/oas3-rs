@@ -1,3 +1,5 @@
+#![expect(missing_docs)]
+
 use std::cell::Cell;
 
 #[derive(Debug, Clone)]
