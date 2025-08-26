@@ -28,13 +28,11 @@ function bump_changelog_version() {
             >"$change_chunk_file"
 
     # if word count of changelog chunk is 0 then insert filler changelog chunk
-    if [ "$(wc -w "$change_chunk_file" | awk '{ print $1 }')" = "0" ]; then
+    if [[ "$(wc -w "$change_chunk_file" | awk '{ print $1 }')" == "0" ]]; then
         echo >"$change_chunk_file"
         echo "- No significant changes since \`$current_version\`." >>"$change_chunk_file"
         echo >>"$change_chunk_file"
     fi
-
-    cat "$change_chunk_file"
 
     (
         sed '/Unreleased/ q' "$changelog_file"                   # up to unreleased heading
