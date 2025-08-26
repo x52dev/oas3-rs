@@ -8,7 +8,7 @@ use super::spec_extensions;
 /// Allows referencing an external resource for extended documentation.
 ///
 /// See <https://spec.openapis.org/oas/v3.1.1#external-documentation-object>.
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct ExternalDoc {
     /// The URL for the target documentation.
     pub url: Url,

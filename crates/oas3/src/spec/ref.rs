@@ -13,7 +13,7 @@ static RE_REF: Lazy<Regex> = Lazy::new(|| {
 });
 
 /// Container for a type of OpenAPI object, or a reference to one.
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(untagged)]
 pub enum ObjectOrReference<T> {
     /// Object reference.
@@ -49,7 +49,7 @@ where
 }
 
 /// Object reference error.
-#[derive(Clone, Debug, PartialEq, Display, Error)]
+#[derive(Debug, Clone, PartialEq, Display, Error)]
 pub enum RefError {
     /// Referenced object has unknown type.
     #[display("Invalid type: {}", _0)]

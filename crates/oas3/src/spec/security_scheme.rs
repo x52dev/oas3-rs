@@ -17,7 +17,7 @@ use crate::{
 /// [RFC6749]: https://tools.ietf.org/html/rfc6749
 /// [OpenID Connect Discovery]: https://tools.ietf.org/html/draft-ietf-oauth-discovery-06
 #[allow(clippy::large_enum_variant)]
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(tag = "type")]
 pub enum SecurityScheme {
     /// API key authentication.

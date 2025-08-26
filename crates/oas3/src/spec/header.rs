@@ -22,7 +22,7 @@ use super::{
 ///
 /// [Parameter Object]: https://spec.openapis.org/oas/v3.1.1#parameter-object
 /// [`style`]: https://spec.openapis.org/oas/v3.1.1#parameterStyle
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
+#[derive(Debug, Clone, Default, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Header {
     /// A brief description of the header.

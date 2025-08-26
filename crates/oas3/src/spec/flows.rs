@@ -8,7 +8,7 @@ use super::spec_extensions;
 /// Allows configuration of the supported OAuth Flows.
 ///
 /// See <https://spec.openapis.org/oas/v3.1.1#oauth-flows-object>.
-#[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Clone, Default, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Flows {
     /// Configuration for the OAuth Implicit flow.
@@ -39,7 +39,7 @@ pub struct Flows {
 /// Configuration details for a implicit OAuth Flow.
 ///
 /// See <https://spec.openapis.org/oas/v3.1.1#oauth-flow-object>.
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ImplicitFlow {
     /// The authorization URL to be used for this flow.
@@ -71,7 +71,7 @@ pub struct ImplicitFlow {
 /// Configuration details for a password OAuth Flow.
 ///
 /// See <https://spec.openapis.org/oas/v3.1.1#oauth-flow-object>.
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PasswordFlow {
     /// The token URL to be used for this flow.
@@ -95,7 +95,7 @@ pub struct PasswordFlow {
 /// Configuration details for a client credentials OAuth Flow.
 ///
 /// See <https://spec.openapis.org/oas/v3.1.1#oauth-flow-object>.
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ClientCredentialsFlow {
     /// The token URL to be used for this flow.
@@ -119,7 +119,7 @@ pub struct ClientCredentialsFlow {
 /// Configuration details for a authorization code OAuth Flow.
 ///
 /// See <https://spec.openapis.org/oas/v3.1.1#oauth-flow-object>.
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AuthorizationCodeFlow {
     /// The authorization URL to be used for this flow.
@@ -154,7 +154,7 @@ pub struct AuthorizationCodeFlow {
 /// callback operation.
 ///
 /// See <https://spec.openapis.org/oas/v3.1.1#callback-object>.
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
+#[derive(Debug, Clone, Default, PartialEq, Deserialize, Serialize)]
 pub struct Callback(
     /// A Path Item Object used to define a callback request and expected responses.
     serde_json::Value, // TODO: Add "Specification Extensions" https://spec.openapis.org/oas/v3.1.1#specificationExtensions}
@@ -163,6 +163,6 @@ pub struct Callback(
 // FIXME: Implement
 // /// Allows configuration of the supported OAuth Flows.
 // /// https://spec.openapis.org/oas/v3.1.1#oauthFlowsObject
-// #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Default)]
+// #[derive(Debug, Clone, Default, PartialEq, Deserialize, Serialize)]
 // pub struct OAuthFlows {
 // }

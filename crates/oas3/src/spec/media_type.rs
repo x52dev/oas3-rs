@@ -10,7 +10,7 @@ use crate::spec::{
 /// Each Media Type Object provides schema and examples for the media type identified by its key.
 ///
 /// See <https://spec.openapis.org/oas/v3.1.1#media-type-object>.
-#[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
+#[derive(Debug, Clone, Default, PartialEq, Deserialize, Serialize)]
 pub struct MediaType {
     /// The schema defining the type used for the request body.
     #[serde(skip_serializing_if = "Option::is_none")]
