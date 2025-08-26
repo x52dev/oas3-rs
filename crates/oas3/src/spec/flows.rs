@@ -144,25 +144,3 @@ pub struct AuthorizationCodeFlow {
     #[serde(default)]
     pub scopes: BTreeMap<String, String>,
 }
-
-// TODO: Implement
-/// Map of possible out-of band callbacks related to the parent operation.
-///
-/// Each value in the map is a Path Item Object that describes a set of requests that may be
-/// initiated by the API provider and the expected responses. The key value used to identify the
-/// callback object is an expression, evaluated at runtime, that identifies a URL to use for the
-/// callback operation.
-///
-/// See <https://spec.openapis.org/oas/v3.1.1#callback-object>.
-#[derive(Debug, Clone, Default, PartialEq, Deserialize, Serialize)]
-pub struct Callback(
-    /// A Path Item Object used to define a callback request and expected responses.
-    serde_json::Value, // TODO: Add "Specification Extensions" https://spec.openapis.org/oas/v3.1.1#specificationExtensions}
-);
-
-// FIXME: Implement
-// /// Allows configuration of the supported OAuth Flows.
-// /// https://spec.openapis.org/oas/v3.1.1#oauthFlowsObject
-// #[derive(Debug, Clone, Default, PartialEq, Deserialize, Serialize)]
-// pub struct OAuthFlows {
-// }

@@ -13,6 +13,7 @@ mod components;
 mod contact;
 mod encoding;
 
+mod callback;
 mod discriminator;
 mod error;
 mod example;
@@ -38,6 +39,7 @@ mod spec_extensions;
 mod tag;
 
 pub use self::{
+    callback::*,
     components::*,
     contact::*,
     discriminator::*,
@@ -87,21 +89,23 @@ pub struct Spec {
     pub info: Info,
 
     /// An array of Server Objects, which provide connectivity information to a target server.
+    ///
     /// If the `servers` property is not provided, or is an empty array, the default value would
-    /// be a
-    /// [Server Object](https://spec.openapis.org/oas/v3.1.1#server-object)
-    /// with a
-    /// [url](https://spec.openapis.org/oas/v3.1.1#serverUrl)
-    /// value of `/`.
+    /// be a [Server Object] with a [url] value of `/`.
+    ///
+    /// [Server Object]: https://spec.openapis.org/oas/v3.1.1#server-object
+    /// [url]: https://spec.openapis.org/oas/v3.1.1#server-url
     // FIXME: Provide a default value as specified in documentation instead of `None`.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub servers: Vec<Server>,
 
-    /// Holds the relative paths to the individual endpoints and their operations. The path is
-    /// appended to the URL from the
-    /// [`Server Object`](https://spec.openapis.org/oas/v3.1.1#server-object)
-    /// in order to construct the full URL. The Paths MAY be empty, due to
-    /// [ACL constraints](https://spec.openapis.org/oas/v3.1.1#securityFiltering).
+    /// Holds the relative paths to the individual endpoints and their operations.
+    ///
+    /// The path is appended to the URL from the [Server Object] in order to construct the full URL.
+    /// The Paths MAY be empty, due to [ACL constraints].
+    ///
+    /// [Server Object]: https://spec.openapis.org/oas/v3.1.1#server-object
+    /// [ACL constraints]: https://spec.openapis.org/oas/v3.1.1#security-filtering
     #[serde(skip_serializing_if = "Option::is_none")]
     pub paths: Option<BTreeMap<String, PathItem>>,
 

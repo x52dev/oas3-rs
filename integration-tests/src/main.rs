@@ -1,6 +1,8 @@
 #![allow(missing_docs)]
 
+#[cfg(test)]
 mod issues;
+#[cfg(test)]
 mod samples;
 
 fn main() {
