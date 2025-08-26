@@ -34,18 +34,5 @@ jobs:
         id: release-plz
 
       - name: Bump changelog versions
-        if: ${{ steps.release-plz.outputs.prs_created }}
-        run: |
-          set -e
-
-          # bump while still on main so that versions in manifests are current
-          scripts/bump-changelogs '${{ steps.release-plz.outputs.pr }}'
-
-          # update release PR if one was created
-          pr_number="${{ fromJSON(steps.release-plz.outputs.pr).number }}"
-          if [[ -n "$pr_number" ]]; then
-            gh pr checkout "$pr_number"
-            git add --all
-            git commit -m "docs: update changelog versions"
-            git push
-          fi
+        if: ${{ steps.release-plz.outputs.prs_created == true }}
+        run: scripts/bump-changelogs '${{ steps.release-plz.outputs.pr }}'

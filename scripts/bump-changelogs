@@ -58,3 +58,13 @@ for spec in $specs; do
     
     bump_changelog_version "crates/$name" "$version"
 done
+
+PR_NUMBER="$(echo "$RELEASE_PLZ_PR_JSON" | jq -r '.number')"
+
+# update release PR if one was created
+if [[ -n "$PR_NUMBER" ]]; then
+    gh pr checkout "$PR_NUMBER"
+    git add --all
+    git commit -m "docs: update changelog versions"
+    git push
+fi
