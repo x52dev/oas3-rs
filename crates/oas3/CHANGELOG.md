@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.18.0
+
 - Add `spec::ObjectOrReference::Ref::{summary, description}` fields.
 - Add `spec::MediaType::extensions` field.
 - The `spec::MediaType::schema()` method now returns a `Result<Option<ObjectSchema>, Error>`.
