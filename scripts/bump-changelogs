@@ -14,6 +14,7 @@ function bump_changelog_version() {
     local current_version="$(sed -nE 's/^version ?= ?"([^"]+)"$/\1/ p' "$cargo_manifest" | head -n 1)"
     local changelog_file="${package_dir}/CHANGELOG.md"
     local change_chunk_file="$(mktemp)"
+    local readme_file="${package_dir}/README.md"
 
     echo "${package_dir}/CHANGELOG.md | $current_version -> $version"
 
@@ -44,6 +45,12 @@ function bump_changelog_version() {
     ) >"$changelog_file.bak"
 
     mv "$changelog_file.bak" "$changelog_file"
+
+    # update readme links
+    if [ -f "$readme_file" ]; then
+        sed -i.bak -E "s#([=/])$current_version([/)])#\1$version\2#g" "$readme_file"
+        rm -f "${readme_file}.bak"
+    fi
 }
 
 ### END HELPERS
