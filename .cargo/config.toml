@@ -1,0 +1,5 @@
+[registries]
+github = { index = "ssh://git@github_IvanRazhnou1/folio-id/crates-index.git" }
+
+[net]
+git-fetch-with-cli = true

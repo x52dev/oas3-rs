@@ -1,0 +1,71 @@
+openapi: 3.1.0
+info:
+  title: Product API with Discriminator
+  version: 1.0.0
+paths: {}
+components:
+  schemas:
+    ProductBase:
+      type: object
+      required:
+        - name
+        - productType
+      properties:
+        id:
+          type: string
+          pattern: '^prod_[a-zA-Z0-9]{16}$'
+        name:
+          type: string
+          maxLength: 255
+        productType:
+          type: string
+          enum: [physical, digital, service]
+
+    Product:
+      oneOf:
+        - $ref: '#/components/schemas/PhysicalProduct'
+        - $ref: '#/components/schemas/DigitalProduct'
+        - $ref: '#/components/schemas/ServiceProduct'
+      discriminator:
+        propertyName: productType
+        mapping:
+          physical: '#/components/schemas/PhysicalProduct'
+          digital: '#/components/schemas/DigitalProduct'
+          service: '#/components/schemas/ServiceProduct'
+
+    PhysicalProduct:
+      allOf:
+        - $ref: '#/components/schemas/ProductBase'
+        - type: object
+          required:
+            - weight
+          properties:
+            weight:
+              type: number
+              format: double
+              minimum: 0
+              description: Product weight in grams
+
+    DigitalProduct:
+      allOf:
+        - $ref: '#/components/schemas/ProductBase'
+        - type: object
+          required:
+            - fileSize
+          properties:
+            fileSize:
+              type: integer
+              minimum: 0
+              description: Download file size in bytes
+
+    ServiceProduct:
+      allOf:
+        - $ref: '#/components/schemas/ProductBase'
+        - type: object
+          required:
+            - duration
+          properties:
+            duration:
+              type: integer
+              minimum: 1
+              description: Service duration in minutes

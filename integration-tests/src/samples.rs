@@ -89,6 +89,23 @@ fn test_schema_prefix_items_yaml() {
     validate_sample(input, Format::Yaml);
 }
 
+#[test]
+fn test_discriminator_products_yaml() {
+    let input = include_str!("../samples/pass/discriminator-products.yaml");
+    let spec = validate_sample(input, Format::Yaml);
+    
+    // Verify the Product schema has a discriminator
+    let product_schema = spec.components.as_ref()
+        .and_then(|c| c.schemas.get("Product"))
+        .and_then(|s| s.resolve(&spec).ok())
+        .expect("Product schema should exist");
+    
+    assert!(product_schema.discriminator.is_some(), "Product schema should have discriminator");
+    let discriminator = product_schema.discriminator.as_ref().unwrap();
+    assert_eq!(discriminator.property_name, "productType");
+    assert_eq!(discriminator.mapping.as_ref().unwrap().len(), 3);
+}
+
 /// Describes the format of the text input.
 enum Format {
     Json,
