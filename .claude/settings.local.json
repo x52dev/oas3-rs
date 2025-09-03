@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(cargo update:*)"
+      "Bash(cargo update:*)",
+      "Bash(cargo clippy:*)"
     ],
     "deny": [],
     "ask": []

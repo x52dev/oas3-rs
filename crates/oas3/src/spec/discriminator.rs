@@ -63,7 +63,7 @@ impl Discriminator {
 
     /// Returns true if this discriminator has any mappings defined.
     pub fn has_mappings(&self) -> bool {
-        self.mapping.as_ref().map_or(false, |m| !m.is_empty())
+        self.mapping.as_ref().is_some_and(|m| !m.is_empty())
     }
 
     /// Validates that the discriminator property name is not empty.
@@ -126,8 +126,14 @@ mod tests {
     #[test]
     fn discriminator_with_mapping() {
         let mut mapping = BTreeMap::new();
-        mapping.insert("physical".into(), "#/components/schemas/PhysicalProduct".into());
-        mapping.insert("digital".into(), "#/components/schemas/DigitalProduct".into());
+        mapping.insert(
+            "physical".into(),
+            "#/components/schemas/PhysicalProduct".into(),
+        );
+        mapping.insert(
+            "digital".into(),
+            "#/components/schemas/DigitalProduct".into(),
+        );
 
         let disc = Discriminator::with_mapping("productType", mapping);
         assert_eq!(disc.property_name, "productType");
@@ -150,7 +156,10 @@ mod tests {
     #[test]
     fn discriminator_get_schema_ref() {
         let mut mapping = BTreeMap::new();
-        mapping.insert("service".into(), "#/components/schemas/ServiceProduct".into());
+        mapping.insert(
+            "service".into(),
+            "#/components/schemas/ServiceProduct".into(),
+        );
 
         let disc = Discriminator::with_mapping("type", mapping);
         assert_eq!(
@@ -176,7 +185,10 @@ mod tests {
         assert!(valid_disc.validate().is_ok());
 
         let invalid_disc = Discriminator::new("");
-        assert_eq!(invalid_disc.validate(), Err(DiscriminatorError::EmptyPropertyName));
+        assert_eq!(
+            invalid_disc.validate(),
+            Err(DiscriminatorError::EmptyPropertyName)
+        );
     }
 
     #[test]
