@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.19.1
+
+- No significant changes since `0.19.0`.
+
 ## 0.19.0
 
 - Refine structure and deserializer for `Callback` type.
