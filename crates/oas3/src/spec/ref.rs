@@ -25,9 +25,11 @@ pub enum ObjectOrReference<T> {
         ref_path: String,
 
         /// Summary override.
+        #[serde(skip_serializing_if = "Option::is_none")]
         summary: Option<String>,
 
         /// Description override.
+        #[serde(skip_serializing_if = "Option::is_none")]
         description: Option<String>,
     },
 
