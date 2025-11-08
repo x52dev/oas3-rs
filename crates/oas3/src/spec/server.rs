@@ -71,8 +71,9 @@ pub struct ServerVariable {
 
 #[cfg(test)]
 mod tests {
-    use super::{Server, ServerVariable};
     use serde_json::json;
+
+    use super::{Server, ServerVariable};
 
     #[test]
     fn server_extensions_round_trip() {
