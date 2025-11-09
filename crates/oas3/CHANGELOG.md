@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add `spec::Server::extensions` field.
+- Add `spec::ServerVariable::extensions` field.
+
 ## 0.19.0
 
 - Refine structure and deserializer for `Callback` type.
