@@ -152,3 +152,50 @@ pub trait FromRef: Clone {
     /// Finds an object in `spec` using the given `path`.
     fn from_ref(spec: &Spec, path: &str) -> Result<Self, RefError>;
 }
+
+#[cfg(test)]
+mod tests {
+    use serde_json::json;
+
+    use super::ObjectOrReference;
+
+    #[test]
+    fn ref_serialization_omits_empty_overrides() {
+        // A plain reference should not emit `null` summary/description slots.
+        let reference = ObjectOrReference::<()>::Ref {
+            ref_path: "#/components/examples/RustMascot".to_owned(),
+            summary: None,
+            description: None,
+        };
+
+        let serialized = serde_json::to_value(reference).expect("serializing ref");
+
+        assert_eq!(
+            serialized,
+            json!({
+                "$ref": "#/components/examples/RustMascot",
+            })
+        );
+    }
+
+    #[test]
+    fn ref_serialization_includes_present_overrides() {
+        // Explicit overrides must still be preserved during serialization.
+        let reference = ObjectOrReference::<()>::Ref {
+            ref_path: "#/components/examples/RustMascot".to_owned(),
+            summary: Some("Rust mascot override".to_owned()),
+            description: Some("Let Ferris do the talking.".to_owned()),
+        };
+
+        let serialized = serde_json::to_value(reference).expect("serializing ref");
+
+        assert_eq!(
+            serialized,
+            json!({
+                "$ref": "#/components/examples/RustMascot",
+                "summary": "Rust mascot override",
+                "description": "Let Ferris do the talking.",
+            })
+        );
+    }
+}
