@@ -680,7 +680,7 @@ dependencies = [
 
 [[package]]
 name = "oas3"
-version = "0.19.0"
+version = "0.19.1"
 dependencies = [
  "assert_matches",
  "derive_more",
@@ -904,7 +904,7 @@ dependencies = [
 
 [[package]]
 name = "roast"
-version = "0.9.0"
+version = "0.9.1"
 dependencies = [
  "bytes",
  "color-eyre",
