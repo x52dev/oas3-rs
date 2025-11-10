@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.20.0
+
+- Add `spec::Server::extensions` field.
+- Add `spec::ServerVariable::extensions` field.
+- Skip serialization of empty `$ref` overrides.
+
 ## 0.19.0
 
 - Refine structure and deserializer for `Callback` type.

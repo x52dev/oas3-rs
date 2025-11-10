@@ -6,6 +6,7 @@ words:
   - deserializable
   - docsrs
   - dotenv
+  - dotenvy
   - indoc
   - ints
   - maplit
