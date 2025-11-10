@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.19.1
+
 - Add `spec::Server::extensions` field.
 - Add `spec::ServerVariable::extensions` field.
 - Skip serialization of empty `$ref` overrides.
