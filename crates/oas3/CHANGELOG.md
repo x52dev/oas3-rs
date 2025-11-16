@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.20.1
+
+- No significant changes since `0.20.0`.
+
 ## 0.20.0
 
 - Add `spec::Server::extensions` field.

@@ -1,7 +1,7 @@
 [package]
 name = "oas3"
 description = "Structures and tools to parse, navigate, and validate OpenAPI v3.1.xß specifications"
-version = "0.20.0"
+version = "0.20.1"
 authors = ["softprops <d.tangren@gmail.com>", "Rob Ede <robjtede@icloud.com>"]
 keywords = ["openapi", "oas3", "swagger", "api", "oas"]
 categories = ["data-structures", "parsing"]
