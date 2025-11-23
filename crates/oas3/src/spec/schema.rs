@@ -793,4 +793,44 @@ mod tests {
 
         pretty_assertions::assert_eq!(spec, serialized);
     }
+
+    #[test]
+    fn properties_supports_boolean_schemas() {
+        // Test for issue #278 - boolean schemas in properties
+        let spec = indoc::indoc! {"
+          type: object
+          properties:
+            data: true
+            meta: false
+        "};
+        let schema = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
+
+        assert_eq!(
+            2,
+            schema.properties.len(),
+            "properties should have two elements",
+        );
+
+        // Check data property is true boolean schema
+        let data_schema = schema.properties.get("data").expect("data property should exist");
+        match data_schema {
+            ObjectOrReference::Object(obj) => {
+                panic!("Expected boolean schema, got object: {:?}", obj);
+            }
+            ObjectOrReference::Ref { .. } => {
+                panic!("Expected boolean schema, got reference");
+            }
+        }
+
+        // Check meta property is false boolean schema
+        let meta_schema = schema.properties.get("meta").expect("meta property should exist");
+        match meta_schema {
+            ObjectOrReference::Object(obj) => {
+                panic!("Expected boolean schema, got object: {:?}", obj);
+            }
+            ObjectOrReference::Ref { .. } => {
+                panic!("Expected boolean schema, got reference");
+            }
+        }
+    }
 }
