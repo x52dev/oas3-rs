@@ -124,7 +124,7 @@ pub struct ObjectSchema {
     ///
     /// See <https://json-schema.org/draft/2020-12/json-schema-core#name-allof>.
     #[serde(rename = "allOf", default, skip_serializing_if = "Vec::is_empty")]
-    pub all_of: Vec<ObjectOrReference<ObjectSchema>>,
+    pub all_of: Vec<Schema>,
 
     /// An instance validates successfully against this keyword if it validates successfully against
     /// at least one schema defined by this keyword's value.
@@ -134,7 +134,7 @@ pub struct ObjectSchema {
     ///
     /// See <https://json-schema.org/draft/2020-12/json-schema-core#name-anyof>.
     #[serde(rename = "anyOf", default, skip_serializing_if = "Vec::is_empty")]
-    pub any_of: Vec<ObjectOrReference<ObjectSchema>>,
+    pub any_of: Vec<Schema>,
 
     /// An instance validates successfully against this keyword if it validates successfully against
     /// exactly one schema defined by this keyword's value.
@@ -144,7 +144,7 @@ pub struct ObjectSchema {
     ///
     /// See <https://json-schema.org/draft/2020-12/json-schema-core#name-oneof>.
     #[serde(rename = "oneOf", default, skip_serializing_if = "Vec::is_empty")]
-    pub one_of: Vec<ObjectOrReference<ObjectSchema>>,
+    pub one_of: Vec<Schema>,
 
     // TODO: missing fields
     // - not
@@ -180,7 +180,7 @@ pub struct ObjectSchema {
     ///
     /// See <https://json-schema.org/draft/2020-12/json-schema-core#name-prefixitems>.
     #[serde(rename = "prefixItems", default, skip_serializing_if = "Vec::is_empty")]
-    pub prefix_items: Vec<ObjectOrReference<ObjectSchema>>,
+    pub prefix_items: Vec<Schema>,
 
     // TODO: missing fields
     // - contains
@@ -199,7 +199,7 @@ pub struct ObjectSchema {
     ///
     /// See <https://json-schema.org/draft/2020-12/json-schema-core#name-properties>.
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
-    pub properties: BTreeMap<String, ObjectOrReference<ObjectSchema>>,
+    pub properties: BTreeMap<String, Schema>,
 
     /// Schema for additional object properties.
     ///
@@ -596,6 +596,19 @@ pub enum Schema {
     Object(Box<ObjectOrReference<ObjectSchema>>),
 }
 
+impl Schema {
+    /// Resolves the schema (if needed) from the given `spec` and returns an `ObjectSchema`.
+    ///
+    /// For boolean schemas, this returns an empty `ObjectSchema` since boolean schemas
+    /// don't have a structure to resolve into.
+    pub fn resolve(&self, spec: &Spec) -> Result<ObjectSchema, RefError> {
+        match self {
+            Schema::Boolean(_) => Ok(ObjectSchema::default()),
+            Schema::Object(obj_ref) => obj_ref.resolve(spec),
+        }
+    }
+}
+
 /// Considers any value that is present as `Some`, including `null`.
 fn distinguish_missing_and_null<'de, T, D>(de: D) -> Result<Option<T>, D::Error>
 where
@@ -690,16 +703,22 @@ mod tests {
 
         assert_matches!(
             &schema.prefix_items[0],
-            ObjectOrReference::Object(ObjectSchema {
-                schema_type: Some(TypeSet::Single(Type::String)),
-                ..
-            }),
+            Schema::Object(obj) if matches!(
+                &**obj,
+                ObjectOrReference::Object(ObjectSchema {
+                    schema_type: Some(TypeSet::Single(Type::String)),
+                    ..
+                })
+            ),
             "First prefixItems element should be inline string schema",
         );
 
         assert_matches!(
             &schema.prefix_items[1],
-            ObjectOrReference::Ref { ref_path, .. } if ref_path == "#/components/schemas/Age",
+            Schema::Object(obj) if matches!(
+                &**obj,
+                ObjectOrReference::Ref { ref_path, .. } if ref_path == "#/components/schemas/Age"
+            ),
             "Second prefixItems element should be reference to an Age schema",
         );
     }
@@ -813,24 +832,98 @@ mod tests {
 
         // Check data property is true boolean schema
         let data_schema = schema.properties.get("data").expect("data property should exist");
-        match data_schema {
-            ObjectOrReference::Object(obj) => {
-                panic!("Expected boolean schema, got object: {:?}", obj);
-            }
-            ObjectOrReference::Ref { .. } => {
-                panic!("Expected boolean schema, got reference");
-            }
-        }
+        assert_matches!(
+            data_schema,
+            Schema::Boolean(BooleanSchema(true)),
+            "data property should be boolean schema with value true",
+        );
 
         // Check meta property is false boolean schema
         let meta_schema = schema.properties.get("meta").expect("meta property should exist");
-        match meta_schema {
-            ObjectOrReference::Object(obj) => {
-                panic!("Expected boolean schema, got object: {:?}", obj);
-            }
-            ObjectOrReference::Ref { .. } => {
-                panic!("Expected boolean schema, got reference");
-            }
-        }
+        assert_matches!(
+            meta_schema,
+            Schema::Boolean(BooleanSchema(false)),
+            "meta property should be boolean schema with value false",
+        );
+    }
+
+    #[test]
+    fn allof_anyof_oneof_support_boolean_schemas() {
+        // Test for issue #278 - boolean schemas in allOf, anyOf, oneOf
+        let spec = indoc::indoc! {"
+          allOf:
+            - type: string
+            - true
+          anyOf:
+            - false
+            - type: number
+          oneOf:
+            - true
+            - $ref: '#/components/schemas/Test'
+        "};
+        let schema = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
+
+        // Check allOf
+        assert_eq!(2, schema.all_of.len(), "allOf should have two elements");
+        assert_matches!(
+            &schema.all_of[1],
+            Schema::Boolean(BooleanSchema(true)),
+            "Second allOf element should be boolean schema with value true",
+        );
+
+        // Check anyOf
+        assert_eq!(2, schema.any_of.len(), "anyOf should have two elements");
+        assert_matches!(
+            &schema.any_of[0],
+            Schema::Boolean(BooleanSchema(false)),
+            "First anyOf element should be boolean schema with value false",
+        );
+
+        // Check oneOf
+        assert_eq!(2, schema.one_of.len(), "oneOf should have two elements");
+        assert_matches!(
+            &schema.one_of[0],
+            Schema::Boolean(BooleanSchema(true)),
+            "First oneOf element should be boolean schema with value true",
+        );
+    }
+
+    #[test]
+    fn prefix_items_supports_boolean_schemas() {
+        // Test for issue #278 - boolean schemas in prefixItems
+        let spec = indoc::indoc! {"
+          type: array
+          prefixItems:
+            - true
+            - false
+            - type: string
+        "};
+        let schema = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
+
+        assert_eq!(3, schema.prefix_items.len(), "prefixItems should have three elements");
+
+        assert_matches!(
+            &schema.prefix_items[0],
+            Schema::Boolean(BooleanSchema(true)),
+            "First prefixItems element should be boolean schema with value true",
+        );
+
+        assert_matches!(
+            &schema.prefix_items[1],
+            Schema::Boolean(BooleanSchema(false)),
+            "Second prefixItems element should be boolean schema with value false",
+        );
+
+        assert_matches!(
+            &schema.prefix_items[2],
+            Schema::Object(obj) if matches!(
+                &**obj,
+                ObjectOrReference::Object(ObjectSchema {
+                    schema_type: Some(TypeSet::Single(Type::String)),
+                    ..
+                })
+            ),
+            "Third prefixItems element should be inline string schema",
+        );
     }
 }
