@@ -831,7 +831,10 @@ mod tests {
         );
 
         // Check data property is true boolean schema
-        let data_schema = schema.properties.get("data").expect("data property should exist");
+        let data_schema = schema
+            .properties
+            .get("data")
+            .expect("data property should exist");
         assert_matches!(
             data_schema,
             Schema::Boolean(BooleanSchema(true)),
@@ -839,7 +842,10 @@ mod tests {
         );
 
         // Check meta property is false boolean schema
-        let meta_schema = schema.properties.get("meta").expect("meta property should exist");
+        let meta_schema = schema
+            .properties
+            .get("meta")
+            .expect("meta property should exist");
         assert_matches!(
             meta_schema,
             Schema::Boolean(BooleanSchema(false)),
@@ -900,7 +906,11 @@ mod tests {
         "};
         let schema = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
 
-        assert_eq!(3, schema.prefix_items.len(), "prefixItems should have three elements");
+        assert_eq!(
+            3,
+            schema.prefix_items.len(),
+            "prefixItems should have three elements"
+        );
 
         assert_matches!(
             &schema.prefix_items[0],
@@ -925,5 +935,53 @@ mod tests {
             ),
             "Third prefixItems element should be inline string schema",
         );
+    }
+
+    #[test]
+    fn boolean_schema_serialization_round_trip() {
+        // Test for issue #278 - boolean schemas serialization round trip
+        let spec = indoc::indoc! {"
+            properties:
+              data: true
+              meta: false
+              name:
+                type: string
+            type: object
+        "};
+
+        let original = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
+        let serialized = serde_yaml::to_string(&original).unwrap();
+
+        pretty_assertions::assert_eq!(spec, serialized);
+    }
+
+    #[test]
+    fn boolean_schema_json_parsing() {
+        // Test for issue #278 - ensure JSON parsing works (aide generates JSON)
+        let json_spec = r#"{
+            "type": "object",
+            "properties": {
+                "data": true,
+                "meta": true
+            }
+        }"#;
+
+        let schema: ObjectSchema = serde_json::from_str(json_spec).expect("should parse JSON");
+
+        assert_eq!(2, schema.properties.len());
+        assert_matches!(
+            schema.properties.get("data"),
+            Some(Schema::Boolean(BooleanSchema(true)))
+        );
+        assert_matches!(
+            schema.properties.get("meta"),
+            Some(Schema::Boolean(BooleanSchema(true)))
+        );
+
+        // Test round-trip
+        let json_output = serde_json::to_string(&schema).expect("should serialize to JSON");
+        let schema2: ObjectSchema =
+            serde_json::from_str(&json_output).expect("should parse JSON again");
+        assert_eq!(schema, schema2);
     }
 }
