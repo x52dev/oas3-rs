@@ -600,7 +600,13 @@ impl Schema {
     /// Resolves the schema (if needed) from the given `spec` and returns an `ObjectSchema`.
     ///
     /// For boolean schemas, this returns an empty `ObjectSchema` since boolean schemas
-    /// don't have a structure to resolve into.
+    /// don't have a traditional structure to resolve into. Note that this loses the boolean
+    /// validation semantics:
+    /// - `true` (accept all) becomes an empty schema with no constraints
+    /// - `false` (reject all) becomes an empty schema with no constraints
+    ///
+    /// Callers should check if the schema is a boolean schema and handle it specially
+    /// if boolean validation semantics need to be preserved.
     pub fn resolve(&self, spec: &Spec) -> Result<ObjectSchema, RefError> {
         match self {
             Schema::Boolean(_) => Ok(ObjectSchema::default()),
