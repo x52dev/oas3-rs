@@ -10,7 +10,7 @@ rust-version = "1.80"
 
 [workspace.dependencies]
 assert_matches = "1"
-bytes = "1.10"
+bytes = "1.11"
 color-eyre = "0.6"
 colored = "3"
 derive_more = "2"
