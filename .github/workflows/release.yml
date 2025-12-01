@@ -23,7 +23,7 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@v1.15.2
 
       - name: Authenticate with crates.io
-        uses: rust-lang/crates-io-auth-action@v1.0.2
+        uses: rust-lang/crates-io-auth-action@v1.0.3
         id: auth
 
       - name: release-plz
