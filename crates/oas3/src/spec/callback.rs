@@ -2,7 +2,10 @@ use std::{collections::BTreeMap, error::Error as StdError};
 
 use serde::{Deserialize, Serialize};
 
-use crate::spec::PathItem;
+use crate::spec::{
+    r#ref::{FromRef, Ref, RefError, RefType},
+    PathItem, Spec,
+};
 
 /// Map of possible out-of band callbacks related to the parent operation.
 ///
@@ -90,5 +93,22 @@ impl From<Callback> for CallbackSerde {
                 .chain(extensions)
                 .collect(),
         )
+    }
+}
+
+impl FromRef for Callback {
+    fn from_ref(spec: &Spec, path: &str) -> Result<Self, RefError> {
+        let refpath = path.parse::<Ref>()?;
+
+        match refpath.kind {
+            RefType::Callback => spec
+                .components
+                .as_ref()
+                .and_then(|cs| cs.callbacks.get(&refpath.name))
+                .ok_or_else(|| RefError::Unresolvable(path.to_owned()))
+                .and_then(|oor| oor.resolve(spec)),
+
+            _ => Err(RefError::MismatchedType(refpath.kind, RefType::Callback)),
+        }
     }
 }
