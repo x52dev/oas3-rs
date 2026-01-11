@@ -5,8 +5,18 @@ fn callback() {
     let input = include_str!("../samples/pass/callback.yml");
     let spec = validate_sample(input, Format::Yaml);
     let op = spec.operation_by_id("callback").unwrap();
-    assert_eq!(1, op.callbacks["onData"].paths.len());
-    assert_eq!(2, op.callbacks["onData"].extensions.len());
+    assert_eq!(
+        1,
+        op.callbacks["onData"].resolve(&spec).unwrap().paths.len()
+    );
+    assert_eq!(
+        2,
+        op.callbacks["onData"]
+            .resolve(&spec)
+            .unwrap()
+            .extensions
+            .len()
+    );
 }
 
 #[test]
