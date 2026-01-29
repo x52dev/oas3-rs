@@ -27,14 +27,14 @@ pretty_assertions = "1"
 pretty_env_logger = "0.5"
 prettytable-rs = "0.10"
 regex = "1.12.2"
-reqwest = { version = "0.12", default-features = false }
+reqwest = { version = "0.13", default-features = false }
 semver = "1"
 serde = "1"
 serde_json = "1"
 serde_path_to_error = "0.1.20"
 serde_with = "3"
 serde_yaml = "0.9.34-deprecated"
-tokio = "1.48.0"
+tokio = "1.49.0"
 url = "2"
 
 [patch.crates-io]
