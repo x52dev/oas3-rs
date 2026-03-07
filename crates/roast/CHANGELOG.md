@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.10.1
+
+- No significant changes since `0.10.0`.
+
 ## 0.10.0
 
 - Update `oas3` dependency to `0.20`.
