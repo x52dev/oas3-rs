@@ -91,7 +91,7 @@ pub struct Operation {
     ///
     /// [Callback Object]: https://spec.openapis.org/oas/v3.1.1#callback-object
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
-    pub callbacks: BTreeMap<String, Callback>,
+    pub callbacks: BTreeMap<String, ObjectOrReference<Callback>>,
 
     /// Declares this operation to be deprecated.
     ///
@@ -146,6 +146,19 @@ impl Operation {
                 oor.resolve(spec)
                     .map(|obj| (name.clone(), obj))
                     // TODO: find better error solution
+                    .map_err(|err| error!("{err}"))
+                    .ok()
+            })
+            .collect()
+    }
+
+    /// Resolves and returns map of this operation's callbacks.
+    pub fn callbacks(&self, spec: &Spec) -> BTreeMap<String, Callback> {
+        self.callbacks
+            .iter()
+            .filter_map(|(name, oor)| {
+                oor.resolve(spec)
+                    .map(|obj| (name.clone(), obj))
                     .map_err(|err| error!("{err}"))
                     .ok()
             })
