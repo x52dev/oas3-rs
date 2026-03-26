@@ -133,7 +133,9 @@ impl FromStr for Ref {
     type Err = RefError;
 
     fn from_str(path: &str) -> Result<Self, Self::Err> {
-        let parts = RE_REF.captures(path).unwrap();
+        let parts = RE_REF
+            .captures(path)
+            .ok_or_else(|| RefError::Unresolvable(path.to_owned()))?;
 
         trace!("creating Ref: {}/{}", &parts["type"], &parts["name"]);
 
@@ -155,9 +157,10 @@ pub trait FromRef: Clone {
 
 #[cfg(test)]
 mod tests {
+    use assert_matches::assert_matches;
     use serde_json::json;
 
-    use super::ObjectOrReference;
+    use super::{ObjectOrReference, Ref, RefError};
 
     #[test]
     fn ref_serialization_omits_empty_overrides() {
@@ -196,6 +199,18 @@ mod tests {
                 "summary": "Rust mascot override",
                 "description": "Let Ferris do the talking.",
             })
+        );
+    }
+
+    #[test]
+    fn invalid_ref_path_returns_error() {
+        let err = "/components/schemas/petdetails#pet_details_id"
+            .parse::<Ref>()
+            .expect_err("invalid $ref should not parse");
+
+        assert_matches!(
+            err,
+            RefError::Unresolvable(path) if path == "/components/schemas/petdetails#pet_details_id"
         );
     }
 }

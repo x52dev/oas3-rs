@@ -102,7 +102,7 @@ mod tests {
     #[test]
     fn deserialize() {
         assert_eq!(
-            serde_yaml::from_str::<MediaTypeExamples>(indoc::indoc! {"
+            yaml_serde::from_str::<MediaTypeExamples>(indoc::indoc! {"
                     examples: {}
                 "})
             .unwrap(),
@@ -110,7 +110,7 @@ mod tests {
         );
 
         assert_eq!(
-            serde_yaml::from_str::<MediaTypeExamples>(indoc::indoc! {"
+            yaml_serde::from_str::<MediaTypeExamples>(indoc::indoc! {"
                     example: null
                 "})
             .unwrap(),
@@ -124,7 +124,7 @@ mod tests {
     fn serialize() {
         let mt_examples = MediaTypeExamples::default();
         assert_eq!(
-            serde_yaml::to_string(&mt_examples).unwrap(),
+            yaml_serde::to_string(&mt_examples).unwrap(),
             indoc::indoc! {"
                 examples: {}
             "},
@@ -134,7 +134,7 @@ mod tests {
             example: json!(null),
         };
         assert_eq!(
-            serde_yaml::to_string(&mt_examples).unwrap(),
+            yaml_serde::to_string(&mt_examples).unwrap(),
             indoc::indoc! {"
                 example: null
             "},
@@ -143,7 +143,7 @@ mod tests {
 
     #[test]
     fn single_example() {
-        let spec = serde_yaml::from_str::<Spec>(indoc::indoc! {"
+        let spec = yaml_serde::from_str::<Spec>(indoc::indoc! {"
 openapi: 3.1.0
 info:
   title: Mascots
@@ -170,7 +170,7 @@ paths: {}
 
     #[test]
     fn resolve_references() {
-        let spec = serde_yaml::from_str::<Spec>(indoc::indoc! {"
+        let spec = yaml_serde::from_str::<Spec>(indoc::indoc! {"
 openapi: 3.1.0
 info:
   title: Mascots
