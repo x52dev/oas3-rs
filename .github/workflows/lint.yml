@@ -20,15 +20,15 @@ jobs:
       checks: write
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Install Rust
-        uses: actions-rust-lang/setup-rust-toolchain@v1.15.3
+        uses: actions-rust-lang/setup-rust-toolchain@a0b538fa0b742a6aa35d6e2c169b4bd06d225a98 # v1.15.3
         with:
           components: clippy
 
       - name: Install just, cargo-hack
-        uses: taiki-e/install-action@v2.68.15
+        uses: taiki-e/install-action@68675c5a5f1a6950c3975d33f3ae0ef155e5bf3d # v2.68.15
         with:
           tool: just,cargo-hack
 
@@ -38,10 +38,10 @@ jobs:
   rustfmt:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Install Rust (nightly)
-        uses: actions-rust-lang/setup-rust-toolchain@v1.15.3
+        uses: actions-rust-lang/setup-rust-toolchain@a0b538fa0b742a6aa35d6e2c169b4bd06d225a98 # v1.15.3
         with:
           toolchain: nightly
           components: rustfmt
@@ -52,10 +52,10 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Install Rust (nightly)
-        uses: actions-rust-lang/setup-rust-toolchain@v1.15.3
+        uses: actions-rust-lang/setup-rust-toolchain@a0b538fa0b742a6aa35d6e2c169b4bd06d225a98 # v1.15.3
         with:
           toolchain: nightly
           components: rust-docs
