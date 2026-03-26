@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Minimum supported Rust version (MSRV) is now 1.81.
+- Return `RefError::Unresolvable` for malformed `$ref` paths instead of panicking.
 
 ## 0.20.1
 

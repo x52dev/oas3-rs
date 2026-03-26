@@ -47,3 +47,27 @@ fn issue_79() {
 
     assert_eq!(schema.title.as_deref(), Some("foo"));
 }
+
+#[test]
+fn issue_318() {
+    use assert_matches::assert_matches;
+    use oas3::spec::RefError;
+
+    let spec = oas3::from_yaml(include_str!("../issues/issue-318.yaml")).unwrap();
+
+    let property = spec.components.as_ref().unwrap().schemas["PetDetails"]
+        .resolve(&spec)
+        .unwrap()
+        .properties["petDetailsId"]
+        .clone();
+
+    let err = property
+        .resolve(&spec)
+        .expect_err("malformed $ref should return an error");
+
+    assert_matches!(
+        err,
+        RefError::Unresolvable(path)
+            if path == "/components/schemas/petdetails#pet_details_id"
+    );
+}
