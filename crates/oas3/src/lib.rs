@@ -33,21 +33,21 @@ pub type OpenApiV3Spec = spec::Spec;
 #[cfg(all(test, feature = "yaml-spec"))]
 pub(crate) fn from_path(
     path: impl AsRef<std::path::Path>,
-) -> std::io::Result<Result<OpenApiV3Spec, serde_yaml::Error>> {
+) -> std::io::Result<Result<OpenApiV3Spec, yaml_serde::Error>> {
     let file = std::fs::File::open(path.as_ref())?;
     Ok(from_reader(file))
 }
 
 /// Try deserializing an OpenAPI spec (YAML or JSON) from a [`Read`] type.
 #[cfg(all(test, feature = "yaml-spec"))]
-pub(crate) fn from_reader(read: impl std::io::Read) -> Result<OpenApiV3Spec, serde_yaml::Error> {
-    serde_yaml::from_reader::<_, OpenApiV3Spec>(read)
+pub(crate) fn from_reader(read: impl std::io::Read) -> Result<OpenApiV3Spec, yaml_serde::Error> {
+    yaml_serde::from_reader::<_, OpenApiV3Spec>(read)
 }
 
 /// Deserializes an OpenAPI spec (YAML-format) from a string.
 #[cfg(feature = "yaml-spec")]
-pub fn from_yaml(yaml: impl AsRef<str>) -> Result<OpenApiV3Spec, serde_yaml::Error> {
-    serde_yaml::from_str(yaml.as_ref())
+pub fn from_yaml(yaml: impl AsRef<str>) -> Result<OpenApiV3Spec, yaml_serde::Error> {
+    yaml_serde::from_str(yaml.as_ref())
 }
 
 /// Deserializes an OpenAPI spec (JSON-format) from a string.
@@ -57,8 +57,8 @@ pub fn from_json(json: impl AsRef<str>) -> Result<OpenApiV3Spec, serde_json::Err
 
 /// Serializes OpenAPI spec to a YAML string.
 #[cfg(feature = "yaml-spec")]
-pub fn to_yaml(spec: &OpenApiV3Spec) -> Result<String, serde_yaml::Error> {
-    serde_yaml::to_string(spec)
+pub fn to_yaml(spec: &OpenApiV3Spec) -> Result<String, yaml_serde::Error> {
+    yaml_serde::to_string(spec)
 }
 
 /// Serializes OpenAPI spec to a JSON string.
@@ -92,14 +92,14 @@ mod tests {
 
     /// Convert a YAML `&str` to a JSON `String`.
     fn convert_yaml_str_to_json(yaml_str: &str) -> String {
-        let yaml: serde_yaml::Value = serde_yaml::from_str(yaml_str).unwrap();
-        let json: serde_json::Value = serde_yaml::from_value(yaml).unwrap();
+        let yaml: yaml_serde::Value = yaml_serde::from_str(yaml_str).unwrap();
+        let json: serde_json::Value = yaml_serde::from_value(yaml).unwrap();
         serde_json::to_string_pretty(&json).unwrap()
     }
 
     /// Deserialize and re-serialize the input file to a JSON string through two different
     /// paths, comparing the result.
-    /// 1. File -> `String` -> `serde_yaml::Value` -> `serde_json::Value` -> `String`
+    /// 1. File -> `String` -> `yaml_serde::Value` -> `serde_json::Value` -> `String`
     /// 2. File -> `Spec` -> `serde_json::Value` -> `String`
     ///
     /// Both conversion of `serde_json::Value` -> `String` are done
@@ -114,7 +114,7 @@ mod tests {
         save_path_base: &Path,
     ) -> (String, String, String) {
         // First conversion:
-        //     File -> `String` -> `serde_yaml::Value` -> `serde_json::Value` -> `String`
+        //     File -> `String` -> `yaml_serde::Value` -> `serde_json::Value` -> `String`
 
         // Read the original file to string
         let spec_yaml_str = read_to_string(input_file)

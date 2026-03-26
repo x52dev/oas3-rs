@@ -20,15 +20,15 @@ jobs:
       checks: write
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Install Rust
-        uses: actions-rust-lang/setup-rust-toolchain@v1.15.2
+        uses: actions-rust-lang/setup-rust-toolchain@v1.15.3
         with:
           components: clippy
 
       - name: Install just, cargo-hack
-        uses: taiki-e/install-action@v2.62.60
+        uses: taiki-e/install-action@v2.68.15
         with:
           tool: just,cargo-hack
 
@@ -38,10 +38,10 @@ jobs:
   rustfmt:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Install Rust (nightly)
-        uses: actions-rust-lang/setup-rust-toolchain@v1.15.2
+        uses: actions-rust-lang/setup-rust-toolchain@v1.15.3
         with:
           toolchain: nightly
           components: rustfmt
@@ -52,10 +52,10 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Install Rust (nightly)
-        uses: actions-rust-lang/setup-rust-toolchain@v1.15.2
+        uses: actions-rust-lang/setup-rust-toolchain@v1.15.3
         with:
           toolchain: nightly
           components: rust-docs

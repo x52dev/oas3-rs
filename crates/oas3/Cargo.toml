@@ -1,7 +1,7 @@
 [package]
 name = "oas3"
 description = "Structures and tools to parse, navigate, and validate OpenAPI v3.1.xß specifications"
-version = "0.20.1"
+version = "0.21.0"
 authors = ["softprops <d.tangren@gmail.com>", "Rob Ede <robjtede@icloud.com>"]
 keywords = ["openapi", "oas3", "swagger", "api", "oas"]
 categories = ["data-structures", "parsing"]
@@ -15,7 +15,7 @@ all-features = true
 
 [features]
 default = []
-yaml-spec = ["dep:serde_yaml"]
+yaml-spec = ["dep:yaml_serde"]
 
 [dependencies]
 derive_more = { workspace = true, features = ["display", "error", "from"] }
@@ -26,8 +26,8 @@ regex = { workspace = true }
 semver = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
-serde_yaml = { workspace = true, optional = true }
 url = { workspace = true, features = ["serde"] }
+yaml_serde = { workspace = true, optional = true }
 
 [dev-dependencies]
 assert_matches = { workspace = true }

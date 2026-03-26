@@ -122,7 +122,7 @@ fn validate_sample(input: &str, format: Format) -> Spec {
             }
         }
         Format::Yaml => {
-            let yaml_deserializer = serde_yaml::Deserializer::from_str(input);
+            let yaml_deserializer = yaml_serde::Deserializer::from_str(input);
             let result: Result<oas3::OpenApiV3Spec, _> =
                 serde_path_to_error::deserialize(yaml_deserializer);
 

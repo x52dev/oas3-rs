@@ -261,7 +261,7 @@ mod tests {
                 type: string
         "};
 
-        let parameter = serde_yaml::from_str::<Parameter>(spec).unwrap();
+        let parameter = yaml_serde::from_str::<Parameter>(spec).unwrap();
         assert_eq!(parameter.name, "foo");
     }
 }

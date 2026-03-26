@@ -76,7 +76,7 @@ mod tests {
             qux: true
         "};
 
-        let spec = serde_yaml::from_str::<Spec>(spec).unwrap();
+        let spec = yaml_serde::from_str::<Spec>(spec).unwrap();
         assert!(spec.components.is_some());
         assert!(!spec.extensions.contains_key("x-bar"));
         assert!(!spec.extensions.contains_key("qux"));
@@ -96,7 +96,7 @@ mod tests {
             44: test numeric key doesn't break it
         "};
 
-        let spec = serde_yaml::from_str::<Spec>(spec).unwrap();
+        let spec = yaml_serde::from_str::<Spec>(spec).unwrap();
         assert!(spec.components.is_some());
         assert!(!spec.extensions.contains_key("x-bar"));
         assert_eq!(spec.extensions.get("bar").unwrap(), true);
@@ -113,8 +113,8 @@ mod tests {
             x-bar: true
         "};
 
-        let parsed_spec = serde_yaml::from_str::<Spec>(spec).unwrap();
-        let round_trip_spec = serde_yaml::to_string(&parsed_spec).unwrap();
+        let parsed_spec = yaml_serde::from_str::<Spec>(spec).unwrap();
+        let round_trip_spec = yaml_serde::to_string(&parsed_spec).unwrap();
 
         assert_eq!(spec, round_trip_spec);
     }

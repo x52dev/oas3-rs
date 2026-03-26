@@ -1,0 +1,12 @@
+openapi: 3.1.1
+info:
+  title: Invalid reference regression
+  version: "1.0.0"
+paths: {}
+components:
+  schemas:
+    PetDetails:
+      type: object
+      properties:
+        petDetailsId:
+          $ref: /components/schemas/petdetails#pet_details_id
