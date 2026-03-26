@@ -33,9 +33,9 @@ serde = "1"
 serde_json = "1"
 serde_path_to_error = "0.1.20"
 serde_with = "3"
-serde_yaml = "0.9.34-deprecated"
 tokio = "1.50.0"
 url = "2"
+yaml_serde = "0.10"
 
 [patch.crates-io]
 oas3 = { path = "crates/oas3" }

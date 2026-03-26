@@ -2,8 +2,9 @@
 
 ## Unreleased
 
-- Minimum supported Rust version (MSRV) is now 1.81.
+- Migrate YAML parsing to `yaml_serde`. Exposed error type(s) have been altered.
 - Return `RefError::Unresolvable` for malformed `$ref` paths instead of panicking.
+- Minimum supported Rust version (MSRV) is now 1.81.
 
 ## 0.20.1
 

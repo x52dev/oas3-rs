@@ -614,23 +614,23 @@ mod tests {
     #[test]
     fn type_set_contains() {
         let spec = "type: integer";
-        let schema = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
+        let schema = yaml_serde::from_str::<ObjectSchema>(spec).unwrap();
         let schema_type = schema.schema_type.unwrap();
         assert!(schema_type.contains(Type::Integer));
 
         let spec = "type: [integer, 'null']";
-        let schema = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
+        let schema = yaml_serde::from_str::<ObjectSchema>(spec).unwrap();
         let schema_type = schema.schema_type.unwrap();
         assert!(schema_type.contains(Type::Integer));
 
         let spec = "type: [object, 'null']";
-        let schema = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
+        let schema = yaml_serde::from_str::<ObjectSchema>(spec).unwrap();
         let schema_type = schema.schema_type.unwrap();
         assert!(schema_type.contains(Type::Object));
         assert!(schema_type.is_object_or_nullable_object());
 
         let spec = "type: [array]";
-        let schema = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
+        let schema = yaml_serde::from_str::<ObjectSchema>(spec).unwrap();
         let schema_type = schema.schema_type.unwrap();
         assert!(schema_type.contains(Type::Array));
         assert!(schema_type.is_array_or_nullable_array());
@@ -641,14 +641,14 @@ mod tests {
         let spec = indoc::indoc! {"
             type: [string, 'null']
         "};
-        let schema = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
+        let schema = yaml_serde::from_str::<ObjectSchema>(spec).unwrap();
         assert_eq!(schema.example, None);
 
         let spec = indoc::indoc! {"
             type: [string, 'null']
             example: null
         "};
-        let schema = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
+        let schema = yaml_serde::from_str::<ObjectSchema>(spec).unwrap();
         assert_eq!(schema.example, Some(serde_json::Value::Null));
     }
 
@@ -666,7 +666,7 @@ mod tests {
               dog: '#/components/schemas/Dog'
               monster: 'https://gigantic-server.com/schemas/Monster/schema.json'
         "};
-        let schema = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
+        let schema = yaml_serde::from_str::<ObjectSchema>(spec).unwrap();
 
         assert!(schema.discriminator.is_some());
         assert_eq!(2, schema.discriminator.unwrap().mapping.unwrap().len());
@@ -680,7 +680,7 @@ mod tests {
             - type: string
             - $ref: '#/components/schemas/Age'
         "};
-        let schema = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
+        let schema = yaml_serde::from_str::<ObjectSchema>(spec).unwrap();
 
         assert_eq!(
             2,
@@ -710,7 +710,7 @@ mod tests {
           type: array
           prefixItems: []
         "};
-        let schema = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
+        let schema = yaml_serde::from_str::<ObjectSchema>(spec).unwrap();
         assert_eq!(0, schema.prefix_items.len());
     }
 
@@ -721,7 +721,7 @@ mod tests {
           items:
             type: number
         "};
-        let schema = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
+        let schema = yaml_serde::from_str::<ObjectSchema>(spec).unwrap();
 
         let items = schema
             .items
@@ -747,7 +747,7 @@ mod tests {
           type: array
           items: true
         "};
-        let schema = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
+        let schema = yaml_serde::from_str::<ObjectSchema>(spec).unwrap();
 
         let items = schema
             .items
@@ -773,8 +773,8 @@ mod tests {
             type: array
         "};
 
-        let original = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
-        let serialized = serde_yaml::to_string(&original).unwrap();
+        let original = yaml_serde::from_str::<ObjectSchema>(spec).unwrap();
+        let serialized = yaml_serde::to_string(&original).unwrap();
 
         pretty_assertions::assert_eq!(spec, serialized);
     }
@@ -788,8 +788,8 @@ mod tests {
             type: array
         "};
 
-        let original = serde_yaml::from_str::<ObjectSchema>(spec).unwrap();
-        let serialized = serde_yaml::to_string(&original).unwrap();
+        let original = yaml_serde::from_str::<ObjectSchema>(spec).unwrap();
+        let serialized = yaml_serde::to_string(&original).unwrap();
 
         pretty_assertions::assert_eq!(spec, serialized);
     }
