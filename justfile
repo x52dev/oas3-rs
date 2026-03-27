@@ -42,8 +42,7 @@ clippy:
 # Downgrade dev-dependencies necessary to run MSRV checks/tests.
 [private]
 downgrade-for-msrv:
-    cargo {{ toolchain }} update -p=backtrace --precise=0.3.74 # next ver: 1.82.0
-    cargo {{ toolchain }} update -p=idna_adapter --precise=1.2.0 # next ver: 1.82.0
+    # cargo {{ toolchain }} update -p=pkg --precise=0.x.x # next ver: 1.xx
 
 # Test workspace using MSRV.
 [group("test")]
