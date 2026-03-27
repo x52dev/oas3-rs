@@ -1,0 +1,23 @@
+[package]
+name = "jsonpath-fmt"
+description = "Interpolate strings from serde data using dotted JSON-style paths"
+version = "0.1.0"
+authors = ["Rob Ede <robjtede@icloud.com>"]
+keywords = ["json", "template", "interpolation", "jsonpath"]
+categories = ["template-engine", "value-formatting"]
+repository = { workspace = true }
+license = { workspace = true }
+edition = { workspace = true }
+rust-version = { workspace = true }
+
+[dependencies]
+derive_more = { workspace = true, features = ["display", "error", "from"] }
+serde = { workspace = true }
+serde_json = { workspace = true }
+winnow = { workspace = true }
+
+[dev-dependencies]
+serde = { workspace = true, features = ["derive"] }
+
+[lints]
+workspace = true
