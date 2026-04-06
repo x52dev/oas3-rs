@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Support boolean schemas in `spec::ObjectSchema::{all_of, any_of, one_of, prefix_items, properties}`.
+- Add `spec::Schema::resolve()` method.
 - The type of the `spec::Operation::callbacks` field is now `BTreeMap<String, ObjectOrReference<Callback>>`.
 - Add `spec::Operation::callbacks()` method.
 - Migrate YAML parsing to `yaml_serde`. Exposed error type(s) have been altered.
