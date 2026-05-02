@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.10.1
+
 - Update `oas3` dependency to `0.21`.
 
 ## 0.10.0

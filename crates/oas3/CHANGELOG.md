@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.20.2
+
 - The type of the `spec::Operation::callbacks` field is now `BTreeMap<String, ObjectOrReference<Callback>>`.
 - Add `spec::Operation::callbacks()` method.
 - Migrate YAML parsing to `yaml_serde`. Exposed error type(s) have been altered.
