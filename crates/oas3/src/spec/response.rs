@@ -1,11 +1,10 @@
-use std::collections::BTreeMap;
-
 use serde::{Deserialize, Serialize};
 
 use super::{
     spec_extensions, FromRef, Header, Link, MediaType, ObjectOrReference, Ref, RefError, RefType,
     Spec,
 };
+use crate::Map;
 
 /// Describes a single response from an API Operation, including design-time, static `links`
 /// to operations based on the response.
@@ -23,23 +22,23 @@ pub struct Response {
     /// insensitive. If a response header is defined with the name `"Content-Type"`, it SHALL
     /// be ignored.
     #[serde(default)]
-    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
-    pub headers: BTreeMap<String, ObjectOrReference<Header>>,
+    #[serde(skip_serializing_if = "Map::is_empty")]
+    pub headers: Map<String, ObjectOrReference<Header>>,
 
     /// A map containing descriptions of potential response payloads. The key is a media type
     /// or [media type range](https://tools.ietf.org/html/rfc7231#appendix-D) and the value
     /// describes it. For responses that match multiple keys, only the most specific key is
     /// applicable. e.g. text/plain overrides text/*
     #[serde(default)]
-    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
-    pub content: BTreeMap<String, MediaType>,
+    #[serde(skip_serializing_if = "Map::is_empty")]
+    pub content: Map<String, MediaType>,
 
     /// A map of operations links that can be followed from the response. The key of the map
     /// is a short name for the link, following the naming constraints of the names for
     /// [Component Objects](https://spec.openapis.org/oas/v3.1.1#components-object).
     #[serde(default)]
-    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
-    pub links: BTreeMap<String, ObjectOrReference<Link>>,
+    #[serde(skip_serializing_if = "Map::is_empty")]
+    pub links: Map<String, ObjectOrReference<Link>>,
 
     /// Specification extensions.
     ///
@@ -47,7 +46,7 @@ pub struct Response {
     ///
     /// See <https://spec.openapis.org/oas/v3.1.1#specification-extensions>.
     #[serde(flatten, with = "spec_extensions")]
-    pub extensions: BTreeMap<String, serde_json::Value>,
+    pub extensions: Map<String, serde_json::Value>,
 }
 
 impl FromRef for Response {

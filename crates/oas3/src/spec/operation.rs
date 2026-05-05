@@ -1,11 +1,12 @@
-use std::collections::BTreeMap;
-
 use log::error;
 use serde::{Deserialize, Serialize};
 
-use crate::spec::{
-    spec_extensions, Callback, Error, ExternalDoc, ObjectOrReference, Parameter, RequestBody,
-    Response, SecurityRequirement, Server, Spec,
+use crate::{
+    spec::{
+        spec_extensions, Callback, Error, ExternalDoc, ObjectOrReference, Parameter, RequestBody,
+        Response, SecurityRequirement, Server, Spec,
+    },
+    Map,
 };
 
 /// Describes a single API operation on a path.
@@ -81,7 +82,7 @@ pub struct Operation {
     /// response for a successful operation call.
     ///
     /// See <https://spec.openapis.org/oas/v3.1.1#responses-object>.
-    pub responses: Option<BTreeMap<String, ObjectOrReference<Response>>>,
+    pub responses: Option<Map<String, ObjectOrReference<Response>>>,
 
     /// A map of possible out-of band callbacks related to the parent operation.
     ///
@@ -90,8 +91,8 @@ pub struct Operation {
     /// expected responses.
     ///
     /// [Callback Object]: https://spec.openapis.org/oas/v3.1.1#callback-object
-    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
-    pub callbacks: BTreeMap<String, ObjectOrReference<Callback>>,
+    #[serde(default, skip_serializing_if = "Map::is_empty")]
+    pub callbacks: Map<String, ObjectOrReference<Callback>>,
 
     /// Declares this operation to be deprecated.
     ///
@@ -122,7 +123,7 @@ pub struct Operation {
     ///
     /// See <https://spec.openapis.org/oas/v3.1.1#specification-extensions>.
     #[serde(flatten, with = "spec_extensions")]
-    pub extensions: BTreeMap<String, serde_json::Value>,
+    pub extensions: Map<String, serde_json::Value>,
 }
 
 impl Operation {
@@ -138,7 +139,7 @@ impl Operation {
     }
 
     /// Resolves and returns map of this operation's responses, keyed by status code.
-    pub fn responses(&self, spec: &Spec) -> BTreeMap<String, Response> {
+    pub fn responses(&self, spec: &Spec) -> Map<String, Response> {
         self.responses
             .iter()
             .flatten()
@@ -153,7 +154,7 @@ impl Operation {
     }
 
     /// Resolves and returns map of this operation's callbacks.
-    pub fn callbacks(&self, spec: &Spec) -> BTreeMap<String, Callback> {
+    pub fn callbacks(&self, spec: &Spec) -> Map<String, Callback> {
         self.callbacks
             .iter()
             .filter_map(|(name, oor)| {

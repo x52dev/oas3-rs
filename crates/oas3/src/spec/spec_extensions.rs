@@ -1,21 +1,20 @@
-use std::{
-    collections::{BTreeMap, HashMap},
-    fmt,
-};
+use std::fmt;
 
 use serde::{de, Deserializer, Serializer};
+
+use crate::Map;
 
 /// Deserializes fields of a map beginning with `x-`.
 pub(crate) fn deserialize<'de, D>(
     deserializer: D,
-) -> Result<BTreeMap<String, serde_json::Value>, D::Error>
+) -> Result<Map<String, serde_json::Value>, D::Error>
 where
     D: Deserializer<'de>,
 {
     struct ExtraFieldsVisitor;
 
     impl<'de> de::Visitor<'de> for ExtraFieldsVisitor {
-        type Value = BTreeMap<String, serde_json::Value>;
+        type Value = Map<String, serde_json::Value>;
 
         fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
             formatter.write_str("extensions")
@@ -25,7 +24,7 @@ where
         where
             M: de::MapAccess<'de>,
         {
-            let mut map = HashMap::<String, serde_json::Value>::new();
+            let mut map = Map::<String, serde_json::Value>::new();
 
             while let Some((key, value)) = access.next_entry()? {
                 map.insert(key, value);
@@ -45,7 +44,7 @@ where
 
 /// Serializes fields of a map prefixed with `x-`.
 pub(crate) fn serialize<S>(
-    extensions: &BTreeMap<String, serde_json::Value>,
+    extensions: &Map<String, serde_json::Value>,
     serializer: S,
 ) -> Result<S::Ok, S::Error>
 where

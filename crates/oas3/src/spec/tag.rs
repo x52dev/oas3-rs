@@ -1,8 +1,7 @@
-use std::collections::BTreeMap;
-
 use serde::{Deserialize, Serialize};
 
 use super::spec_extensions;
+use crate::Map;
 
 /// Adds metadata to a single tag that is used by the [Operation Object].
 ///
@@ -33,5 +32,5 @@ pub struct Tag {
     ///
     /// See <https://spec.openapis.org/oas/v3.1.1#specification-extensions>.
     #[serde(flatten, with = "spec_extensions")]
-    pub extensions: BTreeMap<String, serde_json::Value>,
+    pub extensions: Map<String, serde_json::Value>,
 }

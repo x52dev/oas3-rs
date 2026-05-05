@@ -1,8 +1,7 @@
-use std::collections::BTreeMap;
-
 use serde::{Deserialize, Serialize};
 
 use super::{spec_extensions, FromRef, Ref, RefError, RefType, Spec};
+use crate::Map;
 
 /// Multi-purpose example objects.
 ///
@@ -40,7 +39,7 @@ pub struct Example {
     ///
     /// See <https://spec.openapis.org/oas/v3.1.1#specification-extensions>.
     #[serde(flatten, with = "spec_extensions")]
-    pub extensions: BTreeMap<String, serde_json::Value>,
+    pub extensions: Map<String, serde_json::Value>,
 }
 
 impl Example {

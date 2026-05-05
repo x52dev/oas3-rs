@@ -1,10 +1,11 @@
-use std::collections::BTreeMap;
-
 use serde::{Deserialize, Serialize};
 
-use crate::spec::{
-    spec_extensions, Encoding, Error, Example, MediaTypeExamples, ObjectOrReference, ObjectSchema,
-    Spec,
+use crate::{
+    spec::{
+        spec_extensions, Encoding, Error, Example, MediaTypeExamples, ObjectOrReference,
+        ObjectSchema, Spec,
+    },
+    Map,
 };
 
 /// Each Media Type Object provides schema and examples for the media type identified by its key.
@@ -27,8 +28,8 @@ pub struct MediaType {
     /// only apply to `requestBody` objects when the media type is `multipart`
     /// or `application/x-www-form-urlencoded`.
     #[serde(default)]
-    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
-    pub encoding: BTreeMap<String, Encoding>,
+    #[serde(skip_serializing_if = "Map::is_empty")]
+    pub encoding: Map<String, Encoding>,
 
     /// Specification extensions.
     ///
@@ -36,7 +37,7 @@ pub struct MediaType {
     ///
     /// See <https://spec.openapis.org/oas/v3.1.1#specification-extensions>.
     #[serde(flatten, with = "spec_extensions")]
-    pub extensions: BTreeMap<String, serde_json::Value>,
+    pub extensions: Map<String, serde_json::Value>,
 }
 
 impl MediaType {
@@ -54,7 +55,7 @@ impl MediaType {
     /// Resolves and returns the provided examples for this media type.
     ///
     /// Also see [`MediaTypeExamples::resolve_all()`].
-    pub fn examples(&self, spec: &Spec) -> BTreeMap<String, Example> {
+    pub fn examples(&self, spec: &Spec) -> Map<String, Example> {
         self.examples
             .as_ref()
             .map(|examples| examples.resolve_all(spec))

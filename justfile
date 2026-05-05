@@ -2,6 +2,7 @@ _list:
     @just --list
 
 toolchain := ""
+external_types_toolchain := "nightly-2025-10-18"
 msrv := ```
     cargo metadata --format-version=1 \
     | jq -r 'first(.packages[] | select(.source == null and .rust_version)) | .rust_version' \
@@ -38,6 +39,18 @@ clippy:
     cargo clippy --workspace --all-targets --no-default-features
     cargo clippy --workspace --all-targets --all-features
     cargo hack --feature-powerset clippy --workspace --all-targets
+
+# Check public API for exposed external types.
+[group("lint")]
+check-external-types:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    cargo metadata --frozen --no-deps --format-version=1 \
+        | jq -r '.workspace_members as $members | .packages[] | select(.id as $id | $members | index($id)) | select(any(.targets[]; .kind | index("lib"))) | .manifest_path' \
+        | while read -r manifest_path; do
+            echo "Checking external types: ${manifest_path}"
+            cargo +{{ external_types_toolchain }} check-external-types --manifest-path "${manifest_path}" --all-features
+        done
 
 # Downgrade dev-dependencies necessary to run MSRV checks/tests.
 [private]

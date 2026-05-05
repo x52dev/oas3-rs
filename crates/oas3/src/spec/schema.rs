@@ -1,6 +1,6 @@
 //! Schema specification for [OpenAPI 3.1](https://spec.openapis.org/oas/v3.1.1)
 
-use std::{collections::BTreeMap, fmt};
+use std::fmt;
 
 use derive_more::derive::{Display, Error};
 use serde::{Deserialize, Deserializer, Serialize};
@@ -9,6 +9,7 @@ use super::{
     discriminator::Discriminator, spec_extensions, FromRef, ObjectOrReference, Ref, RefError,
     RefType, Spec,
 };
+use crate::Map;
 
 /// Schema errors.
 #[derive(Debug, Clone, PartialEq, Display, Error)]
@@ -198,8 +199,8 @@ pub struct ObjectSchema {
     /// Omitting this keyword has the same assertion behavior as an empty object.
     ///
     /// See <https://json-schema.org/draft/2020-12/json-schema-core#name-properties>.
-    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
-    pub properties: BTreeMap<String, ObjectOrReference<ObjectSchema>>,
+    #[serde(default, skip_serializing_if = "Map::is_empty")]
+    pub properties: Map<String, ObjectOrReference<ObjectSchema>>,
 
     /// Schema for additional object properties.
     ///
@@ -546,7 +547,7 @@ pub struct ObjectSchema {
     ///
     /// See <https://spec.openapis.org/oas/v3.1.1#specification-extensions>.
     #[serde(flatten, with = "spec_extensions")]
-    pub extensions: BTreeMap<String, serde_json::Value>,
+    pub extensions: Map<String, serde_json::Value>,
 }
 
 impl ObjectSchema {

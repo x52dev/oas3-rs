@@ -1,10 +1,9 @@
-use std::collections::BTreeMap;
-
 use derive_more::derive::{Display, Error};
 use serde::{Deserialize, Serialize};
 use url::Url;
 
 use super::spec_extensions;
+use crate::Map;
 
 /// Error raised when contact info contains an email field which is not a valid email.
 #[derive(Debug, Display, Error)]
@@ -38,7 +37,7 @@ pub struct Contact {
     ///
     /// See <https://spec.openapis.org/oas/v3.1.1#specification-extensions>.
     #[serde(flatten, with = "spec_extensions")]
-    pub extensions: BTreeMap<String, serde_json::Value>,
+    pub extensions: Map<String, serde_json::Value>,
 }
 
 impl Contact {

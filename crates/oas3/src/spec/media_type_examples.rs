@@ -1,9 +1,8 @@
-use std::collections::BTreeMap;
-
 use log::error;
 use serde::{Deserialize, Serialize};
 
 use super::{Example, ObjectOrReference, Spec};
+use crate::Map;
 
 /// Examples for a media type.
 ///
@@ -19,7 +18,7 @@ pub enum MediaTypeExamples {
     /// by the schema.
     Examples {
         /// Examples of the media type.
-        examples: BTreeMap<String, ObjectOrReference<Example>>,
+        examples: Map<String, ObjectOrReference<Example>>,
     },
 
     /// Example of the media type.
@@ -37,7 +36,7 @@ pub enum MediaTypeExamples {
 impl Default for MediaTypeExamples {
     fn default() -> Self {
         MediaTypeExamples::Examples {
-            examples: BTreeMap::new(),
+            examples: Map::new(),
         }
     }
 }
@@ -54,17 +53,17 @@ impl MediaTypeExamples {
     /// Resolves references and returns a map of provided examples keyed by name.
     ///
     /// If the `example` field is provided, then the map contains one item, keyed as "default".
-    pub fn resolve_all(&self, spec: &Spec) -> BTreeMap<String, Example> {
+    pub fn resolve_all(&self, spec: &Spec) -> Map<String, Example> {
         match self {
             Self::Example { example } => {
                 let example = Example {
                     description: None,
                     summary: None,
                     value: Some(example.clone()),
-                    extensions: BTreeMap::default(),
+                    extensions: Map::default(),
                 };
 
-                let mut map = BTreeMap::new();
+                let mut map = Map::new();
                 map.insert("default".to_owned(), example);
 
                 map
@@ -184,7 +183,7 @@ components:
         .unwrap();
 
         let mt_examples = MediaTypeExamples::Examples {
-            examples: BTreeMap::from([
+            examples: Map::from([
                 (
                     "Rust".to_owned(),
                     ObjectOrReference::Ref {

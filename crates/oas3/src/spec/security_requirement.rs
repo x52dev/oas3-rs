@@ -1,6 +1,6 @@
-use std::collections::BTreeMap;
-
 use serde::{Deserialize, Serialize};
+
+use crate::Map;
 
 /// Lists the required security schemes to execute this operation.
 ///
@@ -25,4 +25,4 @@ use serde::{Deserialize, Serialize};
 /// contain a list of role names which are required for the execution, but are not otherwise defined
 /// or exchanged in-band.
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
-pub struct SecurityRequirement(pub BTreeMap<String, Vec<String>>);
+pub struct SecurityRequirement(pub Map<String, Vec<String>>);

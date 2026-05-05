@@ -32,6 +32,31 @@ match oas3::from_yaml(yaml) {
 }
 ```
 
+## Order Preservation
+
+OpenAPI maps are represented by [`Map`], an order-preserving map type. When a
+document is deserialized, map entries keep the order they had in the input
+document. When a spec is serialized again, those entries are emitted in that
+stored order rather than being sorted by key.
+
+This applies to typed OpenAPI maps, such as paths, component maps, schema
+properties, media type maps, responses, callbacks, and specification
+extensions. Nested JSON objects inside extension values also preserve order
+when the default `preserve-order` feature is enabled.
+
+If a deterministic key-sorted map is needed, convert a [`Map`] into a
+[`std::collections::BTreeMap`].
+
+## Crate Features
+
+- `preserve-order`: Enabled by default. Enables `serde_json`'s
+  `preserve_order` feature so JSON object order is preserved inside
+  [`serde_json::Value`] values, including nested specification extension
+  objects. Disabling default features opts out of this `serde_json` feature;
+  typed OpenAPI maps still use [`Map`], but arbitrary nested JSON objects in
+  extension values may use `serde_json`'s default object ordering.
+- `yaml-spec`: Enables YAML parsing and serialization with `yaml_serde`.
+
 [OpenAPI v3.1.x]: https://spec.openapis.org/oas/v3.1.1
 
 <!-- cargo-rdme end -->

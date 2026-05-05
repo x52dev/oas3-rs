@@ -64,3 +64,30 @@ jobs:
         env:
           RUSTDOCFLAGS: -D warnings
         run: cargo doc --workspace --no-deps --all-features
+
+  external-types:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Install just
+        uses: taiki-e/install-action@bfadeaba214680fb4ab63e710bcb2a6a17019fdc # v2.70.4
+        with:
+          tool: just
+
+      - name: Read external types Rust toolchain
+        id: toolchain
+        run: echo "toolchain=$(just --eval external_types_toolchain)" >> "$GITHUB_OUTPUT"
+
+      - name: Install Rust
+        uses: actions-rust-lang/setup-rust-toolchain@a0b538fa0b742a6aa35d6e2c169b4bd06d225a98 # v1.15.3
+        with:
+          toolchain: ${{ steps.toolchain.outputs.toolchain }}
+
+      - name: Install cargo-check-external-types
+        uses: taiki-e/cache-cargo-install-action@7447f04c51f2ba27ca35e7f1e28fab848c5b3ba7 # v2.3.1
+        with:
+          tool: cargo-check-external-types
+
+      - name: Check external types
+        run: just check-external-types

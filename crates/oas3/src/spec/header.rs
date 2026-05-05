@@ -1,11 +1,10 @@
-use std::collections::BTreeMap;
-
 use serde::{Deserialize, Serialize};
 
 use super::{
     spec_extensions, Example, FromRef, MediaType, ObjectOrReference, ObjectSchema, ParameterStyle,
     Ref, RefError, RefType, Spec,
 };
+use crate::Map;
 
 /// Describes a single header for HTTP responses and for individual parts in multipart
 /// representations.
@@ -84,8 +83,8 @@ pub struct Header {
     /// encoding. The `examples` field is mutually exclusive of the `example` field. Furthermore, if
     /// referencing a `schema` that contains an example, the `examples` value SHALL override the
     /// example provided by the schema.
-    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
-    pub examples: BTreeMap<String, ObjectOrReference<Example>>,
+    #[serde(default, skip_serializing_if = "Map::is_empty")]
+    pub examples: Map<String, ObjectOrReference<Example>>,
 
     /// A map containing the representations for the header.
     ///
@@ -93,7 +92,7 @@ pub struct Header {
     ///
     /// The key is the media type and the value describes it. The map MUST only contain one entry.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub content: Option<BTreeMap<String, MediaType>>,
+    pub content: Option<Map<String, MediaType>>,
 
     /// Specification extensions.
     ///
@@ -101,7 +100,7 @@ pub struct Header {
     ///
     /// See <https://spec.openapis.org/oas/v3.1.1#specification-extensions>.
     #[serde(flatten, with = "spec_extensions")]
-    pub extensions: BTreeMap<String, serde_json::Value>,
+    pub extensions: Map<String, serde_json::Value>,
 }
 
 impl FromRef for Header {

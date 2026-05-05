@@ -1,8 +1,7 @@
-use std::collections::BTreeMap;
-
 use serde::{Deserialize, Serialize};
 
 use super::spec_extensions;
+use crate::Map;
 
 /// An object representing a Server.
 ///
@@ -25,8 +24,8 @@ pub struct Server {
     /// A map between a variable name and its value.
     ///
     /// The value is used for substitution in the server's URL template.
-    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
-    pub variables: BTreeMap<String, ServerVariable>,
+    #[serde(default, skip_serializing_if = "Map::is_empty")]
+    pub variables: Map<String, ServerVariable>,
 
     /// Specification extensions.
     ///
@@ -34,7 +33,7 @@ pub struct Server {
     ///
     /// See <https://spec.openapis.org/oas/v3.1.1#specification-extensions>.
     #[serde(flatten, with = "spec_extensions")]
-    pub extensions: BTreeMap<String, serde_json::Value>,
+    pub extensions: Map<String, serde_json::Value>,
 }
 
 /// An object representing a Server Variable for server URL template substitution.
@@ -66,7 +65,7 @@ pub struct ServerVariable {
     ///
     /// See <https://spec.openapis.org/oas/v3.1.1#specification-extensions>.
     #[serde(flatten, with = "spec_extensions")]
-    pub extensions: BTreeMap<String, serde_json::Value>,
+    pub extensions: Map<String, serde_json::Value>,
 }
 
 #[cfg(test)]

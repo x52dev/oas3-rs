@@ -2,12 +2,14 @@
 //!
 //! High-level structures include [`Spec`], [`Components`] & [`Schema`].
 
-use std::{collections::BTreeMap, iter::Iterator};
+use std::iter::Iterator;
 
 use derive_more::derive::Error;
 use http::Method;
 use log::debug;
 use serde::{Deserialize, Serialize};
+
+use crate::Map;
 
 mod components;
 mod contact;
@@ -107,7 +109,7 @@ pub struct Spec {
     /// [Server Object]: https://spec.openapis.org/oas/v3.1.1#server-object
     /// [ACL constraints]: https://spec.openapis.org/oas/v3.1.1#security-filtering
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub paths: Option<BTreeMap<String, PathItem>>,
+    pub paths: Option<Map<String, PathItem>>,
 
     /// An element to hold various schemas for the specification.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -141,8 +143,8 @@ pub struct Spec {
     ///
     /// See <>.
     #[serde(default)]
-    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
-    pub webhooks: BTreeMap<String, PathItem>,
+    #[serde(skip_serializing_if = "Map::is_empty")]
+    pub webhooks: Map<String, PathItem>,
 
     /// Additional external documentation.
     #[serde(skip_serializing_if = "Option::is_none", rename = "externalDocs")]
@@ -154,7 +156,7 @@ pub struct Spec {
     ///
     /// See <https://spec.openapis.org/oas/v3.1.1#specification-extensions>.
     #[serde(flatten, with = "spec_extensions")]
-    pub extensions: BTreeMap<String, serde_json::Value>,
+    pub extensions: Map<String, serde_json::Value>,
 }
 
 impl Spec {
