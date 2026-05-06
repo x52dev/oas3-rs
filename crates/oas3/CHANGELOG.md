@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-## 0.21.1
+## 0.22.0
 
 - Support boolean schemas in schema-bearing fields including `spec::Components::schemas`,
   `spec::MediaType::schema`, `spec::Parameter::schema`, `spec::Header::schema`, and
