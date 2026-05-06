@@ -71,6 +71,9 @@ pub enum Error {
     #[display("Required field missing: {}", _0)]
     RequiredFieldMissing(#[error(not(source))] Path),
 
+    #[display("False schema does not allow value: {}", _0)]
+    FalseSchema(#[error(not(source))] Path),
+
     #[display("Type did not match any `anyOf` variant: {}\n{}", _0, _1)]
     OneOfNoMatch(Path, AggregateError),
 

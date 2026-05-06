@@ -125,7 +125,7 @@ pub struct ObjectSchema {
     ///
     /// See <https://json-schema.org/draft/2020-12/json-schema-core#name-allof>.
     #[serde(rename = "allOf", default, skip_serializing_if = "Vec::is_empty")]
-    pub all_of: Vec<ObjectOrReference<ObjectSchema>>,
+    pub all_of: Vec<Schema>,
 
     /// An instance validates successfully against this keyword if it validates successfully against
     /// at least one schema defined by this keyword's value.
@@ -135,7 +135,7 @@ pub struct ObjectSchema {
     ///
     /// See <https://json-schema.org/draft/2020-12/json-schema-core#name-anyof>.
     #[serde(rename = "anyOf", default, skip_serializing_if = "Vec::is_empty")]
-    pub any_of: Vec<ObjectOrReference<ObjectSchema>>,
+    pub any_of: Vec<Schema>,
 
     /// An instance validates successfully against this keyword if it validates successfully against
     /// exactly one schema defined by this keyword's value.
@@ -145,7 +145,7 @@ pub struct ObjectSchema {
     ///
     /// See <https://json-schema.org/draft/2020-12/json-schema-core#name-oneof>.
     #[serde(rename = "oneOf", default, skip_serializing_if = "Vec::is_empty")]
-    pub one_of: Vec<ObjectOrReference<ObjectSchema>>,
+    pub one_of: Vec<Schema>,
 
     // TODO: missing fields
     // - not
@@ -181,7 +181,7 @@ pub struct ObjectSchema {
     ///
     /// See <https://json-schema.org/draft/2020-12/json-schema-core#name-prefixitems>.
     #[serde(rename = "prefixItems", default, skip_serializing_if = "Vec::is_empty")]
-    pub prefix_items: Vec<ObjectOrReference<ObjectSchema>>,
+    pub prefix_items: Vec<Schema>,
 
     // TODO: missing fields
     // - contains
@@ -200,7 +200,7 @@ pub struct ObjectSchema {
     ///
     /// See <https://json-schema.org/draft/2020-12/json-schema-core#name-properties>.
     #[serde(default, skip_serializing_if = "Map::is_empty")]
-    pub properties: Map<String, ObjectOrReference<ObjectSchema>>,
+    pub properties: Map<String, Schema>,
 
     /// Schema for additional object properties.
     ///
@@ -560,27 +560,10 @@ impl ObjectSchema {
     }
 }
 
-impl FromRef for ObjectSchema {
-    fn from_ref(spec: &Spec, path: &str) -> Result<Self, RefError> {
-        let refpath = path.parse::<Ref>()?;
-
-        match refpath.kind {
-            RefType::Schema => spec
-                .components
-                .as_ref()
-                .and_then(|cs| cs.schemas.get(&refpath.name))
-                .ok_or_else(|| RefError::Unresolvable(path.to_owned()))
-                .and_then(|oor| oor.resolve(spec)),
-
-            typ => Err(RefError::MismatchedType(typ, RefType::Schema)),
-        }
-    }
-}
-
 /// A boolean JSON schema.
 ///
 /// See <https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-01#name-boolean-json-schemas>.
-#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Deserialize, Serialize)]
 #[serde(transparent)]
 pub struct BooleanSchema(pub bool);
 
@@ -595,6 +578,46 @@ pub enum Schema {
 
     /// An object JSON schema.
     Object(Box<ObjectOrReference<ObjectSchema>>),
+}
+
+impl Schema {
+    fn new_object(schema: ObjectSchema) -> Self {
+        Schema::Object(Box::new(ObjectOrReference::Object(schema)))
+    }
+}
+
+impl Schema {
+    /// Resolves the schema (if needed) from the given `spec` and returns a schema document.
+    ///
+    /// If the schema is a reference, references are followed recursively until the result is either
+    /// a boolean schema or an inline object schema.
+    pub fn resolve(&self, spec: &Spec) -> Result<Self, RefError> {
+        match self {
+            Schema::Boolean(schema) => Ok(Schema::Boolean(*schema)),
+
+            Schema::Object(obj_ref) => match obj_ref.as_ref() {
+                ObjectOrReference::Object(schema) => Ok(Schema::new_object(schema.clone())),
+                ObjectOrReference::Ref { ref_path, .. } => Schema::from_ref(spec, ref_path),
+            },
+        }
+    }
+}
+
+impl FromRef for Schema {
+    fn from_ref(spec: &Spec, path: &str) -> Result<Self, RefError> {
+        let refpath = path.parse::<Ref>()?;
+
+        match refpath.kind {
+            RefType::Schema => spec
+                .components
+                .as_ref()
+                .and_then(|cs| cs.schemas.get(&refpath.name))
+                .ok_or_else(|| RefError::Unresolvable(path.to_owned()))
+                .and_then(|schema| schema.resolve(spec)),
+
+            typ => Err(RefError::MismatchedType(typ, RefType::Schema)),
+        }
+    }
 }
 
 /// Considers any value that is present as `Some`, including `null`.
@@ -691,16 +714,22 @@ mod tests {
 
         assert_matches!(
             &schema.prefix_items[0],
-            ObjectOrReference::Object(ObjectSchema {
-                schema_type: Some(TypeSet::Single(Type::String)),
-                ..
-            }),
+            Schema::Object(obj) if matches!(
+                obj.as_ref(),
+                ObjectOrReference::Object(ObjectSchema {
+                    schema_type: Some(TypeSet::Single(Type::String)),
+                    ..
+                })
+            ),
             "First prefixItems element should be inline string schema",
         );
 
         assert_matches!(
             &schema.prefix_items[1],
-            ObjectOrReference::Ref { ref_path, .. } if ref_path == "#/components/schemas/Age",
+            Schema::Object(obj) if matches!(
+                obj.as_ref(),
+                ObjectOrReference::Ref { ref_path, .. } if ref_path == "#/components/schemas/Age"
+            ),
             "Second prefixItems element should be reference to an Age schema",
         );
     }
@@ -793,5 +822,150 @@ mod tests {
         let serialized = yaml_serde::to_string(&original).unwrap();
 
         pretty_assertions::assert_eq!(spec, serialized);
+    }
+
+    #[test]
+    fn properties_support_boolean_schemas() {
+        let spec = indoc::indoc! {"
+          type: object
+          properties:
+            data: true
+            meta: false
+        "};
+        let schema = yaml_serde::from_str::<ObjectSchema>(spec).unwrap();
+
+        assert_eq!(2, schema.properties.len());
+
+        assert_matches!(
+            schema.properties.get("data"),
+            Some(Schema::Boolean(BooleanSchema(true))),
+            "data property should be boolean schema with value true",
+        );
+
+        assert_matches!(
+            schema.properties.get("meta"),
+            Some(Schema::Boolean(BooleanSchema(false))),
+            "meta property should be boolean schema with value false",
+        );
+    }
+
+    #[test]
+    fn composition_keywords_support_boolean_schemas() {
+        let spec = indoc::indoc! {"
+          allOf:
+            - type: string
+            - true
+          anyOf:
+            - false
+            - type: number
+          oneOf:
+            - true
+            - $ref: '#/components/schemas/Test'
+        "};
+        let schema = yaml_serde::from_str::<ObjectSchema>(spec).unwrap();
+
+        assert_eq!(2, schema.all_of.len());
+        assert_matches!(
+            &schema.all_of[1],
+            Schema::Boolean(BooleanSchema(true)),
+            "Second allOf element should be boolean schema with value true",
+        );
+
+        assert_eq!(2, schema.any_of.len());
+        assert_matches!(
+            &schema.any_of[0],
+            Schema::Boolean(BooleanSchema(false)),
+            "First anyOf element should be boolean schema with value false",
+        );
+
+        assert_eq!(2, schema.one_of.len());
+        assert_matches!(
+            &schema.one_of[0],
+            Schema::Boolean(BooleanSchema(true)),
+            "First oneOf element should be boolean schema with value true",
+        );
+    }
+
+    #[test]
+    fn prefix_items_support_boolean_schemas() {
+        let spec = indoc::indoc! {"
+          type: array
+          prefixItems:
+            - true
+            - false
+            - type: string
+        "};
+        let schema = yaml_serde::from_str::<ObjectSchema>(spec).unwrap();
+
+        assert_eq!(3, schema.prefix_items.len());
+
+        assert_matches!(
+            &schema.prefix_items[0],
+            Schema::Boolean(BooleanSchema(true)),
+            "First prefixItems element should be boolean schema with value true",
+        );
+
+        assert_matches!(
+            &schema.prefix_items[1],
+            Schema::Boolean(BooleanSchema(false)),
+            "Second prefixItems element should be boolean schema with value false",
+        );
+
+        assert_matches!(
+            &schema.prefix_items[2],
+            Schema::Object(obj) if matches!(
+                obj.as_ref(),
+                ObjectOrReference::Object(ObjectSchema {
+                    schema_type: Some(TypeSet::Single(Type::String)),
+                    ..
+                })
+            ),
+            "Third prefixItems element should be inline string schema",
+        );
+    }
+
+    #[test]
+    fn boolean_schema_serialization_round_trip() {
+        let spec = indoc::indoc! {"
+            properties:
+              data: true
+              meta: false
+              name:
+                type: string
+            type: object
+        "};
+
+        let original = yaml_serde::from_str::<ObjectSchema>(spec).unwrap();
+        let serialized = yaml_serde::to_string(&original).unwrap();
+
+        pretty_assertions::assert_eq!(spec, serialized);
+    }
+
+    #[test]
+    fn boolean_schema_json_parsing() {
+        let json_spec = r#"{
+            "type": "object",
+            "properties": {
+                "data": true,
+                "meta": true
+            }
+        }"#;
+
+        let schema: ObjectSchema = serde_json::from_str(json_spec).expect("should parse JSON");
+
+        assert_eq!(2, schema.properties.len());
+        assert_matches!(
+            schema.properties.get("data"),
+            Some(Schema::Boolean(BooleanSchema(true)))
+        );
+        assert_matches!(
+            schema.properties.get("meta"),
+            Some(Schema::Boolean(BooleanSchema(true)))
+        );
+
+        let json_output = serde_json::to_string(&schema).expect("should serialize to JSON");
+        let schema2: ObjectSchema =
+            serde_json::from_str(&json_output).expect("should parse JSON again");
+        assert_eq!(schema, schema2);
     }
 }

@@ -1,10 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    spec::{
-        spec_extensions, Encoding, Error, Example, MediaTypeExamples, ObjectOrReference,
-        ObjectSchema, Spec,
-    },
+    spec::{spec_extensions, Encoding, Error, Example, MediaTypeExamples, Schema, Spec},
     Map,
 };
 
@@ -15,7 +12,7 @@ use crate::{
 pub struct MediaType {
     /// The schema defining the type used for the request body.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub schema: Option<ObjectOrReference<ObjectSchema>>,
+    pub schema: Option<Schema>,
 
     /// Example of the media type.
     // TODO: figure out how to make this not an Option
@@ -42,7 +39,7 @@ pub struct MediaType {
 
 impl MediaType {
     /// Resolves and returns the JSON schema definition for this media type.
-    pub fn schema(&self, spec: &Spec) -> Result<Option<ObjectSchema>, Error> {
+    pub fn schema(&self, spec: &Spec) -> Result<Option<Schema>, Error> {
         let Some(schema) = self.schema.as_ref() else {
             return Ok(None);
         };

@@ -2,8 +2,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     spec::{
-        schema::ObjectSchema, spec_extensions, Callback, Example, Header, Link, ObjectOrReference,
-        Parameter, PathItem, RequestBody, Response, SecurityScheme,
+        spec_extensions, Callback, Example, Header, Link, ObjectOrReference, Parameter, PathItem,
+        RequestBody, Response, Schema, SecurityScheme,
     },
     Map,
 };
@@ -16,9 +16,9 @@ use crate::{
 /// See <https://spec.openapis.org/oas/v3.1.1#components-object>.
 #[derive(Debug, Clone, Default, PartialEq, Deserialize, Serialize)]
 pub struct Components {
-    /// An object to hold reusable [Schema Objects](ObjectSchema).
+    /// An object to hold reusable [Schema Objects](Schema).
     #[serde(default, skip_serializing_if = "Map::is_empty")]
-    pub schemas: Map<String, ObjectOrReference<ObjectSchema>>,
+    pub schemas: Map<String, Schema>,
 
     /// An object to hold reusable [Response Objects](Response).
     #[serde(default, skip_serializing_if = "Map::is_empty")]
