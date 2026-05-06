@@ -186,7 +186,7 @@ impl ConformanceTestSpec {
 
                 if let Some(ref ex) = example.value {
                     // check example validity
-                    let validator = ValidationTree::from_schema(&schema, spec)?;
+                    let validator = ValidationTree::from_schema_document(&schema, spec)?;
 
                     debug!("validating example: {:?}", &ex);
                     debug!("against schema: {:?}", &schema);
@@ -246,7 +246,7 @@ impl ConformanceTestSpec {
                     let schema = media_spec.schema(spec)?.unwrap();
 
                     // create validator
-                    let validator = ValidationTree::from_schema(&schema, spec)?;
+                    let validator = ValidationTree::from_schema_document(&schema, spec)?;
 
                     TestResponseSpec {
                         operation: test_op.clone(),
@@ -279,7 +279,7 @@ impl ConformanceTestSpec {
                             ))))?;
 
                     // create validator
-                    let validator = ValidationTree::from_schema(&schema, spec)?;
+                    let validator = ValidationTree::from_schema_document(&schema, spec)?;
 
                     if let Some(ref ex) = example.value {
                         // check example validity

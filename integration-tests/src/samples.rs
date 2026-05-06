@@ -1,4 +1,7 @@
-use oas3::{spec::ObjectOrReference, Spec};
+use oas3::{
+    spec::{ObjectOrReference, Schema},
+    Spec,
+};
 
 fn assert_ordered(text: &str, first: &str, second: &str) {
     let first_index = text
@@ -27,7 +30,10 @@ fn assert_spec_preserves_map_order(spec: &Spec) {
         ["Zebra", "Apple"]
     );
 
-    let ObjectOrReference::Object(zebra) = &schemas["Zebra"] else {
+    let Schema::Object(zebra) = &schemas["Zebra"] else {
+        panic!("expected inline Zebra schema");
+    };
+    let ObjectOrReference::Object(zebra) = zebra.as_ref() else {
         panic!("expected inline Zebra schema");
     };
     assert_eq!(

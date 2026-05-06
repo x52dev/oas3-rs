@@ -1,8 +1,8 @@
 use serde::{Deserialize, Serialize};
 
 use super::{
-    spec_extensions, Example, FromRef, MediaType, ObjectOrReference, ObjectSchema, ParameterStyle,
-    Ref, RefError, RefType, Spec,
+    spec_extensions, Example, FromRef, MediaType, ObjectOrReference, ParameterStyle, Ref, RefError,
+    RefType, Schema, Spec,
 };
 use crate::Map;
 
@@ -65,7 +65,7 @@ pub struct Header {
     ///
     /// A header MUST contain either a `schema` property, or a `content` property, but not both.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub schema: Option<ObjectOrReference<ObjectSchema>>,
+    pub schema: Option<Schema>,
 
     /// Example of the header's potential value.
     ///

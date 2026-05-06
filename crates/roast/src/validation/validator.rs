@@ -2,7 +2,10 @@ use std::{collections::BTreeMap, fmt};
 
 use log::trace;
 use oas3::{
-    spec::{Error as SchemaError, ObjectSchema, SchemaType, SchemaTypeSet},
+    spec::{
+        BooleanSchema, Error as SchemaError, ObjectOrReference, ObjectSchema, Schema, SchemaType,
+        SchemaTypeSet,
+    },
     Spec,
 };
 use serde_json::Value as JsonValue;
@@ -12,6 +15,7 @@ use super::{AggregateError, DataType, Error, Path, RequiredFields, Validate};
 #[derive(Debug)]
 pub enum ValidationBranch {
     Leaf,
+    Reject,
     Array(Box<ValidationTree>),
     Object(BTreeMap<String, ValidationTree>),
     AllOf(Vec<ValidationTree>),
@@ -64,8 +68,7 @@ impl ValidationTree {
                     .properties
                     .iter()
                     .map(|(prop, schema)| {
-                        let sub_schema = schema.resolve(spec).unwrap();
-                        let valtree = ValidationTree::from_schema(&sub_schema, spec).unwrap();
+                        let valtree = ValidationTree::from_schema_document(schema, spec).unwrap();
                         (prop.clone(), valtree)
                     })
                     .collect();
@@ -95,8 +98,11 @@ impl ValidationTree {
                             // No additional validation needed
                         }
                         oas3::spec::Schema::Object(obj_ref) => {
-                            let sub_schema = obj_ref.resolve(spec).unwrap();
-                            let vls = ValidationTree::from_schema(&sub_schema, spec).unwrap();
+                            let sub_schema = oas3::spec::Schema::Object(obj_ref.clone())
+                                .resolve(spec)
+                                .unwrap();
+                            let vls =
+                                ValidationTree::from_schema_document(&sub_schema, spec).unwrap();
                             valtree.branch = ValidationBranch::Array(Box::new(vls))
                         }
                     }
@@ -111,8 +117,7 @@ impl ValidationTree {
                     let vs = schema
                         .all_of
                         .iter()
-                        .map(|schema_ref| schema_ref.resolve(spec).unwrap())
-                        .map(|schema| ValidationTree::from_schema(&schema, spec).unwrap())
+                        .map(|schema| ValidationTree::from_schema_document(schema, spec).unwrap())
                         .collect();
 
                     valtree.branch = ValidationBranch::AllOf(vs)
@@ -123,8 +128,7 @@ impl ValidationTree {
                     let vs = schema
                         .any_of
                         .iter()
-                        .map(|schema_ref| schema_ref.resolve(spec).unwrap())
-                        .map(|schema| ValidationTree::from_schema(&schema, spec).unwrap())
+                        .map(|schema| ValidationTree::from_schema_document(schema, spec).unwrap())
                         .collect();
 
                     valtree.branch = ValidationBranch::AnyOf(vs)
@@ -135,8 +139,7 @@ impl ValidationTree {
                     let vs = schema
                         .one_of
                         .iter()
-                        .map(|schema_ref| schema_ref.resolve(spec).unwrap())
-                        .map(|schema| ValidationTree::from_schema(&schema, spec).unwrap())
+                        .map(|schema| ValidationTree::from_schema_document(schema, spec).unwrap())
                         .collect();
 
                     valtree.branch = ValidationBranch::OneOf(vs)
@@ -145,6 +148,30 @@ impl ValidationTree {
         }
 
         Ok(valtree)
+    }
+
+    pub(crate) fn from_schema_document(
+        schema: &Schema,
+        spec: &Spec,
+    ) -> Result<ValidationTree, SchemaError> {
+        match schema.resolve(spec).unwrap() {
+            Schema::Boolean(BooleanSchema(true)) => Ok(ValidationTree {
+                validators: vec![],
+                branch: ValidationBranch::Leaf,
+            }),
+
+            Schema::Boolean(BooleanSchema(false)) => Ok(ValidationTree {
+                validators: vec![],
+                branch: ValidationBranch::Reject,
+            }),
+
+            Schema::Object(obj_ref) => {
+                let ObjectOrReference::Object(sub_schema) = *obj_ref else {
+                    unreachable!("Schema::resolve() should resolve outer schema references")
+                };
+                ValidationTree::from_schema(&sub_schema, spec)
+            }
+        }
     }
 
     #[allow(dead_code)]
@@ -176,6 +203,8 @@ impl ValidationTree {
     /// trigger sub-valtrees validation
     fn validate_inner(&self, val: &JsonValue, path: Path) -> Result<(), Error> {
         match &self.branch {
+            ValidationBranch::Reject => Err(Error::FalseSchema(path)),
+
             ValidationBranch::AllOf(vs) => {
                 // TODO: error if any self validations
 
@@ -322,14 +351,25 @@ mod tests {
     use crate::validation::RequiredFields;
 
     fn get_schema(spec: &Spec, name: &str) -> ObjectSchema {
-        spec.components
+        let schema = spec
+            .components
             .as_ref()
             .unwrap()
             .schemas
             .get(name)
             .unwrap()
             .resolve(spec)
-            .unwrap()
+            .unwrap();
+
+        let oas3::spec::Schema::Object(schema) = schema else {
+            panic!("expected {name} to resolve to an object schema");
+        };
+
+        let ObjectOrReference::Object(schema) = *schema else {
+            unreachable!("Schema::resolve() should resolve outer schema references")
+        };
+
+        schema
     }
 
     #[test]
@@ -433,6 +473,38 @@ components:
 
         let test = json!({ "size": 123, "other": "what" });
         valtree.validate(&test).unwrap_err();
+    }
+
+    #[test]
+    fn object_boolean_property_schemas() {
+        let spec_str = r#"openapi: "3"
+paths: {}
+info:
+  title: Test API
+  version: "0.1"
+components:
+  schemas:
+    data:
+      title: Data
+      type: object
+      properties:
+        allowed: true
+        denied: false
+"#;
+
+        let spec = oas3::from_yaml(spec_str).unwrap();
+
+        let schema = get_schema(&spec, "data");
+        let valtree = ValidationTree::from_schema(&schema, &spec).unwrap();
+
+        let test = json!({ "allowed": { "any": "value" } });
+        valtree.validate(&test).unwrap();
+
+        let test = json!({ "denied": "anything" });
+        assert!(matches!(
+            valtree.validate(&test),
+            Err(Error::FalseSchema(path)) if path.to_string() == "denied"
+        ));
     }
 
     #[test]
