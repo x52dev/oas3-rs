@@ -563,7 +563,7 @@ impl ObjectSchema {
 /// A boolean JSON schema.
 ///
 /// See <https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-01#name-boolean-json-schemas>.
-#[derive(Debug, Clone, Copy, PartialEq, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(transparent)]
 pub struct BooleanSchema(pub bool);
 

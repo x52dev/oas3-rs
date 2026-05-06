@@ -8,7 +8,6 @@
 - Add `spec::Schema::resolve()` method.
 - The type of the `spec::Operation::callbacks` field is now `BTreeMap<String, ObjectOrReference<Callback>>`.
 - Add `spec::Operation::callbacks()` method.
-- Implement `Copy` for `spec::BooleanSchema`.
 - Remove implementation of `FromRef` for `spec::ObjectSchema`.
 - Minimum supported Rust version (MSRV) is now 1.87.
 
