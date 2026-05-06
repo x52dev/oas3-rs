@@ -593,7 +593,7 @@ impl Schema {
     /// a boolean schema or an inline object schema.
     pub fn resolve(&self, spec: &Spec) -> Result<Self, RefError> {
         match self {
-            Schema::Boolean(schema) => Ok(Schema::Boolean(*schema)),
+            Schema::Boolean(schema) => Ok(Schema::Boolean(schema.clone())),
 
             Schema::Object(obj_ref) => match obj_ref.as_ref() {
                 ObjectOrReference::Object(schema) => Ok(Schema::new_object(schema.clone())),
