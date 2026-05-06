@@ -1,10 +1,13 @@
-use std::{collections::BTreeMap, error::Error as StdError};
+use std::error::Error as StdError;
 
 use serde::{Deserialize, Serialize};
 
-use crate::spec::{
-    r#ref::{FromRef, Ref, RefError, RefType},
-    PathItem, Spec,
+use crate::{
+    spec::{
+        r#ref::{FromRef, Ref, RefError, RefType},
+        PathItem, Spec,
+    },
+    Map,
 };
 
 /// Map of possible out-of band callbacks related to the parent operation.
@@ -29,14 +32,14 @@ pub struct Callback {
     /// runtime, that identifies a URL to use for the callback operation.
     ///
     /// [Path Item Object]: https://spec.openapis.org/oas/v3.1.1#path-item-object
-    pub paths: BTreeMap<String, PathItem>,
+    pub paths: Map<String, PathItem>,
 
     /// Specification extensions.
     ///
     /// Only "x-" prefixed keys are collected, and the prefix is stripped.
     ///
     /// See <https://spec.openapis.org/oas/v3.1.1#specification-extensions>.
-    pub extensions: BTreeMap<String, serde_json::Value>,
+    pub extensions: Map<String, serde_json::Value>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

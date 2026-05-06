@@ -1,8 +1,7 @@
-use std::collections::BTreeMap;
-
 use serde::{Deserialize, Serialize};
 
 use super::{spec_extensions, Server};
+use crate::Map;
 
 /// The Link object represents a possible design-time link for a response.
 ///
@@ -47,10 +46,10 @@ pub enum Link {
         /// [parameter location]: https://spec.openapis.org/oas/v3.1.1#parameterIn
         //
         // FIXME: Implement
-        // parameters: BTreeMap<String, Any | {expression}>,
+        // parameters: Map<String, Any | {expression}>,
         //
-        #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
-        parameters: BTreeMap<String, String>,
+        #[serde(default, skip_serializing_if = "Map::is_empty")]
+        parameters: Map<String, String>,
 
         // FIXME: Implement
         // /// A literal value or
@@ -76,7 +75,7 @@ pub enum Link {
         ///
         /// See <https://spec.openapis.org/oas/v3.1.1#specification-extensions>.
         #[serde(flatten, with = "spec_extensions")]
-        extensions: BTreeMap<String, serde_json::Value>,
+        extensions: Map<String, serde_json::Value>,
     },
 
     /// The name of an _existing_, resolvable OAS operation, as defined with a unique `operationId`.
@@ -96,10 +95,10 @@ pub enum Link {
         /// [parameter location]: https://spec.openapis.org/oas/v3.1.1#parameterIn
         //
         // FIXME: Implement
-        // parameters: BTreeMap<String, Any | {expression}>,
+        // parameters: Map<String, Any | {expression}>,
         //
-        #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
-        parameters: BTreeMap<String, String>,
+        #[serde(default, skip_serializing_if = "Map::is_empty")]
+        parameters: Map<String, String>,
 
         // FIXME: Implement
         // /// A literal value or
@@ -125,6 +124,6 @@ pub enum Link {
         ///
         /// See <https://spec.openapis.org/oas/v3.1.1#specification-extensions>.
         #[serde(flatten, with = "spec_extensions")]
-        extensions: BTreeMap<String, serde_json::Value>,
+        extensions: Map<String, serde_json::Value>,
     },
 }

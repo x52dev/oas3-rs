@@ -1,9 +1,8 @@
-use std::collections::BTreeMap;
-
 use serde::{Deserialize, Serialize};
 use url::Url;
 
 use super::spec_extensions;
+use crate::Map;
 
 /// Allows referencing an external resource for extended documentation.
 ///
@@ -24,5 +23,5 @@ pub struct ExternalDoc {
     ///
     /// See <https://spec.openapis.org/oas/v3.1.1#specification-extensions>.
     #[serde(flatten, with = "spec_extensions")]
-    pub extensions: BTreeMap<String, serde_json::Value>,
+    pub extensions: Map<String, serde_json::Value>,
 }

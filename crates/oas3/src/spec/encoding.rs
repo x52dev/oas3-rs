@@ -1,8 +1,7 @@
-use std::collections::BTreeMap;
-
 use serde::{Deserialize, Serialize};
 
 use super::{Header, ObjectOrReference};
+use crate::Map;
 
 /// A single encoding definition applied to a single schema property.
 #[derive(Debug, Clone, Default, PartialEq, Deserialize, Serialize)]
@@ -21,8 +20,8 @@ pub struct Encoding {
     /// ignored in this section. This property SHALL be ignored if the request body
     /// media type is not a `multipart`.
     #[serde(default)]
-    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
-    pub headers: BTreeMap<String, ObjectOrReference<Header>>,
+    #[serde(skip_serializing_if = "Map::is_empty")]
+    pub headers: Map<String, ObjectOrReference<Header>>,
 
     /// Describes how a specific property value will be serialized depending on its type.
     /// See [Parameter Object](https://spec.openapis.org/oas/v3.1.1#parameter-object)

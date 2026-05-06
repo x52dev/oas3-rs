@@ -1,8 +1,8 @@
 //! Schema specification for [OpenAPI 3.1](https://spec.openapis.org/oas/v3.1.1)
 
-use std::collections::BTreeMap;
-
 use serde::{Deserialize, Serialize};
+
+use crate::Map;
 
 /// A discriminator object can be used to aid in serialization, deserialization, and validation when
 /// payloads may be one of a number of different schemas.
@@ -21,7 +21,7 @@ pub struct Discriminator {
     ///
     /// When using the discriminator, inline schemas will not be considered.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub mapping: Option<BTreeMap<String, String>>,
+    pub mapping: Option<Map<String, String>>,
 }
 
 #[cfg(all(test, feature = "yaml-spec"))]

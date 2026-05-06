@@ -1,9 +1,8 @@
-use std::collections::BTreeMap;
-
 use serde::{Deserialize, Serialize};
 use url::Url;
 
 use super::spec_extensions;
+use crate::Map;
 
 /// Allows configuration of the supported OAuth Flows.
 ///
@@ -33,7 +32,7 @@ pub struct Flows {
     ///
     /// See <https://spec.openapis.org/oas/v3.1.1#specification-extensions>.
     #[serde(flatten, with = "spec_extensions")]
-    pub extensions: BTreeMap<String, serde_json::Value>,
+    pub extensions: Map<String, serde_json::Value>,
 }
 
 /// Configuration details for a implicit OAuth Flow.
@@ -57,7 +56,7 @@ pub struct ImplicitFlow {
     ///
     /// A map between the scope name and a short description for it. The map MAY be empty.
     #[serde(default)]
-    pub scopes: BTreeMap<String, String>,
+    pub scopes: Map<String, String>,
 
     /// Specification extensions.
     ///
@@ -65,7 +64,7 @@ pub struct ImplicitFlow {
     ///
     /// See <https://spec.openapis.org/oas/v3.1.1#specification-extensions>.
     #[serde(flatten, with = "spec_extensions")]
-    pub extensions: BTreeMap<String, serde_json::Value>,
+    pub extensions: Map<String, serde_json::Value>,
 }
 
 /// Configuration details for a password OAuth Flow.
@@ -89,7 +88,7 @@ pub struct PasswordFlow {
     ///
     /// A map between the scope name and a short description for it. The map MAY be empty.
     #[serde(default)]
-    pub scopes: BTreeMap<String, String>,
+    pub scopes: Map<String, String>,
 }
 
 /// Configuration details for a client credentials OAuth Flow.
@@ -113,7 +112,7 @@ pub struct ClientCredentialsFlow {
     ///
     /// A map between the scope name and a short description for it. The map MAY be empty.
     #[serde(default)]
-    pub scopes: BTreeMap<String, String>,
+    pub scopes: Map<String, String>,
 }
 
 /// Configuration details for a authorization code OAuth Flow.
@@ -142,5 +141,5 @@ pub struct AuthorizationCodeFlow {
     ///
     /// A map between the scope name and a short description for it. The map MAY be empty.
     #[serde(default)]
-    pub scopes: BTreeMap<String, String>,
+    pub scopes: Map<String, String>,
 }

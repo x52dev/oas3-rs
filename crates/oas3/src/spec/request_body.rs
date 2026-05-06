@@ -1,8 +1,7 @@
-use std::collections::BTreeMap;
-
 use serde::{Deserialize, Serialize};
 
 use super::{FromRef, MediaType, Ref, RefError, RefType, Spec};
+use crate::Map;
 
 /// Describes a single request body.
 ///
@@ -24,7 +23,7 @@ pub struct RequestBody {
     /// `text/*`.
     ///
     /// [media type range]: https://tools.ietf.org/html/rfc7231#appendix-D
-    pub content: BTreeMap<String, MediaType>,
+    pub content: Map<String, MediaType>,
 
     /// Determines if the request body is required in the request.
     ///

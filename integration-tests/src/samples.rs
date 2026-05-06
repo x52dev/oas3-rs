@@ -1,4 +1,58 @@
-use oas3::Spec;
+use oas3::{spec::ObjectOrReference, Spec};
+
+fn assert_ordered(text: &str, first: &str, second: &str) {
+    let first_index = text
+        .find(first)
+        .unwrap_or_else(|| panic!("expected {first:?} in:\n{text}"));
+    let second_index = text
+        .find(second)
+        .unwrap_or_else(|| panic!("expected {second:?} in:\n{text}"));
+
+    assert!(
+        first_index < second_index,
+        "expected {first:?} before {second:?} in:\n{text}"
+    );
+}
+
+fn assert_spec_preserves_map_order(spec: &Spec) {
+    let paths = spec.paths.as_ref().unwrap();
+    assert_eq!(
+        paths.keys().map(String::as_str).collect::<Vec<_>>(),
+        ["/z", "/a"]
+    );
+
+    let schemas = &spec.components.as_ref().unwrap().schemas;
+    assert_eq!(
+        schemas.keys().map(String::as_str).collect::<Vec<_>>(),
+        ["Zebra", "Apple"]
+    );
+
+    let ObjectOrReference::Object(zebra) = &schemas["Zebra"] else {
+        panic!("expected inline Zebra schema");
+    };
+    assert_eq!(
+        zebra
+            .properties
+            .keys()
+            .map(String::as_str)
+            .collect::<Vec<_>>(),
+        ["beta", "alpha"]
+    );
+
+    assert_eq!(
+        spec.extensions
+            .keys()
+            .map(String::as_str)
+            .collect::<Vec<_>>(),
+        ["meta", "first", "second"]
+    );
+
+    let meta = spec.extensions["meta"].as_object().unwrap();
+    assert_eq!(
+        meta.keys().map(String::as_str).collect::<Vec<_>>(),
+        ["zed", "alpha"]
+    );
+}
 
 #[test]
 fn callback() {
@@ -90,6 +144,106 @@ fn test_security_schemes_choice_yaml() {
 fn test_schema_prefix_items_yaml() {
     let input = include_str!("../samples/pass/schema_prefix_items.yaml");
     validate_sample(input, Format::Yaml);
+}
+
+#[test]
+fn preserves_map_order_when_deserializing_yaml_and_json() {
+    let yaml = indoc::indoc! {"
+        openapi: 3.1.0
+        info:
+          title: order test
+          version: v1
+        paths:
+          /z:
+            get:
+              responses: {}
+          /a:
+            get:
+              responses: {}
+        components:
+          schemas:
+            Zebra:
+              type: object
+              properties:
+                beta:
+                  type: string
+                alpha:
+                  type: string
+            Apple:
+              type: object
+        x-meta:
+          zed: true
+          alpha: true
+        x-first: true
+        x-second: true
+    "};
+
+    let json = indoc::indoc! {r##"
+        {
+          "openapi": "3.1.0",
+          "info": {
+            "title": "order test",
+            "version": "v1"
+          },
+          "paths": {
+            "/z": {
+              "get": {
+                "responses": {}
+              }
+            },
+            "/a": {
+              "get": {
+                "responses": {}
+              }
+            }
+          },
+          "components": {
+            "schemas": {
+              "Zebra": {
+                "type": "object",
+                "properties": {
+                  "beta": {
+                    "type": "string"
+                  },
+                  "alpha": {
+                    "type": "string"
+                  }
+                }
+              },
+              "Apple": {
+                "type": "object"
+              }
+            }
+          },
+          "x-meta": {
+            "zed": true,
+            "alpha": true
+          },
+          "x-first": true,
+          "x-second": true
+        }
+    "##};
+
+    let yaml_spec = oas3::from_yaml(yaml).unwrap();
+    let json_spec = oas3::from_json(json).unwrap();
+
+    assert_spec_preserves_map_order(&yaml_spec);
+    assert_spec_preserves_map_order(&json_spec);
+
+    let output = oas3::to_yaml(&yaml_spec).unwrap();
+    assert_ordered(&output, "/z:", "/a:");
+    assert_ordered(&output, "Zebra:", "Apple:");
+    assert_ordered(&output, "beta:", "alpha:");
+    assert_ordered(&output, "x-meta:", "x-first:");
+    assert_ordered(&output, "x-first:", "x-second:");
+    assert_ordered(&output, "zed: true", "alpha: true");
+
+    let output = oas3::to_json(&json_spec).unwrap();
+    assert_ordered(&output, "\"/z\"", "\"/a\"");
+    assert_ordered(&output, "\"Zebra\"", "\"Apple\"");
+    assert_ordered(&output, "\"beta\"", "\"alpha\"");
+    assert_ordered(&output, "\"x-meta\"", "\"x-first\"");
+    assert_ordered(&output, "\"x-first\"", "\"x-second\"");
 }
 
 /// Describes the format of the text input.

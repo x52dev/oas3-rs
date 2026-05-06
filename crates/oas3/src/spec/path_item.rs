@@ -1,9 +1,8 @@
-use std::collections::BTreeMap;
-
 use http::Method;
 use serde::{Deserialize, Serialize};
 
 use super::{spec_extensions, ObjectOrReference, Operation, Parameter, Server};
+use crate::Map;
 
 /// Describes the operations available on a single path.
 ///
@@ -90,7 +89,7 @@ pub struct PathItem {
     ///
     /// See <https://spec.openapis.org/oas/v3.1.1#specification-extensions>.
     #[serde(flatten, with = "spec_extensions")]
-    pub extensions: BTreeMap<String, serde_json::Value>,
+    pub extensions: Map<String, serde_json::Value>,
 }
 
 impl PathItem {
@@ -113,7 +112,6 @@ impl PathItem {
         push_method!(options, OPTIONS);
         push_method!(head, HEAD);
         push_method!(patch, PATCH);
-        push_method!(trace, TRACE);
         push_method!(trace, TRACE);
 
         methods

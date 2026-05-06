@@ -1,6 +1,6 @@
 [package]
 name = "oas3"
-description = "Structures and tools to parse, navigate, and validate OpenAPI v3.1.xß specifications"
+description = "Structures and tools to parse, navigate, and validate OpenAPI v3.1.x specifications"
 version = "0.21.0"
 authors = ["softprops <d.tangren@gmail.com>", "Rob Ede <robjtede@icloud.com>"]
 keywords = ["openapi", "oas3", "swagger", "api", "oas"]
@@ -13,13 +13,18 @@ rust-version = { workspace = true }
 [package.metadata.docs.rs]
 all-features = true
 
+[package.metadata.cargo_check_external_types]
+allowed_external_types = ["http::*", "semver::*", "serde_core::*", "serde_json::*", "url::*", "yaml_serde::*"]
+
 [features]
-default = []
+default = ["preserve-order"]
+preserve-order = ["serde_json/preserve_order"]
 yaml-spec = ["dep:yaml_serde"]
 
 [dependencies]
 derive_more = { workspace = true, features = ["display", "error", "from"] }
 http = { workspace = true }
+indexmap = { workspace = true }
 log = { workspace = true }
 once_cell = { workspace = true }
 regex = { workspace = true }

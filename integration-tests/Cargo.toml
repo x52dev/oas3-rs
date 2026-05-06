@@ -5,7 +5,8 @@ rust-version.workspace = true
 
 [dependencies]
 assert_matches = { workspace = true }
-oas3 = { workspace = true, features = ["yaml-spec"] }
+indoc = { workspace = true }
+oas3 = { workspace = true, features = ["preserve-order", "yaml-spec"] }
 serde_json = { workspace = true }
 serde_path_to_error = { workspace = true }
 yaml_serde = { workspace = true }
