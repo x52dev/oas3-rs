@@ -4,7 +4,7 @@
 
 ## 0.12.0
 
-- No significant changes since `0.11.0`.
+- Update `oas3` dependency to `0.22`.
 
 ## 0.11.0
 
