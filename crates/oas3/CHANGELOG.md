@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.21.1
+
 - Support boolean schemas in schema-bearing fields including `spec::Components::schemas`,
   `spec::MediaType::schema`, `spec::Parameter::schema`, `spec::Header::schema`, and
   `spec::ObjectSchema::{all_of, any_of, one_of, prefix_items, properties}`.
