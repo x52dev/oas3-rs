@@ -1,0 +1,7 @@
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: Containerfile.dev
+  
+  
