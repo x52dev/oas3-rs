@@ -242,4 +242,69 @@ components:
             from_reader(yaml.as_bytes()).unwrap()
         );
     }
+
+        #[test]
+    fn json_schema_dialect_parses_when_present() {
+        let spec = from_yaml(indoc::indoc! {"
+            openapi: 3.1.1
+            info:
+              title: Test
+              version: 1.0.0
+            jsonSchemaDialect: https://example.com/my-dialect
+        "})
+        .unwrap();
+
+        assert_eq!(
+            spec.json_schema_dialect.as_deref(),
+            Some("https://example.com/my-dialect")
+        );
+        assert_eq!(spec.schema_dialect(), "https://example.com/my-dialect");
+    }
+
+    #[test]
+    fn json_schema_dialect_is_none_when_absent() {
+        let spec = from_yaml(indoc::indoc! {"
+            openapi: 3.1.1
+            info:
+              title: Test
+              version: 1.0.0
+        "})
+        .unwrap();
+
+        assert_eq!(spec.json_schema_dialect, None);
+    }
+
+    #[test]
+    fn schema_dialect_returns_default_when_absent() {
+        let spec = from_yaml(indoc::indoc! {"
+            openapi: 3.1.1
+            info:
+              title: Test
+              version: 1.0.0
+        "})
+        .unwrap();
+
+        assert_eq!(
+            spec.schema_dialect(),
+            spec::OAS_DIALECT_ID
+        );
+    }
+
+    #[test]
+    fn json_schema_dialect_json_round_trip() {
+        let json = serde_json::json!({
+            "openapi": "3.1.1",
+            "info": {
+                "title": "Test",
+                "version": "1.0.0"
+            },
+            "jsonSchemaDialect": "https://example.com/my-dialect"
+        });
+
+        let spec: OpenApiV3Spec =
+            serde_json::from_value(json.clone()).expect("should parse JSON");
+        let output = serde_json::to_value(&spec).expect("should serialize to JSON");
+
+        assert_eq!(output["jsonSchemaDialect"], json["jsonSchemaDialect"]);
+    }
 }

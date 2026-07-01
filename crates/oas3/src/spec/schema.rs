@@ -116,6 +116,14 @@ pub struct ObjectSchema {
     // https://json-schema.org/draft/2020-12/json-schema-core#name-keywords-for-applying-subsch
     // #########################################################################
 
+    /// The `$schema` keyword may be present in any Schema Object that is a schema resource root,
+    /// and if present MUST be used to determine which dialect should be used when processing
+    /// the schema. Overrides `jsonSchemaDialect` from the OpenAPI Object.
+    ///
+    /// See <https://spec.openapis.org/oas/v3.1.1#specifying-schema-dialects>.
+    #[serde(rename = "$schema", skip_serializing_if = "Option::is_none")]
+    pub schema: Option<String>,
+
     //
     /// An instance validates successfully against this keyword if it validates successfully against
     /// all schemas defined by this keyword's value.
@@ -558,6 +566,17 @@ impl ObjectSchema {
             TypeSet::Multiple(set) => set.contains(&Type::Null),
         })
     }
+
+    /// Returns the effective JSON Schema dialect for this schema.
+    ///
+    /// Resolution order: `$schema` on this object → `jsonSchemaDialect` on the spec →
+    /// [`super::OAS_DIALECT_ID`].
+    pub fn effective_schema<'s>(&'s self, spec: &'s Spec) -> &'s str {
+        self.schema
+            .as_deref()
+            .or(spec.json_schema_dialect.as_deref())
+            .unwrap_or(super::OAS_DIALECT_ID)
+    }
 }
 
 /// A boolean JSON schema.
@@ -967,5 +986,112 @@ mod tests {
         let schema2: ObjectSchema =
             serde_json::from_str(&json_output).expect("should parse JSON again");
         assert_eq!(schema, schema2);
+    }
+
+    #[test]
+    fn schema_keyword_parses_when_present() {
+        let spec = indoc::indoc! {r#"
+            $schema: https://example.com/custom-dialect
+            type: string
+        "#};
+        let schema = yaml_serde::from_str::<ObjectSchema>(spec).unwrap();
+
+        assert_eq!(
+            schema.schema.as_deref(),
+            Some("https://example.com/custom-dialect")
+        );
+        assert_eq!(schema.schema_type, Some(TypeSet::Single(Type::String)));
+    }
+
+    #[test]
+    fn schema_keyword_is_none_when_absent() {
+        let spec = indoc::indoc! {"
+            type: string
+        "};
+        let schema = yaml_serde::from_str::<ObjectSchema>(spec).unwrap();
+
+        assert_eq!(schema.schema, None);
+        assert_eq!(schema.schema_type, Some(TypeSet::Single(Type::String)));
+    }
+
+    #[test]
+    fn schema_keyword_round_trip() {
+        let spec = indoc::indoc! {r#"
+            $schema: https://spec.openapis.org/oas/3.1/dialect/base
+            properties:
+              name:
+                type: string
+            type: object
+        "#};
+
+        let original = yaml_serde::from_str::<ObjectSchema>(spec).unwrap();
+        let serialized = yaml_serde::to_string(&original).unwrap();
+
+        pretty_assertions::assert_eq!(spec, serialized);
+    }
+
+    #[test]
+    fn effective_schema_uses_own_schema_first() {
+        let spec = crate::from_yaml(indoc::indoc! {"
+            openapi: 3.1.1
+            info:
+              title: Test
+              version: 1.0.0
+            jsonSchemaDialect: https://example.com/spec-dialect
+        "})
+        .unwrap();
+
+        let schema = ObjectSchema {
+            schema: Some("https://example.com/own-dialect".into()),
+            ..Default::default()
+        };
+
+        assert_eq!(
+            schema.effective_schema(&spec),
+            "https://example.com/own-dialect"
+        );
+    }
+
+    #[test]
+    fn effective_schema_falls_back_to_spec_dialect() {
+        let spec = crate::from_yaml(indoc::indoc! {"
+            openapi: 3.1.1
+            info:
+              title: Test
+              version: 1.0.0
+            jsonSchemaDialect: https://example.com/spec-dialect
+        "})
+        .unwrap();
+
+        let schema = ObjectSchema {
+            schema: None,
+            ..Default::default()
+        };
+
+        assert_eq!(
+            schema.effective_schema(&spec),
+            "https://example.com/spec-dialect"
+        );
+    }
+
+    #[test]
+    fn effective_schema_falls_back_to_oas_default() {
+        let spec = crate::from_yaml(indoc::indoc! {"
+            openapi: 3.1.1
+            info:
+              title: Test
+              version: 1.0.0
+        "})
+        .unwrap();
+
+        let schema = ObjectSchema {
+            schema: None,
+            ..Default::default()
+        };
+
+        assert_eq!(
+            schema.effective_schema(&spec),
+            super::super::OAS_DIALECT_ID
+        );
     }
 }
