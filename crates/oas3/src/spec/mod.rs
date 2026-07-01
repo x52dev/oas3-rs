@@ -256,7 +256,6 @@ impl Spec {
     }
 }
 
-
 /// The default OAS 3.1 JSON Schema dialect URI, used when `jsonSchemaDialect` is not set.
 ///
 /// See <https://spec.openapis.org/oas/v3.1.1#fixed-fields>.

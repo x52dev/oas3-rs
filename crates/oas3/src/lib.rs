@@ -243,7 +243,7 @@ components:
         );
     }
 
-        #[test]
+    #[test]
     fn json_schema_dialect_parses_when_present() {
         let spec = from_yaml(indoc::indoc! {"
             openapi: 3.1.1
@@ -284,10 +284,7 @@ components:
         "})
         .unwrap();
 
-        assert_eq!(
-            spec.schema_dialect(),
-            spec::OAS_DIALECT_ID
-        );
+        assert_eq!(spec.schema_dialect(), spec::OAS_DIALECT_ID);
     }
 
     #[test]
@@ -301,8 +298,7 @@ components:
             "jsonSchemaDialect": "https://example.com/my-dialect"
         });
 
-        let spec: OpenApiV3Spec =
-            serde_json::from_value(json.clone()).expect("should parse JSON");
+        let spec: OpenApiV3Spec = serde_json::from_value(json.clone()).expect("should parse JSON");
         let output = serde_json::to_value(&spec).expect("should serialize to JSON");
 
         assert_eq!(output["jsonSchemaDialect"], json["jsonSchemaDialect"]);

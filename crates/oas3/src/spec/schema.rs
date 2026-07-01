@@ -115,7 +115,6 @@ pub struct ObjectSchema {
     // Keywords for Applying Subschemas With Logic
     // https://json-schema.org/draft/2020-12/json-schema-core#name-keywords-for-applying-subsch
     // #########################################################################
-
     /// The `$schema` keyword may be present in any Schema Object that is a schema resource root,
     /// and if present MUST be used to determine which dialect should be used when processing
     /// the schema. Overrides `jsonSchemaDialect` from the OpenAPI Object.
@@ -1088,9 +1087,6 @@ mod tests {
             ..Default::default()
         };
 
-        assert_eq!(
-            schema.effective_schema(&spec),
-            super::super::OAS_DIALECT_ID
-        );
+        assert_eq!(schema.effective_schema(&spec), super::super::OAS_DIALECT_ID);
     }
 }
