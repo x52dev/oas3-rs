@@ -574,8 +574,7 @@ impl ObjectSchema {
     pub fn effective_schema<'s>(&'s self, spec: &'s Spec) -> &'s str {
         self.schema
             .as_deref()
-            .or(spec.json_schema_dialect.as_deref())
-            .unwrap_or(super::OAS_DIALECT_ID)
+            .unwrap_or_else(|| spec.schema_dialect())
     }
 }
 
