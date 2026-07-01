@@ -1,0 +1,3 @@
+FROM docker.io/rust:latest
+
+RUN rustup component add rustfmt

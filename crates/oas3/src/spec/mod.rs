@@ -157,6 +157,16 @@ pub struct Spec {
     /// See <https://spec.openapis.org/oas/v3.1.1#specification-extensions>.
     #[serde(flatten, with = "spec_extensions")]
     pub extensions: Map<String, serde_json::Value>,
+
+    /// The default value for the `$schema` keyword within Schema Objects contained within this
+    /// OAS document. This MUST be in the form of a URI.
+    ///
+    /// If this field is absent, the default value is the OAS dialect schema id:
+    /// [`OAS_DIALECT_ID`].
+    ///
+    /// See <https://spec.openapis.org/oas/v3.1.1#fixed-fields>.
+    #[serde(rename = "jsonSchemaDialect", skip_serializing_if = "Option::is_none")]
+    pub json_schema_dialect: Option<String>,
 }
 
 impl Spec {
@@ -235,4 +245,18 @@ impl Spec {
     pub fn primary_server(&self) -> Option<&Server> {
         self.servers.first()
     }
+
+    /// Returns the effective JSON Schema dialect for this spec.
+    ///
+    /// Falls back to [`OAS_DIALECT_ID`] when `jsonSchemaDialect` is not set.
+    pub fn schema_dialect(&self) -> &str {
+        self.json_schema_dialect
+            .as_deref()
+            .unwrap_or(OAS_DIALECT_ID)
+    }
 }
+
+/// The default OAS 3.1 JSON Schema dialect URI, used when `jsonSchemaDialect` is not set.
+///
+/// See <https://spec.openapis.org/oas/v3.1.1#fixed-fields>.
+pub const OAS_DIALECT_ID: &str = "https://spec.openapis.org/oas/3.1/dialect/base";

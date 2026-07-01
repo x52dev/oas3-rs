@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Add `jsonSchemaDialect` to `Spec` and `$schema` to `ObjectSchema`.
+  - `Spec::schema_dialect()` returns the effective dialect, falling back to the OAS 3.1 default.
+  - `ObjectSchema::effective_schema(&Spec)` resolves per-schema `$schema` → `jsonSchemaDialect` → OAS default.
+
 ## 0.22.0
 
 - Support boolean schemas in schema-bearing fields including `spec::Components::schemas`,
