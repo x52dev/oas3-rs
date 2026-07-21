@@ -2,7 +2,7 @@ _list:
     @just --list
 
 toolchain := ""
-external_types_toolchain := "nightly-2025-10-18"
+external_types_toolchain := "nightly-2026-03-20"
 msrv := ```
     cargo metadata --format-version=1 \
     | jq -r 'first(.packages[] | select(.source == null and .rust_version)) | .rust_version' \
