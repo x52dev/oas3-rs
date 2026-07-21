@@ -32,7 +32,7 @@ match oas3::from_yaml(yaml) {
 }
 ```
 
-## Order Preservation
+## Map Order Preservation
 
 OpenAPI maps are represented by [`Map`], an order-preserving map type. When a
 document is deserialized, map entries keep the order they had in the input

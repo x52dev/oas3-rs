@@ -62,7 +62,7 @@ impl ConformanceTestSpec {
     }
 
     pub fn resolve(&self, spec: &Spec) -> Result<ResolvedConformanceTestSpec, Error> {
-        trace!("resolving: {:?}", &self.operation);
+        trace!("resolving: {:?}", self.operation);
 
         let mut req = self.resolve_request(spec)?;
 
@@ -78,7 +78,7 @@ impl ConformanceTestSpec {
     }
 
     pub fn resolve_test_operation(&self, spec: &Spec) -> Result<TestOperation, Error> {
-        trace!("resolve_test_operation: {:?}", &self.operation);
+        trace!("resolve_test_operation: {:?}", self.operation);
 
         let test_op = match &self.operation {
             OperationSpec::Parts { method, path } => {
@@ -88,7 +88,7 @@ impl ConformanceTestSpec {
             OperationSpec::OperationId(op_id) => spec
                 .operations()
                 .find(|(path, method, op)| {
-                    trace!("checking {} {} ({:?})", &method, &path, &op);
+                    trace!("checking {method} {path} ({op:?})");
 
                     op.operation_id
                         .as_ref()
@@ -141,7 +141,7 @@ impl ConformanceTestSpec {
     }
 
     pub fn resolve_request(&self, spec: &Spec) -> Result<TestRequest, Error> {
-        trace!("resolving request: {:?}", &self.operation);
+        trace!("resolving request: {:?}", self.operation);
 
         let test_op = self.resolve_test_operation(spec)?;
         let op = test_op.resolve_operation(spec)?;
@@ -173,24 +173,23 @@ impl ConformanceTestSpec {
             } => {
                 let req_body = op.request_body(spec)?.unwrap();
                 let media_spec = req_body.content.get(media_type).ok_or(SpecError::Ref(
-                    RefError::Unresolvable(format!("mediaType/{}", &name)),
+                    RefError::Unresolvable(format!("mediaType/{name}")),
                 ))?;
                 let schema = media_spec.schema(spec)?.unwrap();
                 let examples = media_spec.examples(spec);
                 let example = examples
                     .get(name)
                     .ok_or(SpecError::Ref(RefError::Unresolvable(format!(
-                        "example/{}",
-                        &name
+                        "example/{name}"
                     ))))?;
 
                 if let Some(ref ex) = example.value {
                     // check example validity
                     let validator = ValidationTree::from_schema_document(&schema, spec)?;
 
-                    debug!("validating example: {:?}", &ex);
-                    debug!("against schema: {:?}", &schema);
-                    debug!("with validator: {:?}", &validator);
+                    debug!("validating example: {ex:?}");
+                    debug!("against schema: {schema:?}");
+                    debug!("with validator: {validator:?}");
 
                     // TODO: restore
                     // validator.validate(&ex)?;
@@ -238,10 +237,10 @@ impl ConformanceTestSpec {
                     // traverse spec
                     let responses = op.responses(spec);
                     let status_spec = responses.get(status.as_str()).ok_or(SpecError::Ref(
-                        RefError::Unresolvable(format!("status/{}", &status.as_u16())),
+                        RefError::Unresolvable(format!("status/{}", status.as_u16())),
                     ))?;
                     let media_spec = status_spec.content.get(media_type).ok_or(SpecError::Ref(
-                        RefError::Unresolvable(format!("mediaType/{}", &media_type)),
+                        RefError::Unresolvable(format!("mediaType/{media_type}")),
                     ))?;
                     let schema = media_spec.schema(spec)?.unwrap();
 
@@ -263,10 +262,10 @@ impl ConformanceTestSpec {
                     // traverse spec
                     let reses = op.responses(spec);
                     let status_spec = reses.get(status.as_str()).ok_or(SpecError::Ref(
-                        RefError::Unresolvable(format!("status/{}", &status.as_u16())),
+                        RefError::Unresolvable(format!("status/{}", status.as_u16())),
                     ))?;
                     let media_spec = status_spec.content.get(media_type).ok_or(SpecError::Ref(
-                        RefError::Unresolvable(format!("mediaType/{}", &media_type)),
+                        RefError::Unresolvable(format!("mediaType/{media_type}")),
                     ))?;
                     let schema = media_spec.schema(spec)?.unwrap();
                     let examples = media_spec.examples(spec);
@@ -274,8 +273,7 @@ impl ConformanceTestSpec {
                         examples
                             .get(name)
                             .ok_or(SpecError::Ref(RefError::Unresolvable(format!(
-                                "example/{}",
-                                &name
+                                "example/{name}"
                             ))))?;
 
                     // create validator
@@ -284,9 +282,9 @@ impl ConformanceTestSpec {
                     if let Some(ref ex) = example.value {
                         // check example validity
 
-                        debug!("validating example: {:?}", &ex);
-                        debug!("against schema: {:?}", &schema);
-                        debug!("with validator: {:?}", &validator);
+                        debug!("validating example: {ex:?}");
+                        debug!("against schema: {schema:?}");
+                        debug!("with validator: {validator:?}");
 
                         validator.validate(ex).map_err(Error::Validation)?;
                     }

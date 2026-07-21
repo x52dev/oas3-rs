@@ -60,7 +60,7 @@ impl TestOperation {
     }
 
     pub fn resolve_operation<'a>(&self, spec: &'a Spec) -> Result<&'a Operation, ValidationError> {
-        debug!("resolving op {:?}", &self);
+        debug!("resolving op {self:?}");
 
         spec.operation(&self.method, &self.path).ok_or_else(|| {
             ValidationError::OperationNotFound(self.method.clone(), self.path.clone())
