@@ -32,7 +32,7 @@ impl ValidationTree {
     pub fn from_schema(schema: &ObjectSchema, spec: &Spec) -> Result<ValidationTree, SchemaError> {
         trace!(
             "creating validation tree from schema: {}",
-            &schema.title.as_deref().unwrap_or("_unnamed_")
+            schema.title.as_deref().unwrap_or("_unnamed_")
         );
 
         let mut valtree = ValidationTree {
@@ -76,7 +76,7 @@ impl ValidationTree {
                 valtree.branch = ValidationBranch::Object(vls);
 
                 if !schema.required.is_empty() {
-                    trace!("required fields: {:?}", &schema.required);
+                    trace!("required fields: {:?}", schema.required);
 
                     let req_fields = RequiredFields::new(schema.required.clone());
                     valtree.validators.push(Box::new(req_fields));

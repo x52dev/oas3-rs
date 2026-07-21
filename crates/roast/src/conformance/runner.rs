@@ -120,8 +120,8 @@ impl TestRunner {
     }
 
     async fn run_test(&self, test: ResolvedConformanceTestSpec) -> Result<TestResponse, Error> {
-        debug!("request: {:?}", &test.request);
-        debug!("response spec: {:?}", &test.response);
+        debug!("request: {:?}", test.request);
+        debug!("response spec: {:?}", test.response);
 
         let res = self.send_request(&test.request).await?;
 
@@ -168,7 +168,7 @@ impl TestRunner {
                 let num = Arc::clone(&num).fetch_sub(1, Ordering::SeqCst);
 
                 println!("running test: {num}");
-                trace!("run test: {:?}", &test);
+                trace!("run test: {test:?}");
 
                 self.run_test(test).map(|result| (test_spec, result))
             })
