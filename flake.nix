@@ -2,6 +2,11 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     flake-parts.url = "github:hercules-ci/flake-parts";
+    x52 = {
+      url = "github:x52dev/nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-parts.follows = "flake-parts";
+    };
   };
 
   outputs = inputs@{ flake-parts, ... }:
@@ -13,6 +18,7 @@
         devShells.default = pkgs.mkShell {
           packages = [
             config.formatter
+            inputs'.x52.packages.x52-release-tools
             pkgs.cargo-rdme
             pkgs.just
             pkgs.libgit2
