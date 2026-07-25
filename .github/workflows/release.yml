@@ -41,7 +41,7 @@ jobs:
 
       - name: Set up FlakeHub Cache
         if: ${{ steps.release-plz.outputs.prs_created == 'true' || steps.release-plz.outputs.releases_created == 'true' }}
-        uses: DeterminateSystems/flakehub-cache-action@3be0931021788e3bb4df65f59a555039c2fa2d46 # v3.21.7
+        uses: DeterminateSystems/flakehub-cache-action@77c6bddd7d747943530aaa578c57f233ee5d920e # v3.21.8
 
       - name: Enter Nix devshell
         if: ${{ steps.release-plz.outputs.prs_created == 'true' || steps.release-plz.outputs.releases_created == 'true' }}
