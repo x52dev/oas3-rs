@@ -11,7 +11,7 @@
 [![codecov](https://codecov.io/gh/x52dev/oas3-rs/graph/badge.svg?token=OpYe6I7dj5)](https://codecov.io/gh/x52dev/oas3-rs)
 ![Version](https://img.shields.io/crates/msrv/oas3.svg)
 [![Download](https://img.shields.io/crates/d/oas3.svg)](https://crates.io/crates/oas3)
-[![Discord: Join chat](https://img.shields.io/badge/Discord-Join%20chat-5865F2?logo=discord&logoColor=white)](https://discord.gg/Vjdw8UE5kS)
+[![Chat on Discord](https://img.shields.io/discord/1554698838651179088?label=chat&logo=discord)](https://discord.gg/Vjdw8UE5kS)
 
 <!-- prettier-ignore-end -->
 
