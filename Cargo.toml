@@ -33,18 +33,17 @@ semver = "1"
 serde = "1"
 serde_json = "1"
 serde_path_to_error = "0.1.20"
-serde_with = "3"
 tokio = "1.52.3"
 url = "2"
 yaml_serde = "0.10"
 
 [workspace.lints.rust]
-rust-2018-idioms = "deny"
-nonstandard-style = "deny"
-future-incompatible = "deny"
-missing-debug-implementations = { level = "warn", priority = -1 }
-missing-docs = { level = "warn", priority = -1 }
+rust_2018_idioms = "deny"
+nonstandard_style = "deny"
+future_incompatible = "deny"
+missing_debug_implementations = { level = "warn", priority = -1 }
+missing_docs = { level = "warn", priority = -1 }
 
 [workspace.lints.clippy]
-uninlined-format-args = "warn"
-disallowed-names = "warn"
+uninlined_format_args = "warn"
+disallowed_names = "warn"
