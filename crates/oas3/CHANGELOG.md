@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.22.1
+
+- No significant changes since `0.22.0`.
+
 ## 0.22.0
 
 - Support boolean schemas in schema-bearing fields including `spec::Components::schemas`,
