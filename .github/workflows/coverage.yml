@@ -19,7 +19,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Prepare Nix devshell
+      - name: Set up Nix devshell
         id: devshell
         background: true
         uses: $/.github/actions/prepare-nix
@@ -36,13 +36,8 @@ jobs:
         with:
           tool: just,cargo-llvm-cov
 
-      - name: Wait for Nix devshell preparation
+      - name: Wait for Nix devshell
         wait: devshell
-
-      - name: Enter Nix devshell
-        uses: nicknovitski/nix-develop@9be7cfb4b10451d3390a75dc18ad0465bed4932a # v1.2.1
-        with:
-          arguments: .#ci
 
       - name: Generate code coverage
         run: just test-coverage-codecov
