@@ -89,6 +89,51 @@ fn issue_318() {
 }
 
 #[test]
+fn issue_281_ref_schema_siblings_are_preserved() {
+    use indoc::indoc;
+    use oas3::spec::Schema;
+
+    let spec = oas3::from_yaml(indoc! {r#"
+        openapi: 3.1.0
+        info:
+          title: Test API
+          version: "0.1"
+        paths: {}
+        components:
+          schemas:
+            Pet:
+              type: object
+              properties:
+                id:
+                  type: integer
+            PetRequest:
+              $ref: '#/components/schemas/Pet'
+              description: Request payload for a pet
+              required: [id]
+              writeOnly: true
+    "#})
+    .unwrap();
+
+    let resolved = resolved_object_schema(
+        spec.components.as_ref().unwrap().schemas["PetRequest"].clone(),
+        &spec,
+    );
+
+    assert_eq!(resolved.all_of.len(), 2);
+
+    let Schema::Object(siblings) = &resolved.all_of[1] else {
+        panic!("expected `$ref` siblings to be represented as a schema object");
+    };
+    let ObjectOrReference::Object(siblings) = siblings.as_ref() else {
+        panic!("expected inline `$ref` siblings");
+    };
+
+    assert_eq!(siblings.description.as_deref(), Some("Request payload for a pet"));
+    assert_eq!(siblings.required, vec!["id".to_owned()]);
+    assert_eq!(siblings.write_only, Some(true));
+}
+
+#[test]
 fn boolean_schemas_in_schema_bearing_fields() {
     use assert_matches::assert_matches;
     use indoc::indoc;
