@@ -598,7 +598,9 @@ impl<'de> Deserialize<'de> for Schema {
         }
 
         let serde_json::Value::Object(mut object) = value else {
-            return Err(serde::de::Error::custom("expected a schema object or boolean"));
+            return Err(serde::de::Error::custom(
+                "expected a schema object or boolean",
+            ));
         };
 
         let Some(reference) = object.remove("$ref") else {
@@ -620,7 +622,10 @@ impl<'de> Deserialize<'de> for Schema {
             .map_err(serde::de::Error::custom)?;
 
         Ok(Schema::new_object(ObjectSchema {
-            all_of: vec![Schema::Object(Box::new(reference)), Schema::new_object(siblings)],
+            all_of: vec![
+                Schema::Object(Box::new(reference)),
+                Schema::new_object(siblings),
+            ],
             ..ObjectSchema::default()
         }))
     }

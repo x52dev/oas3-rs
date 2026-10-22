@@ -128,7 +128,10 @@ fn issue_281_ref_schema_siblings_are_preserved() {
         panic!("expected inline `$ref` siblings");
     };
 
-    assert_eq!(siblings.description.as_deref(), Some("Request payload for a pet"));
+    assert_eq!(
+        siblings.description.as_deref(),
+        Some("Request payload for a pet")
+    );
     assert_eq!(siblings.required, vec!["id".to_owned()]);
     assert_eq!(siblings.write_only, Some(true));
 }
