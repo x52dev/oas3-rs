@@ -112,6 +112,11 @@ impl ValidationTree {
             Some(_) => {}
 
             None => {
+                if !schema.required.is_empty() {
+                    let req_fields = RequiredFields::new(schema.required.clone());
+                    valtree.validators.push(Box::new(req_fields));
+                }
+
                 // allOf without a `type: object` declaration
                 if !schema.all_of.is_empty() {
                     let vs = schema
@@ -206,7 +211,9 @@ impl ValidationTree {
             ValidationBranch::Reject => Err(Error::FalseSchema(path)),
 
             ValidationBranch::AllOf(vs) => {
-                // TODO: error if any self validations
+                for v in &self.validators {
+                    v.validate(val, path.clone())?;
+                }
 
                 // it's arguable if this should be an error, it may be okay to have an
                 // allOf that's not an object, and even so the validation error will
@@ -573,6 +580,32 @@ components:
     }
 
     #[test]
+    fn all_of_schema_validates_its_own_required_fields() {
+        let spec_str = r#"openapi: "3"
+paths: {}
+info:
+  title: Test API
+  version: "0.1"
+components:
+  schemas:
+    data:
+      allOf:
+      - { type: object, properties: { name: { type: string } } }
+      required: [name]
+"#;
+
+        let spec = oas3::from_yaml(spec_str).unwrap();
+        let schema = get_schema(&spec, "data");
+        let valtree = ValidationTree::from_schema(&schema, &spec).unwrap();
+
+        assert!(valtree.validate(&json!({ "name": "present" })).is_ok());
+        assert!(matches!(
+            valtree.validate(&json!({})),
+            Err(Error::RequiredFieldMissing(path)) if path.to_string() == "name"
+        ));
+    }
+
+    #[test]
     fn any_of_from_schema() {
         let spec_str = r#"openapi: "3"
 paths: {}
@@ -621,3 +654,4 @@ components:
         valtree.validate(&test).unwrap_err();
     }
 }
+
