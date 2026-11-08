@@ -43,7 +43,7 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@ecabd13d1c56bd1345c230e542e9144811ad706f # v2.0.0
         with:
           toolchain: ${{ matrix.toolchain.version }}
-          cache-key: ${{ hashFiles('flake.lock') }}
+          cache-key: ${{ hashFiles('flake.lock', 'flake.nix') }}
 
       - name: Install Nix
         uses: nixbuild/nix-quick-install-action@9f63be77f412a248c9d9a65a4c82cf066cdf8f0c # v35
