@@ -12,6 +12,10 @@ updates:
       interval: monthly
     cooldown:
       default-days: 7
+    groups:
+      all:
+        patterns:
+          - "*"
   - package-ecosystem: cargo
     directory: /
     schedule:
