@@ -570,7 +570,7 @@ pub struct BooleanSchema(pub bool);
 /// A JSON schema document.
 ///
 /// See <https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-01#name-json-schema-documents>.
-#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq, Serialize)]
 #[serde(untagged)]
 pub enum Schema {
     /// A boolean JSON schema.
@@ -583,6 +583,51 @@ pub enum Schema {
 impl Schema {
     fn new_object(schema: ObjectSchema) -> Self {
         Schema::Object(Box::new(ObjectOrReference::Object(schema)))
+    }
+}
+
+impl<'de> Deserialize<'de> for Schema {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let value = serde_json::Value::deserialize(deserializer)?;
+
+        if let Some(value) = value.as_bool() {
+            return Ok(Schema::Boolean(BooleanSchema(value)));
+        }
+
+        let serde_json::Value::Object(mut object) = value else {
+            return Err(serde::de::Error::custom(
+                "expected a schema object or boolean",
+            ));
+        };
+
+        let Some(reference) = object.remove("$ref") else {
+            let schema = serde_json::from_value(serde_json::Value::Object(object))
+                .map_err(serde::de::Error::custom)?;
+            return Ok(Schema::new_object(schema));
+        };
+
+        let reference = serde_json::from_value::<ObjectOrReference<ObjectSchema>>(
+            serde_json::json!({ "$ref": reference }),
+        )
+        .map_err(serde::de::Error::custom)?;
+
+        if object.is_empty() {
+            return Ok(Schema::Object(Box::new(reference)));
+        }
+
+        let siblings = serde_json::from_value(serde_json::Value::Object(object))
+            .map_err(serde::de::Error::custom)?;
+
+        Ok(Schema::new_object(ObjectSchema {
+            all_of: vec![
+                Schema::Object(Box::new(reference)),
+                Schema::new_object(siblings),
+            ],
+            ..ObjectSchema::default()
+        }))
     }
 }
 
